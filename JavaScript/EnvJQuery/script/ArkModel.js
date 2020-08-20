@@ -1,7 +1,7 @@
 function ArkModel () {
 	this.data = {};
 
-	this.dustSelect = function (... path) {
+	this.selectEntity = function (... path) {
 	    var ret = data;
 	
 		for (member of path) {
@@ -14,12 +14,12 @@ function ArkModel () {
 		return ret;
 	}
 
-	function dustGet(entity, key) {
+	function getValue(entity, key) {
 		var e = data[entity];
 		return e ? e[key] : null;
 	}
 
-	function dustSet(entity, key, val) {
+	function setValue(entity, key, val) {
 		var e = data[entity];
 		
 		if ( !entity ) {
@@ -28,11 +28,11 @@ function ArkModel () {
 		var ret = entity[key];
 		entity[key] = val;
 		
-		$('[comp-id=' + id + ']').detach();
-	
-		$(".rtmsValueEdit").trigger('rtmsEventReload', { e: entity, k : key, v: val } );
+		$('[ark-dataEntity=' + entity + ']').trigger('arkEventReload', { e: entity, k : key, v: val } );
+//		$('[ark-dataEntity=' + entity + ']').('[ark-dataKey=' + key + ']').trigger('arkEventReload', { e: entity, k : key, v: val } );
 	
 		return ret;
 	}
-	console.log("Hello, world from ArkModel.");
+	
+	console.log("Hello, world from ArkModel. 01");
 }
