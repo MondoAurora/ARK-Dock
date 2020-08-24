@@ -1,5 +1,5 @@
 
-if ( !("ARKBase" in window) ){
+if ( !('ARKBase' in window) ){
 	function ArkBase () {
 		this.getPath = function(root, rel) {
 			var path = null;
@@ -23,6 +23,7 @@ if ( !("ARKBase" in window) ){
 		}
 		
 		this.Tokens = {};
+		this.TokenInfo = {};
 		
 		this.addModule = function(module, ... tokens) {
 			var mod = this.Tokens[module];
@@ -32,9 +33,13 @@ if ( !("ARKBase" in window) ){
 				this.Tokens[module] = mod;
 				
 				for (t of tokens) {
-					var id = t.type + '_' + t.id;
+					var id = t.type + '_' + module + '_' + t.id;
 					var entity = t.entity ? t.entity : id;
 					mod[id] = entity;
+					
+					if ( t.info ) {
+						this.TokenInfo[id] = t.info;
+					}
 				}
 			} else {
 				console.error('Multiple declaration of module ' + module);
