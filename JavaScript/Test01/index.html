@@ -23,7 +23,7 @@
 	<a href="/cmd/stop">Stop server!</a>
 	
 	<script>
-		var model = new ArkModel();
+		ARKBase.Srv.sendData('Hello', { target: 'World', from: 'Myself'});
 	</script>
 </body>
 </html>

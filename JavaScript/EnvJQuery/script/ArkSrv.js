@@ -8,8 +8,10 @@ if ( !('ARKBase' in window) ){
 		function doSend(request) {
 			request.beforeSend = function(jqXHR, settings ) {
 				jqXHR.arkRequestId = ++requestId;
-				jqXHR.akrMethod = request.method;
-				jqXHR.akrURL = request.url;
+				jqXHR.arkMethod = request.method;
+				jqXHR.arkURL = request.url;
+				
+				console.log('Request ' + jqXHR.arkRequestId + ' sending...');
 			};
 			
 			$.ajax(request)  
@@ -36,12 +38,12 @@ if ( !('ARKBase' in window) ){
 
 			request.data = JSON.stringify(data);
 		
-			this.doSend(request);
+			doSend(request);
 		};
 		
 		this.loadResource = function(request) {
 			request.method = 'GET';
-			this.doSend(request);
+			doSend(request);
 		}		
 	}
 	
