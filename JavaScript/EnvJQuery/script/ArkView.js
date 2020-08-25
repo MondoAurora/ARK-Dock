@@ -3,7 +3,7 @@ if ( !('ARKBase' in window) ){
 	console.error('ArkBase init error. You should load ArkBase.js first!');
 } else {
 	function ArkView () {
-		this.domFragments = {};
+		var DomFragments = {};
 	}
 	
 	ARKBase.View = new ArkView();

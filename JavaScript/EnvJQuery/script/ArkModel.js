@@ -3,14 +3,14 @@ if ( !('ARKBase' in window) ){
 	console.error('ArkBase init error. You should load ArkBase.js first!');
 } else {
 	function ArkModel () {
-		this.data = {};
-		this.orig = {};
-		this.undo = [];
+		var Data = {};
+		var Orig = {};
+		var UndoIds = [];
 		
-		this.Tokens = ARKBase.Tokens.ArkModel;
+		var Tokens = ARKBase.getTokens('ArkModel');
 	
 		this.selectEntity = function (... path) {
-		    var entity = this.data;
+		    var entity = Data;
 			var coll = null;
 			var val = null;
 		
@@ -25,19 +25,19 @@ if ( !('ARKBase' in window) ){
 				}
 				
 				coll = ( (typeof val === 'object') || $.isArray(val)) ? val : null;
-				entity = coll ? null : this.data[val];
+				entity = coll ? null : Data[val];
 			}
 		
 			return val;
 		}
 	
 		this.getValue = function (entity, key) {
-			var e = this.data[entity];
+			var e = Data[entity];
 			return e ? e[key] : null;
 		}
 		
 		this.setValue = function (entity, key, val) {
-			var e = this.data[entity];
+			var e = Data[entity];
 			var ret = null;
 			
 			if ( e ) {

@@ -3,7 +3,7 @@ if ( !('ARKBase' in window) ){
 	console.error('ArkBase init error. You should load ArkBase.js first!');
 } else {
 	function ArkControl () {
-		this.logics = {};
+		var Logics = {};
 	}
 	
 	ARKBase.Control = new ArkControl();

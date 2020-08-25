@@ -1,7 +1,12 @@
 
 if ( !('ARKBase' in window) ){
 	function ArkBase () {
-		this.getPath = function(root, rel) {
+		
+		var Tokens = {};
+		var TokenInfo = {};
+		var Paths = {};
+		
+		function getPath(root, rel) {
 			var path = null;
 			
 			if ( root ) {
@@ -15,22 +20,24 @@ if ( !('ARKBase' in window) ){
 		}
 
 		var r = document.currentScript.src;
+		
 		if ( r ) {
-			this.scriptPath = this.getPath(r, '/..');
-			this.resourcePath = this.getPath(this.scriptPath, '/../res');
+			Paths.script = getPath(r, '/..');
+			Paths.res = getPath(Paths.script, '/../res');
 		} else {
 			console.error('ArkBase path init error.');
 		}
 		
-		this.Tokens = {};
-		this.TokenInfo = {};
+		this.getTokens = function(module) {
+			return Tokens[module];
+		}
 		
 		this.addModule = function(module, ... tokens) {
-			var mod = this.Tokens[module];
+			var mod = Tokens[module];
 			
 			if ( !mod ) {
 				mod = {};
-				this.Tokens[module] = mod;
+				Tokens[module] = mod;
 				
 				for (t of tokens) {
 					var id = t.type + '_' + module + '_' + t.id;
@@ -38,7 +45,7 @@ if ( !('ARKBase' in window) ){
 					mod[id] = entity;
 					
 					if ( t.info ) {
-						this.TokenInfo[id] = t.info;
+						TokenInfo[id] = t.info;
 					}
 				}
 			} else {
@@ -48,6 +55,8 @@ if ( !('ARKBase' in window) ){
 	}
 	
 	ARKBase = new ArkBase();
+	
+	console.log('ArkBase 01 initialized.');
 } else {
 	console.error('ArkBase init error. You should load ArkBase.js only once!');
 }
