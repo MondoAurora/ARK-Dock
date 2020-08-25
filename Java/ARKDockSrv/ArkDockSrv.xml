@@ -10,7 +10,7 @@
 		<jar destfile="${dir.project}/ARKDockSrv.jar">
 			<manifest>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
-				<attribute name="Rsrc-Main-Class" value="ark.light.srv.ARKDockSrv" />
+				<attribute name="Rsrc-Main-Class" value="ark.dock.srv.ARKDockSrv" />
 				<attribute name="Class-Path" value="." />
 				<attribute name="Rsrc-Class-Path" value="./ jetty-server-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar servlet-api-3.1.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar poi-3.14-20160307.jar poi-ooxml-3.14-20160307.jar poi-ooxml-schemas-3.14-20160307.jar xmlbeans-2.6.0.jar json-simple-1.1.1.jar mvel2-2.2.5.Final.jar" />
 			</manifest>
