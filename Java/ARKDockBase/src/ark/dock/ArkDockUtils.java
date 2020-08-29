@@ -52,6 +52,7 @@ public class ArkDockUtils implements ArkDockConsts {
 
 	public static void setLogLevel(ArkEventLevel lvl) {
 		logLevel = lvl;
+		log(ArkEventLevel.INFO, "LogLevel set to", lvl);
 	}
 
 	public static void setLogFile(String fName) throws Exception {

@@ -12,11 +12,11 @@ import ark.dock.ArkDockUtils;
 
 public interface ArkDockSrvConsts extends ArkDockConsts {
 	
-	public enum ArkLightSrvCmd {
-		stop, send, ping
+	public enum ArkDockSrvCmd {
+		stop, send, ping, put, get
 	}
 	
-	public enum ArkLightSrvEnv {
+	public enum ArkDockSrvEnv {
 		userId
 	}
 
@@ -88,9 +88,9 @@ public interface ArkDockSrvConsts extends ArkDockConsts {
 		}
 	}
 
-	public static class ArkSrvCookieMgr extends ArkCookieManager<ArkLightSrvEnv> {
+	public static class ArkSrvCookieMgr extends ArkCookieManager<ArkDockSrvEnv> {
 		public ArkSrvCookieMgr(HttpServletRequest request) {
-			super(request, ArkLightSrvEnv.class);
+			super(request, ArkDockSrvEnv.class);
 		}
 	}
 }

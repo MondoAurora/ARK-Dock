@@ -25,6 +25,8 @@ import ark.dock.ArkDockUtils;
 
 public class ArkDockSrv implements ArkDockSrvConsts {
 
+    ArkDockModel model = new ArkDockModel();
+    
 	Server server;
 	Thread shutdownProcess = new Thread() {
 		@Override
@@ -64,45 +66,66 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 			}
 
 			PrintWriter out = null;
+            Reader in = request.getReader();
+            JSONObject data = null;
+            JSONObject clientData = null;
+            JSONObject respData = null;
+            String id;
 
-			switch (ArkDockUtils.fromString(cmd, ArkLightSrvCmd.ping)) {
+
+			switch (ArkDockUtils.fromString(cmd, ArkDockSrvCmd.ping)) {
 			case send:
-				Reader in = request.getReader();
-				
-				JSONObject data = (JSONObject) JSONValue.parse(in);
-				
-				String clientCmd = (String) data.get("cmd");
-				JSONObject clientData = (JSONObject) data.get("data");
-				
+				data = (JSONObject) JSONValue.parse(in);
+				clientData = (JSONObject) data.get("data");
 				// testing echo
 				
-				JSONObject respData = clientData;
-				
-				
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/json; charset=utf-8");
-				
-				out = response.getWriter();
-				
-				JSONObject ret = new JSONObject();
-				ret.put("status", (null == respData) ? "error" : "OK");
-				ret.put("cmd", clientCmd);
-				if ( null != respData ) {
-					ret.put("data", respData);
-				}
-				
-				String str = ret.toJSONString();
-				ArkDockUtils.log(ArkEventLevel.INFO, "Sending response", str);
+				respData = clientData;
+									
+                break;
+            case put:
+                data = (JSONObject) JSONValue.parse(in);
+                clientData = (JSONObject) data.get("data");
 
-				out.println(str);
-					
-				break;
-			case stop:
+                id = (String) clientData.get("id");
+                model.entities.put(id, clientData);
+                
+                break;
+            case get:
+                id = request.getParameter("id");
+                respData = (JSONObject) model.entities.get(id);
+
+                break;
+            case ping:
+                
+//              long l = System.currentTimeMillis();
+//              for ( String s : model.entities.keySet() ) {
+////                    Object o = model.entities.get(s);
+//              }
+//                ret.put("time", System.currentTimeMillis() - l);
+
+                break;
+            case stop:
 				ArkDockSrv.this.stop();
 				break;
 			default:
 				break;
 			}
+			
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            if ( null != respData ) {
+                response.setContentType("text/json; charset=utf-8");
+                
+                out = response.getWriter();
+                
+                JSONObject ret = new JSONObject();
+                ret.put("status", (null == respData) ? "error" : "OK");
+                ret.put("data", respData);
+                
+                String str = ret.toJSONString();
+                ArkDockUtils.log(ArkEventLevel.INFO, "Sending response", str);
+                out.println(str);
+            }
 			
 			baseRequest.setHandled(true);
 		}
