@@ -1,0 +1,1 @@
+java -jar ../../Java/ARKDockSrv/ARKDockSrv.jar -logLevel=TRACE -logFileX=alma -root=.;../EnvJQuery -port=8081

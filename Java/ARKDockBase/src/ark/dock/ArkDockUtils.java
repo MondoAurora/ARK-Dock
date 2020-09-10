@@ -11,11 +11,25 @@ import java.util.TreeMap;
 
 public class ArkDockUtils implements ArkDockConsts {
 	
-	public static String strTimestamp() {
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd_HH-mm-ss_SSS");
-		return sdf.format(new Date());
-	}
-	
+    @SuppressWarnings("rawtypes")
+    public static Object resolvePath(Object src, Object... path ) {
+        Object current = src;
+        
+        for ( Object member : path ) {
+            current = ((Map)current).get(member);
+            if ( null == current ) {
+                break;
+            }
+        }
+        
+        return current;
+    }
+    
+    public static String strTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd_HH-mm-ss_SSS");
+        return sdf.format(new Date());
+    }
+    
 	static PrintStream psLog = System.out;
 	static ArkEventLevel logLevel = ArkEventLevel.INFO;
 

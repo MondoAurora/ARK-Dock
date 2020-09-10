@@ -1,6 +1,8 @@
 package ark.dock.srv;
 
+import java.awt.geom.Path2D;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -8,6 +10,8 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +22,11 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import ark.dock.ArkDockModel;
 import ark.dock.ArkDockUtils;
 
 public class ArkDockSrv implements ArkDockSrvConsts {
@@ -71,7 +77,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
             JSONObject clientData = null;
             JSONObject respData = null;
             String id;
-
+            ArkDockModel.Entity e;
 
 			switch (ArkDockUtils.fromString(cmd, ArkDockSrvCmd.ping)) {
 			case send:
@@ -85,23 +91,57 @@ public class ArkDockSrv implements ArkDockSrvConsts {
             case put:
                 data = (JSONObject) JSONValue.parse(in);
                 clientData = (JSONObject) data.get("data");
-
+                
                 id = (String) clientData.get("id");
-                model.entities.put(id, clientData);
+                e = model.getEntity(id, true);
+                model.setMember(e, "test", clientData);
                 
                 break;
             case get:
                 id = request.getParameter("id");
-                respData = (JSONObject) model.entities.get(id);
+                e = model.getEntity(id, false);
+                respData = (JSONObject) model.getMember(e, "test", null);
 
                 break;
             case ping:
                 
-//              long l = System.currentTimeMillis();
-//              for ( String s : model.entities.keySet() ) {
-////                    Object o = model.entities.get(s);
-//              }
-//                ret.put("time", System.currentTimeMillis() - l);
+              long l = System.currentTimeMillis();
+              data = (JSONObject) JSONValue.parse(new FileReader("C:\\Temp\\sample_loc.json"));
+
+              JSONArray features = (JSONArray) data.get("features");
+              
+              int cnt = features.size();
+              double x, y;
+              
+              for ( Object o : features ) {
+                  JSONObject loc = (JSONObject) o;
+                  JSONObject geo = (JSONObject) loc.get("geometry");
+                  JSONArray polygons = (JSONArray) geo.get("coordinates");
+                  Set<Path2D.Double> locPolys = new HashSet<>();
+                  
+                  for ( Object p : polygons ) {
+                      JSONArray p1 = (JSONArray) p;
+                      for ( Object p2 : (JSONArray) p1 ) {
+                          JSONArray path = (JSONArray) p2;
+                          Path2D.Double pp = null;
+                          for ( Object pt : path ) {
+                              JSONArray point = (JSONArray) pt;
+                              x = (Double) point.get(0);
+                              y = (Double) point.get(1);
+                              if ( null == pp ) {
+                                  pp = new Path2D.Double();
+                                  pp.moveTo(x, y);
+                              } else {
+                                  pp.lineTo(x, y);
+                              }
+                          }
+                          locPolys.add(pp);
+                      }
+                  }
+              }
+              respData = new JSONObject();
+              respData.put("time", System.currentTimeMillis() - l);
+              respData.put("count", cnt);
 
                 break;
             case stop:

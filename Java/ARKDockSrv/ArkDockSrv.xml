@@ -17,6 +17,8 @@
 			<zipfileset src="${dir.extlib}/antJarInJar/jar-in-jar-loader.zip" />
 			<fileset dir="${dir.project}/bin" />
 			<fileset dir="${dir.project}/../ARKDockBase/bin" />
+			<fileset dir="${dir.project}/../ARKDockGeo/bin" />
+			<fileset dir="${dir.project}/../ARKDockJson/bin" />
 			<zipfileset dir="${dir.extlib}/servlet" includes="servlet-api-3.1.jar" />
 			<zipfileset dir="${dir.extlib}/jetty" includes="jetty-server-9.3.7.v20160115.jar" />
 			<zipfileset dir="${dir.extlib}/jetty" includes="jetty-webapp-9.3.7.v20160115.jar" />
