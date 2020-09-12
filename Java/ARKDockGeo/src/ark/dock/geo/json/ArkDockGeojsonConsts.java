@@ -2,45 +2,55 @@ package ark.dock.geo.json;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.json.simple.parser.ContentHandler;
 
 public interface ArkDockGeojsonConsts {
-    enum GeojsonTypes {
-        Point, MultiPoint(true, Point), 
-        LineString, MultiLineString(true, LineString), 
-        Polygon(false, LineString), MultiPolygon(true, Polygon), GeometryCollection(true), 
-        Feature, FeatureCollection(true, Feature), 
-        NULL;
-
-        public final boolean container;
-        public final GeojsonTypes childType;
-
-        private GeojsonTypes(boolean coll, GeojsonTypes childType) {
-            this.container = coll;
-            this.childType = childType;
-        }
-        private GeojsonTypes(GeojsonTypes childType) {
-            this(false, childType);
-        }
-        private GeojsonTypes(boolean coll) {
-            this(coll, null);
-        }
-        private GeojsonTypes() {
-            this(false, null);
-        }
-    };
-
-    enum GeojsonKeys {
+    enum GeojsonKey {
         type, features, geometry, geometries, coordinates, properties, bbox, NULL
     }
 
+    enum GeojsonType {
+        Point, MultiPoint(true, Point), 
+        LineString(false, Point), MultiLineString(true, LineString), 
+        Polygon(false, LineString), MultiPolygon(true, Polygon), GeometryCollection(true, null, GeojsonKey.geometries), 
+        Feature(false), FeatureCollection(true, Feature, GeojsonKey.features), 
+        NULL;
+
+        public final boolean container;
+        public final GeojsonType childType;
+        public final String childKey;
+
+        private GeojsonType(boolean container, GeojsonType childType, GeojsonKey childKey) {
+            this.container = container;
+            this.childType = childType;
+            this.childKey = (null == childKey) ? null : childKey.name();
+        }
+        private GeojsonType(boolean container, GeojsonType childType) {
+            this(container, childType, GeojsonKey.coordinates);
+        }
+        private GeojsonType(GeojsonType childType) {
+            this(false, childType, null);
+        }
+        private GeojsonType(boolean container) {
+            this(container, null, null);
+        }
+        private GeojsonType() {
+            this(false, null, null);
+        }
+        
+        public boolean isArrKey(String key) {
+            return key.equals(childKey);
+        }
+    };
+
     abstract class GeojsonBuilder {
         protected ContentHandler extHandler;
-        protected GeojsonTypes currType;
+        protected GeojsonType currType;
         protected Object currObj;
         
-        public void select(GeojsonTypes gjt, Object geoObj) {
+        public void select(GeojsonType gjt, Object geoObj) {
             currType = gjt;
             currObj = geoObj;
         }
@@ -57,7 +67,7 @@ public interface ArkDockGeojsonConsts {
             return false;
         }
 
-        public boolean addChild(Object data) {
+        public boolean addChild(Object data, int idx) {
             if (currObj instanceof GeojsonObjectContainer) {
                 ((GeojsonObjectContainer) currObj).addChild(data);
                 return true;
@@ -65,7 +75,7 @@ public interface ArkDockGeojsonConsts {
             return false;
         }
 
-        public Object newGeojsonObj(GeojsonTypes gjt) {
+        public Object newGeojsonObj(GeojsonType gjt) {
             return gjt.container ? new GeojsonObjectArray(gjt) : null;
         }
         
@@ -80,17 +90,39 @@ public interface ArkDockGeojsonConsts {
         Object getBbox();
     }
 
+    public class GeojsonObjectFeature extends HashMap<String, Object> implements GeojsonObjectContainer {
+        private static final long serialVersionUID = 1L;
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean addChild(Object data) {
+            SimpleEntry<String, Object> e = (SimpleEntry<String, Object>) data;
+            put(e.getKey(), e.getValue());
+            return true;
+        }
+
+        @Override
+        public void setBBox(Object bb) {
+            put("bbox", bb);
+        }
+
+        @Override
+        public Object getBbox() {
+            return get("bbox");
+        }
+    }
+
     public class GeojsonObjectArray extends ArrayList<Object> implements GeojsonObjectContainer {
         private static final long serialVersionUID = 1L;
 
-        private final GeojsonTypes type;
+        private final GeojsonType type;
         protected Object bbox;
 
-        GeojsonObjectArray(GeojsonTypes t) {
+        GeojsonObjectArray(GeojsonType t) {
             this.type = t;
         }
 
-        public GeojsonTypes getType() {
+        public GeojsonType getType() {
             return type;
         }
 
@@ -114,8 +146,8 @@ public interface ArkDockGeojsonConsts {
         protected NativeLineRing exterior;
         protected ArrayList<NativeLineRing> holes;
 
-        public GeojsonTypes getType() {
-            return GeojsonTypes.Polygon;
+        public GeojsonType getType() {
+            return GeojsonType.Polygon;
         }
 
         public void setBBox(Object bb) {

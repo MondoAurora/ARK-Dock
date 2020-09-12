@@ -141,4 +141,13 @@ public class ArkDockUtils implements ArkDockConsts {
 	public static String toStringSafe(Object value) {
 		return (null == value) ? null : value.toString();
 	}
+
+    public static boolean contains(Object ob, Object... options) {
+        for ( Object o : options) {
+            if ( ob.equals(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

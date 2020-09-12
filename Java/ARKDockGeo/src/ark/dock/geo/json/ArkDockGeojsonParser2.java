@@ -18,7 +18,7 @@ import org.json.simple.parser.ParseException;
 import ark.dock.ArkDockUtils;
 import ark.dock.json.ArkDockJsonUtils;
 
-public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonConsts {
+public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonConsts {
 
     static class MainHandler extends JsonContentHandlerBase {
         JsonArrayCollector hndPoint = new JsonArrayCollector();

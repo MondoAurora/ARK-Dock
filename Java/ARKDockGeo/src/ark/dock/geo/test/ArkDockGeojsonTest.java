@@ -7,19 +7,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import ark.dock.ArkDockUtils;
 import ark.dock.geo.json.ArkDockGeojson2D.GeojsonBuilder2DDouble;
 import ark.dock.geo.json.ArkDockGeojsonParser;
 
 public class ArkDockGeojsonTest {
-    public static void importGeojson(File fLoc) throws Exception {
-        long l = System.currentTimeMillis();
+    public static void importGeojson(File f) throws Exception {
+        GeojsonBuilder2DDouble bd = new GeojsonBuilder2DDouble();
         
-        FileReader fr = new FileReader(fLoc);       
-        GeojsonBuilder2DDouble bd= new GeojsonBuilder2DDouble();
-        ArkDockGeojsonParser gp = new ArkDockGeojsonParser();
-        
-        gp.parse(fr, bd);
+        ArkDockGeojsonParser.parse(f, bd);
         
 //        JSONParser p = new JSONParser();        
 //        Set<String> locs = new TreeSet<>();
@@ -27,8 +22,6 @@ public class ArkDockGeojsonTest {
 //        p.parse(new FileReader(fLoc), new JsonValueCollector("LOC_CD", locs));
 //        
 //        ArkDockUtils.log("count", locs.size());
-        
-        ArkDockUtils.log("Time", System.currentTimeMillis() - l);
     }
     
     public static void main(String[] args) throws Exception {
