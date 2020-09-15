@@ -8,15 +8,13 @@ import org.json.simple.parser.ContentHandler;
 
 public interface ArkDockGeojsonConsts {
     enum GeojsonKey {
-        type, features, geometry, geometries, coordinates, properties, bbox, NULL
+        type, features, geometry, geometries, coordinates, properties, bbox, NULL;
     }
 
     enum GeojsonType {
-        Point, MultiPoint(true, Point), 
-        LineString(false, Point), MultiLineString(true, LineString), 
-        Polygon(false, LineString), MultiPolygon(true, Polygon), GeometryCollection(true, null, GeojsonKey.geometries), 
-        Feature(false), FeatureCollection(true, Feature, GeojsonKey.features), 
-        NULL;
+        Point, MultiPoint(true, Point), LineString(false, Point), MultiLineString(true, LineString), Polygon(false, LineString), MultiPolygon(true,
+                Polygon), GeometryCollection(true, null,
+                        GeojsonKey.geometries), Feature(false), FeatureCollection(true, Feature, GeojsonKey.features), NULL;
 
         public final boolean container;
         public final GeojsonType childType;
@@ -39,7 +37,7 @@ public interface ArkDockGeojsonConsts {
         private GeojsonType() {
             this(false, null, null);
         }
-        
+
         public boolean isArrKey(String key) {
             return key.equals(childKey);
         }
@@ -47,14 +45,21 @@ public interface ArkDockGeojsonConsts {
 
     abstract class GeojsonBuilder {
         protected ContentHandler extHandler;
-        protected GeojsonType currType;
         protected Object currObj;
-        
-        public void select(GeojsonType gjt, Object geoObj) {
-            currType = gjt;
+
+        public void select(Object geoObj) {
             currObj = geoObj;
+//            return getObjType(currObj);
         }
-        
+
+        public Object newGeojsonObj(GeojsonType gjt) {
+            return gjt.container ? new GeojsonObjectArray(gjt) : null;
+        }
+
+        public GeojsonType getObjType(Object geoObj) {
+            return (geoObj instanceof GeojsonObjectContainer) ? ((GeojsonObjectContainer) geoObj).getType() : null;
+        }
+
         public Object newBBox(Collection<?> points) {
             return null;
         }
@@ -67,7 +72,7 @@ public interface ArkDockGeojsonConsts {
             return false;
         }
 
-        public boolean addChild(Object data, int idx) {
+        public boolean addChild(Object data) {
             if (currObj instanceof GeojsonObjectContainer) {
                 ((GeojsonObjectContainer) currObj).addChild(data);
                 return true;
@@ -75,16 +80,13 @@ public interface ArkDockGeojsonConsts {
             return false;
         }
 
-        public Object newGeojsonObj(GeojsonType gjt) {
-            return gjt.container ? new GeojsonObjectArray(gjt) : null;
-        }
-        
         public ContentHandler getExtHandler() {
             return extHandler;
         }
     }
 
     public interface GeojsonObjectContainer {
+        GeojsonType getType();
         boolean addChild(Object data);
         void setBBox(Object bb);
         Object getBbox();
@@ -93,6 +95,11 @@ public interface ArkDockGeojsonConsts {
     public class GeojsonObjectFeature extends HashMap<String, Object> implements GeojsonObjectContainer {
         private static final long serialVersionUID = 1L;
 
+        @Override
+        public GeojsonType getType() {
+            return GeojsonType.Feature;
+        }
+        
         @SuppressWarnings("unchecked")
         @Override
         public boolean addChild(Object data) {
@@ -133,14 +140,14 @@ public interface ArkDockGeojsonConsts {
         public Object getBbox() {
             return bbox;
         }
-        
+
         @Override
         public boolean addChild(Object data) {
             add(data);
             return true;
         }
     }
-    
+
     public class GeojsonPolygon<NativeLineRing> implements GeojsonObjectContainer {
         protected Object bbox;
         protected NativeLineRing exterior;
@@ -157,25 +164,25 @@ public interface ArkDockGeojsonConsts {
         public Object getBbox() {
             return bbox;
         }
-        
+
         @SuppressWarnings("unchecked")
         @Override
         public boolean addChild(Object data) {
             NativeLineRing lr = (NativeLineRing) data;
-            if ( null == exterior ) {
+            if (null == exterior) {
                 exterior = lr;
             } else {
                 getHoles().add(lr);
             }
             return true;
         }
-        
+
         public NativeLineRing getExterior() {
             return exterior;
         }
-        
+
         public ArrayList<NativeLineRing> getHoles() {
-            if ( null == holes ) {
+            if (null == holes) {
                 holes = new ArrayList<>();
             }
             return holes;

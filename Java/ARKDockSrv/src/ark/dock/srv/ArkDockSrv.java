@@ -28,6 +28,8 @@ import org.json.simple.JSONValue;
 
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockUtils;
+import dust.gen.DustGenInitParams;
+import dust.gen.DustGenLog;
 
 public class ArkDockSrv implements ArkDockSrvConsts {
 
@@ -44,11 +46,11 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 			try {
 				Server s = server;
 				server = null;
-				ArkDockUtils.log("Shutting down ArkDockSrv on port", port);
+				DustGenLog.log("Shutting down ArkDockSrv on port", port);
 				s.stop();
-				ArkDockUtils.log("ArkDockSrv shutdown OK.");
+				DustGenLog.log("ArkDockSrv shutdown OK.");
 			} catch (Exception ex) {
-				ArkDockUtils.log(ArkEventLevel.ERROR, "Failed to stop ArkDockSrv");
+				DustGenLog.log(DustEventLevel.ERROR, "Failed to stop ArkDockSrv");
 			}
 		}
 	};
@@ -163,7 +165,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
                 ret.put("data", respData);
                 
                 String str = ret.toJSONString();
-                ArkDockUtils.log(ArkEventLevel.INFO, "Sending response", str);
+                DustGenLog.log(DustEventLevel.INFO, "Sending response", str);
                 out.println(str);
             }
 			
@@ -186,7 +188,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 				}
 			}
 			
-			ArkDockUtils.log(ArkEventLevel.ERROR, "Missing file", target);
+			DustGenLog.log(DustEventLevel.ERROR, "Missing file", target);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 
@@ -206,7 +208,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 					response.setStatus(HttpServletResponse.SC_OK);
 					return true;
 				} catch (IOException e) {
-					ArkDockUtils.log(ArkEventLevel.ERROR, e, "occured when sending file", f.getAbsolutePath());
+					DustGenLog.log(DustEventLevel.ERROR, e, "occured when sending file", f.getAbsolutePath());
 				}
 			}
 			
@@ -214,7 +216,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 		}
 	}
 
-	public ArkDockSrv(ArkInitParams<ArkSrvParams> params) throws Exception {
+	public ArkDockSrv(DustGenInitParams<ArkSrvParams> params) throws Exception {
 		String rootPaths = params.getString(ArkSrvParams.root);
 		
 		for ( String rp : rootPaths.split(";")) {
@@ -228,12 +230,12 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 		}
 		
 
-		ArkEventLevel lvl = ArkDockUtils.fromString(params.getString(ArkSrvParams.logLevel), ArkEventLevel.INFO);
-		ArkDockUtils.setLogLevel(lvl);
+		DustEventLevel lvl = ArkDockUtils.fromString(params.getString(ArkSrvParams.logLevel), DustEventLevel.INFO);
+		DustGenLog.setLogLevel(lvl);
 		
 		String s = params.getString(ArkSrvParams.logFile);
 		if ( !ArkDockUtils.isEmpty(s) ) {
-			ArkDockUtils.setLogFile(s);
+		    DustGenLog.setLogFile(s);
 		}
 
 		HandlerList hl = new HandlerList();
@@ -259,7 +261,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
 	}
 
 	public static void main(String[] args) throws Exception {
-		ArkInitParams<ArkSrvParams> params = new ArkInitParams<>(args, ArkSrvParams.class);
+		DustGenInitParams<ArkSrvParams> params = new DustGenInitParams<>(args, ArkSrvParams.class);
 
 		ArkDockSrv srv = new ArkDockSrv(params);
 

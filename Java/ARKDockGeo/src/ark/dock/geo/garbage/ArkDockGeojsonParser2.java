@@ -1,4 +1,4 @@
-package ark.dock.geo.json;
+package ark.dock.geo.garbage;
 
 import java.io.File;
 import java.io.FileReader;
@@ -16,7 +16,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockUtils;
+import ark.dock.geo.json.ArkDockGeojsonConsts;
+import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonBuilder;
+import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonKey;
+import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonType;
 import ark.dock.json.ArkDockJsonUtils;
+import dust.gen.DustGenLog;
 
 public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonConsts {
 
@@ -63,7 +68,7 @@ public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonCo
 
         @Override
         public void endJSON() throws ParseException, IOException {
-            ArkDockUtils.log("objCount", count, "maxDepth", procStack.size(), "currDepth", depth, "keyRes", resCount, "prim", primCount);
+            DustGenLog.log("objCount", count, "maxDepth", procStack.size(), "currDepth", depth, "keyRes", resCount, "prim", primCount);
         }
         @Override
         public boolean startObjectEntry(String arg0) throws ParseException, IOException {
@@ -155,18 +160,18 @@ public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonCo
         public boolean endArray() throws ParseException, IOException {
             if (-1 != coordIdx) {
                 coordIdx = -1;
-                builder.addChild(coords, 0);
+                builder.addChild(coords);
             }
             step(false);
             GeojsonType type = procStack.get(depth);
 
             if (0 < depth) {
                 if (1 == depth) {
-                    ArkDockUtils.log("hopp");
+                    DustGenLog.log("hopp");
                 }
                 GeojsonType pType = procStack.get(depth - 1);
                 builder.select(pType, currObjs.get(pType));
-                builder.addChild(currObjs.remove(type), 0);
+                builder.addChild(currObjs.remove(type));
             }
             return true;
         }
@@ -242,7 +247,7 @@ public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonCo
                 if (null != data) {
                     load();
                     builder.select(type, ob);
-                    builder.addChild(data, idx++);
+                    builder.addChild(data);
                 }
 
 //                arrType = type;
@@ -293,12 +298,12 @@ public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonCo
         }
 
         public void log() {
-            ArkDockUtils.log("Objects", objCount, "Items", itemCount);
+            DustGenLog.log("Objects", objCount, "Items", itemCount);
         }
     }
 
     public static void parse(File f, GeojsonBuilder builder) throws Exception {
-        ArkDockUtils.log("Parsing GeoJSON file", f.getName());
+        DustGenLog.log("Parsing GeoJSON file", f.getName());
         FileReader fr = new FileReader(f);
         parse(fr, builder);
     }
@@ -317,6 +322,6 @@ public class ArkDockGeojsonParser2 implements ArkDockJsonUtils, ArkDockGeojsonCo
 
         long elapse = System.currentTimeMillis() - l;
 
-        ArkDockUtils.log("Time", elapse);
+        DustGenLog.log("Time", elapse);
     }
 }

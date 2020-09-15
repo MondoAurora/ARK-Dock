@@ -21,8 +21,8 @@ public interface ArkDockSrvConsts extends ArkDockConsts {
 	}
 
 
-	public enum ArkSrvParams implements ArkHasDefault<String> {
-		port("8080"), root("webRoot"), logLevel(ArkEventLevel.INFO.name()), logFile(null);
+	public enum ArkSrvParams implements DustHasDefault<String> {
+		port("8080"), root("webRoot"), logLevel(DustEventLevel.INFO.name()), logFile(null);
 
 		final String defVal;
 

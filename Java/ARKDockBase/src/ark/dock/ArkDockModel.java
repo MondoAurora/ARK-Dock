@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import dust.gen.DustGenLog;
+
 public class ArkDockModel implements ArkDockConsts {
     
     public class Entity {
@@ -52,11 +54,11 @@ public class ArkDockModel implements ArkDockConsts {
             entities.put(String.valueOf(s + l), new Entity());
             
             if ( 0 == (l % 100000) ) {
-                ArkDockUtils.log(ArkEventLevel.TRACE, l);
+                DustGenLog.log(DustEventLevel.TRACE, l);
             }
         }
         
-        ArkDockUtils.log(ArkEventLevel.INFO, "Model count ", entities.size());
+        DustGenLog.log(DustEventLevel.INFO, "Model count ", entities.size());
     }
     
     

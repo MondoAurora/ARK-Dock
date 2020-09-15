@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="ARKDock Http Server">
-	<!--this file was created by Eclipse Runnable JAR file Export Wizard-->
-	<!--ANT 1.7 is required-->
-	<!--define folder properties-->
+	
+    <property environment="env"/>
+	<include file="${env.ARK_ROOT}/ide/eclipse/dust/ant_props.xml" />
+
 	<property name="dir.project" value="." />
-	<property name="dir.extlib" value="${dir.project}/../ARKDockLibs/lib" />
+	<property name="dir.extlib" value="${ARK_EXT}" />
 
 	<target name="create_run_jar">
 		<jar destfile="${dir.project}/ARKDockSrv.jar">
