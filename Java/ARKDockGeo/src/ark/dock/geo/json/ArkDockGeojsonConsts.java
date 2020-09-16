@@ -3,6 +3,7 @@ package ark.dock.geo.json;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.parser.ContentHandler;
 
@@ -49,7 +50,6 @@ public interface ArkDockGeojsonConsts {
 
         public void select(Object geoObj) {
             currObj = geoObj;
-//            return getObjType(currObj);
         }
 
         public Object newGeojsonObj(GeojsonType gjt) {
@@ -83,6 +83,10 @@ public interface ArkDockGeojsonConsts {
         public ContentHandler getExtHandler() {
             return extHandler;
         }
+    }
+
+    public interface GeojsonObjectSource {
+        Map<GeojsonKey, Object> getObToFill();
     }
 
     public interface GeojsonObjectContainer {

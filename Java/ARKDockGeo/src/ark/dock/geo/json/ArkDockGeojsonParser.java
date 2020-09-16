@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,9 +13,11 @@ import ark.dock.ArkDockUtils;
 import ark.dock.json.ArkDockJsonUtils;
 import ark.dock.json.ArkDockJsonValueAgent;
 import dust.gen.DustGenAgentSmart;
+import dust.gen.DustGenCounter;
+import dust.gen.DustGenDevUtils;
 import dust.gen.DustGenLog;
 
-public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonConsts {
+public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonConsts, DustGenDevUtils {
 
     static class RootAgent implements DustGenAgent {
 
@@ -40,6 +41,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                         }
                         builder.select(gjtOb);
                         relayAgent.setCtxOb(gjtOb);
+                        typeCounter.add(gjt);
 
                         gjt = gjt.childType;
 
@@ -80,7 +82,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
             }
         }
 
-        Map<String, Object> targetMap;
+        GeojsonObjectSource obSrc;
         Map<GeojsonKey, Object> currObj;
 
         JsonContext ctx = new JsonContext();
@@ -94,25 +96,26 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
         String keyStr;
         GeojsonKey keyGeoJSON = GeojsonKey.NULL;
         GeojsonType currType;
+        
+        DustGenCounter typeCounter = new DustGenCounter(true);
 
-        public RootAgent(GeojsonBuilder builder, Map<String, Object> targetMap) {
+        public RootAgent(GeojsonBuilder builder, GeojsonObjectSource obSrc) {
             this.builder = builder;
-            this.targetMap = targetMap;
+            this.obSrc = obSrc;
             relayAgent = new DustGenAgentSmart(this);
             coordAgent = new CoordinatesAgent();
             propertiesAgent = new ArkDockJsonValueAgent(relayAgent, ctx);
         }
 
         public void parse(Reader r, GeojsonBuilder builder) throws IOException, ParseException {
-            long l = System.currentTimeMillis();
+            DevTimer parseTimer = new DevTimer("Parse");
 
             JSONParser p = new JSONParser();
             JsonContentHandlerAgent h = new JsonContentHandlerAgent(relayAgent, ctx);
             p.parse(r, h);
-            long elapse = System.currentTimeMillis() - l;
-            DustGenLog.log("Time", elapse);
-
-            DustGenLog.log("Agent result", this);
+            
+            parseTimer.log();
+            DustGenLog.log("Content:", this);
         }
 
         @Override
@@ -160,15 +163,9 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                     
                     if ( null != content ) {
                         if ( null == currObj ) {
-                            currObj = new TreeMap<>();
+                            currObj = obSrc.getObToFill();
                         }
                         currObj.put(keyGeoJSON, content);
-                        
-                        if ( keyGeoJSON == GeojsonKey.properties ) {
-                            @SuppressWarnings("unchecked")
-                            String id = (String) ((Map<String, Object>)content).get("GlobalID");
-                            targetMap.put(id, currObj);
-                        }
                     }
 
                     break;
@@ -183,7 +180,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                     currType = ArkDockUtils.fromString((String) ctx.getParam(), GeojsonType.NULL);
 
                     if (GeojsonType.Feature == currType) {
-                        currObj = new TreeMap<>();
+                        currObj = obSrc.getObToFill();
                     }
                 }
                 break;
@@ -198,17 +195,17 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
 
         @Override
         public String toString() {
-            return "Features: " + targetMap.size();
+            return typeCounter.toString();
         }
     };
 
-    public static void parse(File f, GeojsonBuilder builder, Map<String, Object> targetMap) throws Exception {
+    public static void parse(File f, GeojsonBuilder builder, GeojsonObjectSource obSrc) throws Exception {
         DustGenLog.log("Parsing GeoJSON file", f.getName(), "size", f.length());
         FileReader fr = new FileReader(f);
-        parse(fr, builder, targetMap);
+        parse(fr, builder, obSrc);
     }
 
-    public static void parse(Reader r, GeojsonBuilder builder, Map<String, Object> targetMap) throws IOException, ParseException {
-        new RootAgent(builder, targetMap).parse(r, builder);
+    public static void parse(Reader r, GeojsonBuilder builder, GeojsonObjectSource obSrc) throws IOException, ParseException {
+        new RootAgent(builder, obSrc).parse(r, builder);
     }
 }

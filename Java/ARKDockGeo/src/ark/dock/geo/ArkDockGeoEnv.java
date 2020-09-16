@@ -3,13 +3,19 @@ package ark.dock.geo;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import ark.dock.ArkDockUtils;
+import dust.gen.DustGenLog;
 
 public class ArkDockGeoEnv {
     Map<String, Path2D.Double> idToPoly = new HashMap<>();
@@ -98,4 +104,28 @@ public class ArkDockGeoEnv {
         Path2D.Double poly = idToPoly.get(id);
         return (null == poly) ? null : poly.getPathIterator(at);
     }
+    
+
+    public void testPoly(FileReader fr) throws Exception {
+        JSONObject data = (JSONObject) JSONValue.parse(fr);
+        JSONObject item;
+
+        JSONArray features = (JSONArray) data.get("features");
+
+        int idx = 0;
+
+        DustGenLog.log("Import Locations", features.size(), "records from", data.get("name"));
+
+        for (Object o : features) {
+            item = (JSONObject) o;
+            Set<String> polyRefs = readMultiPoly(item);
+
+            DustGenLog.log(polyRefs);
+
+            if (0 == (++idx % 500)) {
+                DustGenLog.log("\n*************\n row", idx, "\n*************\n");
+            }
+        }
+    }
+
 }

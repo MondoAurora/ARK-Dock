@@ -79,7 +79,7 @@ public class ArkDockSrv implements ArkDockSrvConsts {
             JSONObject clientData = null;
             JSONObject respData = null;
             String id;
-            ArkDockModel.Entity e;
+            DustEntity e;
 
 			switch (ArkDockUtils.fromString(cmd, ArkDockSrvCmd.ping)) {
 			case send:
@@ -96,13 +96,13 @@ public class ArkDockSrv implements ArkDockSrvConsts {
                 
                 id = (String) clientData.get("id");
                 e = model.getEntity(id, true);
-                model.setMember(e, "test", clientData);
+                model.setMember(e, model.eMemberGeomPoint, clientData);
                 
                 break;
             case get:
                 id = request.getParameter("id");
                 e = model.getEntity(id, false);
-                respData = (JSONObject) model.getMember(e, "test", null);
+                respData = (JSONObject) model.getMember(e, model.eMemberGeomPoint, null);
 
                 break;
             case ping:
