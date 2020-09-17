@@ -1,104 +1,128 @@
 package ark.dock;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 
+import dust.gen.DustGenConsts.DustEntity;
 import dust.gen.DustGenUtils;
 
-public class ArkDockModel implements ArkDockConsts {
-    public static final String TOKEN_SEP = "_";
-    
-    public static final String UNIT_ARK = "Ark";
-    
-    public static final String TYPE_UNIT = "Unit";
-    public static final String TYPE_TYPE = "Type";
-    public static final String TYPE_MEMBER = "Member";
-    
-    public static final String TYPE_GEOM = "Geom";
-    
-    public static final String MEMBER_GEOM_POINT = "Point";
-    public static final String MEMBER_GEOM_POLYGONS = "Polygons";
-    
-    class ModelEntity extends DustEntity {
+public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
+
+    class ModelEntity implements DustEntity {
         final String id;
         final String globalId;
-        Map<String, Object> data = new TreeMap<>();
-        
+        Map<DustEntity, Object> data = new HashMap<>();
+
         public ModelEntity(String globalId) {
             this.globalId = globalId;
             this.id = globalId.substring(globalId.lastIndexOf(TOKEN_SEP) + 1);
+        }
+
+        @Override
+        public String getId() {
+            return id;
         }
         
         @Override
         public String getGlobalId() {
             return globalId;
         }
+
+        @Override
+        public String toString() {
+            return globalId;
+        }
     }
-    
-    public final DustEntity eUnitArk;
-    public final DustEntity eTypeUnit;
-    public final DustEntity eTypeType;
-    public final DustEntity eTypeMember;
-    
-    public final DustEntity eTypeGeom;
-    public final DustEntity eMemberGeomPoint;
-    public final DustEntity eMemberGeomPolygons;
-    
+
+    MetaProvider meta;
+    ArkDockModel parent;
+
     Map<String, ModelEntity> entities = new HashMap<>();
-    
+
     public static String buildGlobalId(String unitId, String typeId, String id) {
         return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, id).toString();
     }
-   
-    public ArkDockModel() {
-        eUnitArk = getEntity(buildGlobalId(UNIT_ARK, TYPE_UNIT, UNIT_ARK), true);
-        eTypeUnit = getEntity(buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_UNIT), true);
-        eTypeType = getEntity(buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_TYPE), true);
-        eTypeMember = getEntity(buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_MEMBER), true);
-        
-        eTypeGeom = getEntity(buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_GEOM), true);
-        eMemberGeomPoint = getMember(eTypeGeom, MEMBER_GEOM_POINT);
-        eMemberGeomPolygons = getMember(eTypeGeom, MEMBER_GEOM_POLYGONS);
+
+    public ArkDockModel(ArkDockModel parent_) {
+        this.parent = parent_;
+        meta = parent.getMeta();
     }
 
-    public DustEntity getMember(DustEntity type, String itemId) {
-        String globalId = DustGenUtils.sbAppend(null, TOKEN_SEP, true, ((ModelEntity)type).globalId.replace(TYPE_TYPE, TYPE_MEMBER), itemId).toString();
-        return getEntity(globalId, true);
+    protected ArkDockModel() {
+    }
+
+    public MetaProvider getMeta() {
+        return meta;
+    }
+
+    public ArkDockModel getParent() {
+        return parent;
     }
 
     public DustEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
-        String globalId = buildGlobalId(((ModelEntity)unit).id, ((ModelEntity)type).id, itemId);
+        String globalId = buildGlobalId(((ModelEntity) unit).id, ((ModelEntity) type).id, itemId);
         return getEntity(globalId, createIfMissing);
     }
 
     public DustEntity getEntity(String globalId, boolean createIfMissing) {
         ModelEntity e = entities.get(globalId);
-        
-        if ( createIfMissing && (null == e) ) {
+
+        if (createIfMissing && (null == e)) {
             e = new ModelEntity(globalId);
             entities.put(globalId, e);
         }
-        
+
         return e;
     }
     
+    public Iterator<DustEntity> getContent(DustEntity e, DustEntity member) {
+        return ((ModelEntity) e).data.keySet().iterator();
+    }
+
     public void setMember(DustEntity e, DustEntity member, Object value) {
-        ((ModelEntity)e).data.put(((ModelEntity)member).globalId, value);
+        ((ModelEntity) e).data.put(member, value);
     }
 
     @SuppressWarnings("unchecked")
     public <RetType> RetType getMember(DustEntity e, DustEntity member, RetType defValue) {
         RetType ret = defValue;
-        
-        if ( null != e ) {
-            Object v = ((ModelEntity)e).data.get(((ModelEntity)member).globalId);
-            if ( null != v ) {
+
+        if (null != e) {
+            Object v = ((ModelEntity) e).data.get(member);
+            if (null != v) {
                 ret = (RetType) v;
             }
         }
-        
+
         return ret;
     }
-    
+
+    class ContentReader implements Iterator<DustEntity> {
+        Iterator<ModelEntity> mi;
+
+        public ContentReader() {
+            mi = entities.values().iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mi.hasNext();
+        }
+
+        @Override
+        public DustEntity next() {
+            return mi.next();
+        }
+
+        @Override
+        public void remove() {
+            DustException.throwException(null, "Should not remove Entity in this way! Use the API.");
+        }
+    }
+
+    @Override
+    public Iterator<DustEntity> iterator() {
+        return new ContentReader();
+    }
 }

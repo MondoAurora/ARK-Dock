@@ -3,6 +3,8 @@ package ark.dock.geo.json;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 
+import dust.gen.DustGenConsts.DustException;
+
 public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 
     public class GeojsonBuilder2DDouble extends GeojsonBuilder {
@@ -29,9 +31,9 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
             if (geoObj instanceof Point2D.Double) {
                 return GeojsonType.Point;
             } else if (geoObj instanceof Path2D.Double) {
-               return GeojsonType.LineString;
+                return GeojsonType.LineString;
             }
-            
+
             return super.getObjType(geoObj);
         }
 
@@ -47,6 +49,10 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
                 case 1:
                     pt.y = (double) data;
                     break;
+                default:
+                    if ( 0.0 != (double) data ) {
+                        DustException.throwException(null, "2DPoint losing coordinate", coordIdx, data);
+                    }
                 }
             } else if (currObj instanceof Path2D.Double) {
                 Path2D.Double path = (Path2D.Double) currObj;

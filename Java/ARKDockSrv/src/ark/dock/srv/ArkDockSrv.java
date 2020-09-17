@@ -26,14 +26,16 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import ark.dock.ArkDockModel;
+import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockUtils;
 import dust.gen.DustGenInitParams;
 import dust.gen.DustGenLog;
 
 public class ArkDockSrv implements ArkDockSrvConsts {
 
-    ArkDockModel model = new ArkDockModel();
+    ArkDockModelMeta model = new ArkDockModelMeta();
+    DustEntity eTestType = model.getType(model.eUnitArk, "Test");
+    DustEntity eTestMember = model.getMember(eTestType, "TestValue");
     
 	Server server;
 	Thread shutdownProcess = new Thread() {
@@ -96,13 +98,13 @@ public class ArkDockSrv implements ArkDockSrvConsts {
                 
                 id = (String) clientData.get("id");
                 e = model.getEntity(id, true);
-                model.setMember(e, model.eMemberGeomPoint, clientData);
+                model.setMember(e, eTestMember, clientData);
                 
                 break;
             case get:
                 id = request.getParameter("id");
                 e = model.getEntity(id, false);
-                respData = (JSONObject) model.getMember(e, model.eMemberGeomPoint, null);
+                respData = (JSONObject) model.getMember(e, eTestMember, null);
 
                 break;
             case ping:

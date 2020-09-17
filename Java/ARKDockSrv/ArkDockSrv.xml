@@ -17,6 +17,7 @@
 			</manifest>
 			<zipfileset src="${dir.extlib}/antJarInJar/jar-in-jar-loader.zip" />
 			<fileset dir="${dir.project}/bin" />
+			<fileset dir="${ARK_API}/DustApiGen/bin" />
 			<fileset dir="${dir.project}/../ARKDockBase/bin" />
 			<fileset dir="${dir.project}/../ARKDockGeo/bin" />
 			<fileset dir="${dir.project}/../ARKDockJson/bin" />
