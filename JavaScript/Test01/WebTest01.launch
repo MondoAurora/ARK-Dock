@@ -13,6 +13,6 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ark.dock.srv.ArkDockSrv"/>
 <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="ARKDockTest01"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-logLevel=TRACE -logFileX=alma -root=.;../EnvJQuery -port=8081"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ArkDockTest01"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ARKDockTest01"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:ARKDockWebTest01}"/>
 </launchConfiguration>

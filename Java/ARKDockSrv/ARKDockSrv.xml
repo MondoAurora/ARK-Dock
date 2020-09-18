@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="ARKDock Http Server">
-	
-    <property environment="env"/>
+
+	<property environment="env" />
 	<include file="${env.ARK_ROOT}/ide/eclipse/dust/ant_props.xml" />
 
 	<property name="dir.project" value="." />
 	<property name="dir.extlib" value="${ARK_EXT}" />
 
-	<target name="create_run_jar">
-		<jar destfile="${dir.project}/ARKDockSrv.jar">
-			<manifest>
-				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
-				<attribute name="Rsrc-Main-Class" value="ark.dock.srv.ArkDockSrv" />
-				<attribute name="Class-Path" value="." />
-				<attribute name="Rsrc-Class-Path" value="./ servlet-api-3.1.jar jetty-server-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar json-simple-1.1.1.jar" />
-			</manifest>
-			<zipfileset src="${dir.extlib}/antJarInJar/jar-in-jar-loader.zip" />
+	<target name="create_services">
+		<jar destfile="${dir.project}/ARKDockServices.jar">
 			<fileset dir="${dir.project}/bin" />
 			<fileset dir="${ARK_API}/DustApiGen/bin" />
 			<fileset dir="${dir.project}/../ARKDockBase/bin" />
 			<fileset dir="${dir.project}/../ARKDockGeo/bin" />
 			<fileset dir="${dir.project}/../ARKDockJson/bin" />
+		</jar>
+		
+		<jar destfile="${dir.project}/ARKDockServices.src.jar">
+			<fileset dir="${dir.project}/src" />
+			<fileset dir="${ARK_JAVA_ROOT}/api/gen/src" />
+			<fileset dir="${dir.project}/../ARKDockBase/src" />
+			<fileset dir="${dir.project}/../ARKDockGeo/src" />
+			<fileset dir="${dir.project}/../ARKDockJson/src" />
+		</jar>
+	</target>
+
+	<target name="create_run_jar" depends="create_services">
+		<jar destfile="${dir.project}/ARKDockSrv.jar">
+			<manifest>
+				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
+				<attribute name="Rsrc-Main-Class" value="ark.dock.srv.ArkDockSrv" />
+				<attribute name="Class-Path" value="." />
+				<attribute name="Rsrc-Class-Path" value="./ ARKDockServices.jar servlet-api-3.1.jar jetty-server-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar json-simple-1.1.1.jar" />
+			</manifest>
+			<zipfileset src="${dir.extlib}/antJarInJar/jar-in-jar-loader.zip" />
+			
+			<zipfileset dir="${dir.project}" includes="ARKDockServices.jar" />
+			
 			<zipfileset dir="${dir.extlib}/servlet" includes="servlet-api-3.1.jar" />
 			<zipfileset dir="${dir.extlib}/jetty" includes="jetty-server-9.3.7.v20160115.jar" />
 			<zipfileset dir="${dir.extlib}/jetty" includes="jetty-webapp-9.3.7.v20160115.jar" />
@@ -32,4 +48,5 @@
 			<zipfileset dir="${dir.extlib}/json" includes="json-simple-1.1.1.jar" />
 		</jar>
 	</target>
+
 </project>

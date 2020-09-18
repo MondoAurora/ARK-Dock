@@ -3,6 +3,6 @@
 	<classpathentry excluding="ark/dock/geo/garbage/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockBase"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ArkDockJson"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockJson"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
