@@ -24,6 +24,18 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		return DustException.throwException(null, "Should never get here");
 	}
 
+	static DustCollType getCollTypeForData(Object data) {
+		if ( data instanceof ArrayList ) {
+			return DustCollType.ARR;
+		} else if ( data instanceof Set ) {
+			return DustCollType.SET;
+		} else if ( data instanceof Map ) {
+			return DustCollType.MAP;
+		}
+		
+		return null;
+	}
+
 	static DustValType getValTypeForValue(Object val) {
 		if ( null == val ) {
 			return null;
@@ -90,13 +102,14 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static boolean setValue(DustDialogCmd cmd, MetaMemberInfo mi, Map<DustEntity, Object> data, DustEntity member, Object currVal, Object newVal, Object hint) {
+	static boolean setValue(DustDialogCmd cmd, MetaMemberInfo mi, Map<DustEntity, Object> data, DustEntity member,
+			Object currVal, Object newVal, Object hint) {
 		DustCollType ct = (null == mi) ? null : mi.getCollType();
-		
+
 		if ( (cmd == DustDialogCmd.ADD) && (null == ct) ) {
-			((ArkDockModelMeta.MemberInfo)mi).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
+			((ArkDockModelMeta.MemberInfo) mi).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
 		}
-		
+
 		if ( (null == ct) || (ct == DustCollType.ONE) ) {
 			if ( DustGenUtils.isEqual(currVal, newVal) ) {
 				return false;
@@ -104,25 +117,25 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 				data.put(member, newVal);
 				return true;
 			}
-		}		
+		}
 
 		switch ( ct ) {
 		case ARR:
 			ArrayList arr;
-			
-			if (currVal instanceof ArrayList) {
+
+			if ( currVal instanceof ArrayList ) {
 				arr = (ArrayList) currVal;
 			} else {
-				if ( (cmd == DustDialogCmd.SET) && ( DustGenUtils.isEqual(currVal, newVal)) ) {
+				if ( (cmd == DustDialogCmd.SET) && (DustGenUtils.isEqual(currVal, newVal)) ) {
 					return false;
 				}
 				arr = (ArrayList) createContainer(ct, data, member);
 				arr.add(currVal);
 			}
-			
+
 			int idx = ((Number) hint).intValue();
-			if ((0 <= idx) && (idx < arr.size())) {
-				if ( cmd == DustDialogCmd.SET) {
+			if ( (0 <= idx) && (idx < arr.size()) ) {
+				if ( cmd == DustDialogCmd.SET ) {
 					if ( DustGenUtils.isEqual(arr.get(idx), newVal) ) {
 						return false;
 					}
@@ -136,20 +149,20 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 			return true;
 		case MAP:
 			Map map = (Map) currVal;
-			if ( DustGenUtils.isEqual(map.get(hint), newVal)) {
+			if ( DustGenUtils.isEqual(map.get(hint), newVal) ) {
 				return false;
 			}
 			map.put(hint, newVal);
 			return true;
 		case SET:
 			Set set;
-			if (currVal instanceof Set) {
+			if ( currVal instanceof Set ) {
 				set = (Set) currVal;
 				if ( cmd == DustDialogCmd.SET ) {
 					set.clear();
 				}
 			} else {
-				if ( (cmd == DustDialogCmd.SET) && ( DustGenUtils.isEqual(currVal, newVal)) ) {
+				if ( (cmd == DustDialogCmd.SET) && (DustGenUtils.isEqual(currVal, newVal)) ) {
 					return false;
 				}
 				set = (Set) createContainer(ct, data, member);

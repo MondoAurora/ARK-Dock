@@ -1,137 +1,19 @@
 package ark.dock;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import dust.gen.DustGenConsts.DustEntity;
 import dust.gen.DustGenUtils;
 
 public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
-	class ModelEntity implements DustEntity {
-		final String id;
-		final String globalId;
-		Map<DustEntity, Object> data = new HashMap<>();
-
-		public ModelEntity(String globalId) {
-			this.globalId = globalId;
-			this.id = globalId.substring(globalId.lastIndexOf(TOKEN_SEP) + 1);
-		}
-
-		@Override
-		public String toString() {
-			return globalId;
-		}
-
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity member, RetType value, Object hint) {
-			Object ret;
-
-			Object val = data.get(member);
-			MetaMemberInfo mi = meta.getMemberInfo(member, value, hint);
-			DustCollType ct = (null == mi) ? null : mi.getCollType();
-
-			Object rv;
-
-			switch ( cmd ) {
-			case GET:
-				ret = value;
-
-				rv = ArkDockUtils.resolveValue(mi, val, hint);
-				if ( null != rv ) {
-					ret = rv;
-				}
-				break;
-			case SET:
-			case ADD:
-				if ( null == val ) {
-					if ( ct == DustCollType.MAP ) {
-						Map m = (Map) ArkDockUtils.createContainer(DustCollType.MAP, data, member);
-						m.put(hint, value);
-					} else {
-						data.put(member, value);
-					}
-					ret = true;
-				} else {
-					if ( (cmd == DustDialogCmd.SET) && DustGenUtils.isEqual(val, value) ) {
-						ret = false;
-					} else {
-						ret = ArkDockUtils.setValue(cmd, mi, data, member, val, value, hint);
-					}
-				}
-				break;
-			case CHK:
-				ret = DustGenUtils.isEqual(value, ArkDockUtils.resolveValue(mi, val, hint));
-				break;
-			case DEL:
-				if ( (null == hint) || (null == mi) || (ct == DustCollType.ONE) ) {
-					ret = (null != data.remove(member));
-				} else {
-					rv = ArkDockUtils.resolveValue(mi, val, hint);
-					if ( null != rv ) {
-						switch ( mi.getCollType() ) {
-						case ARR:
-							((ArrayList) val).remove((int) hint);
-							break;
-						case MAP:
-							((Map) val).remove(hint);
-							break;
-						case SET:
-							((Set) val).remove(hint);
-							break;
-						default:
-							break;
-						}
-						ret = true;
-					} else {
-						ret = false;
-					}
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-
-			return (RetType) ret;
-		}
-
-		@SuppressWarnings("rawtypes")
-		public int getCount(DustEntity member) {
-			Object val = data.get(member);
-			
-			if ( null != val ) {
-				MetaMemberInfo mi = meta.getMemberInfo(member, null, null);
-				DustCollType ct = (null == mi) ? null : mi.getCollType();
-				
-				if ( (null != ct) ) {
-					switch ( ct ) {
-					case ARR:
-						return ( val instanceof ArrayList) ? ((ArrayList)val).size() : 1;
-					case MAP:
-						return ( val instanceof Map) ? ((Map)val).size() : 1;
-					case SET:
-						return ( val instanceof Set) ? ((Set)val).size() : 1;
-					default:
-						break;
-					}
-				}
-				
-				return 1;
-			}
-			
-			
-			return 0;
-		}
-	}
-
 	MetaProvider meta;
 	ArkDockModel parent;
 
-	Map<String, ModelEntity> entities = new HashMap<>();
+	Map<String, ArkDockEntity> entities = new HashMap<>();
 
 	public ArkDockModel(ArkDockModel parent_) {
 		this.parent = parent_;
@@ -150,15 +32,15 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	public DustEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
-		String globalId = ArkDockUtils.buildGlobalId(((ModelEntity) unit).id, ((ModelEntity) type).id, itemId);
+		String globalId = ArkDockUtils.buildGlobalId(((ArkDockEntity) unit).id, ((ArkDockEntity) type).id, itemId);
 		return getEntity(globalId, createIfMissing);
 	}
 
 	public DustEntity getEntity(String globalId, boolean createIfMissing) {
-		ModelEntity e = entities.get(globalId);
+		ArkDockEntity e = entities.get(globalId);
 
 		if ( createIfMissing && (null == e) ) {
-			e = new ModelEntity(globalId);
+			e = new ArkDockEntity(this, globalId);
 			entities.put(globalId, e);
 			initEntity(e);
 		}
@@ -166,19 +48,19 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return e;
 	}
 
-	protected void initEntity(ModelEntity e) {
+	protected void initEntity(ArkDockEntity e) {
 	}
 
 	public int getCount(DustEntity e, DustEntity member) {
-		return (e instanceof ModelEntity) ? ((ModelEntity) e).getCount(member) : 0;
+		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).getCount(member) : 0;
 	}
 
 	public String getId(DustEntity e) {
-		return (e instanceof ModelEntity) ? ((ModelEntity) e).id : null;
+		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).id : null;
 	}
 
 	public String getGlobalId(DustEntity e) {
-		return (e instanceof ModelEntity) ? ((ModelEntity) e).globalId : null;
+		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).globalId : null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -187,10 +69,166 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		Object ret = (cmd == DustDialogCmd.GET) ? value : false;
 
 		if ( null != e ) {
-			ret = ((ModelEntity) e).accessMember(cmd, member, value, hint);
+			ret = ((ArkDockEntity) e).accessMember(cmd, member, value, hint);
 		}
 
 		return (RetType) ret;
+	}
+
+	private DustResultType doProcess(DustGenCtxAgent<? extends DustEntityContext> visitor, Object val, Object key)
+			throws Exception {
+		DustEntityContext ctx = visitor.getEventCtx();
+
+		ctx.mKey = key;
+		ctx.value = val;
+
+		DustResultType ret = visitor.agentAction(DustAgentAction.PROCESS);
+
+		if ( DustGenUtils.isReadOn(ret) && (ctx.valType == DustValType.REF) ) {
+			DustEntityContext save = new DustEntityContext(ctx);
+			ctx.reset();
+			ret = doVisitEntity(visitor, (ArkDockEntity) val);
+			ctx.load(save);
+		}
+
+		return ret;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private DustResultType doVisitMember(DustGenCtxAgent<? extends DustEntityContext> visitor, DustEntity member)
+			throws Exception {
+		DustResultType ret = null;
+		DustEntityContext ctx = visitor.getEventCtx();
+		ArkDockEntity entity = (ArkDockEntity) ctx.entity;
+		ctx.member = member;
+
+		MetaMemberInfo mi = meta.getMemberInfo(member, ctx.value, ctx.mKey);
+		ctx.valType = mi.getValType();
+		ctx.collType = mi.getCollType();
+
+		ctx.block = EntityBlock.Member;
+		ret = visitor.agentAction(DustAgentAction.BEGIN);
+
+		try {
+			if ( DustGenUtils.isReadOn(ret) ) {
+
+				Object val = entity.data.get(member);
+
+				DustCollType actCollType;
+
+				if ( (null == ctx.mKey) && (null != (actCollType = ArkDockUtils.getCollTypeForData(val))) ) {
+					int idx = 0;
+					switch ( actCollType ) {
+					case ARR:
+					case SET:
+						for (Object o : (Collection) val) {
+							ret = doProcess(visitor, o, idx++);
+							if ( DustGenUtils.isReject(ret) ) {
+								break;
+							}
+						}
+						break;
+					case MAP:
+						for (Object o : ((Map) val).entrySet()) {
+							Map.Entry mm = (Map.Entry) o;
+							ret = doProcess(visitor, mm.getValue(), mm.getKey());
+							if ( DustGenUtils.isReject(ret) ) {
+								break;
+							}
+						}
+						break;
+					default:
+						break;
+					}
+					ctx.mKey = null;
+				} else {
+					ret = doProcess(visitor, ArkDockUtils.resolveValue(mi, val, ctx.mKey), ctx.mKey);
+				}
+			}
+		} finally {
+			ctx.entity = entity;
+			ctx.member = mi.getMember();
+			ctx.valType = mi.getValType();
+			ctx.collType = mi.getCollType();
+			ctx.mKey = ctx.value = null;
+			
+			ctx.block = EntityBlock.Member;
+			visitor.agentAction(DustAgentAction.END);
+		}
+
+		return ret;
+	}
+
+	DustResultType doVisitEntity(DustGenCtxAgent<? extends DustEntityContext> visitor, ArkDockEntity entity)
+			throws Exception {
+		DustResultType ret = null;
+		DustEntityContext ctx = visitor.getEventCtx();
+
+		ctx.entity = entity;
+		ctx.block = EntityBlock.Entity;
+		ret = visitor.agentAction(DustAgentAction.BEGIN);
+
+		Object eKey = ctx.eKey;
+
+		try {
+			if ( DustGenUtils.isReadOn(ret) ) {
+				if ( null == ctx.member ) {
+					for (DustEntity de : entity.data.keySet()) {
+						ret = doVisitMember(visitor, de);
+						if ( DustGenUtils.isReject(ret) ) {
+							break;
+						}
+					}
+					return ret;
+				} else {
+					ret = doVisitMember(visitor, ctx.member);
+				}
+			}
+		} finally {
+			ctx.entity = entity;
+			ctx.eKey = eKey;
+			ctx.member = null;
+			ctx.valType = null;
+			ctx.collType = null;
+
+			ctx.block = EntityBlock.Entity;
+			visitor.agentAction(DustAgentAction.END);
+		}
+
+		return ret;
+	}
+
+	public DustResultType visit(DustGenCtxAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
+			Object key) throws Exception {
+		DustResultType ret = null;
+
+		DustEntityContext ctx = visitor.getEventCtx();
+		ctx.entity = e;
+		ctx.member = member;
+		ctx.mKey = key;
+
+		visitor.agentAction(DustAgentAction.INIT);
+
+		try {
+			if ( null == e ) {
+				for (ArkDockEntity me : entities.values()) {
+					ret = doVisitEntity(visitor, me);
+					if ( DustGenUtils.isReject(ret) ) {
+						break;
+					}
+				}
+			} else {
+				ret = doVisitEntity(visitor, (ArkDockEntity) e);
+			}
+		} finally {
+			ctx.reset();
+			ctx.entity = e;
+			ctx.member = member;
+			ctx.mKey = key;
+			visitor.agentAction(DustAgentAction.RELEASE);
+		}
+
+		return ret;
 	}
 
 	public boolean setMember(DustEntity e, DustEntity member, Object value, Object hint) {
@@ -202,11 +240,11 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	public Iterator<DustEntity> getContent(DustEntity e, DustEntity member) {
-		return ((ModelEntity) e).data.keySet().iterator();
+		return ((ArkDockEntity) e).data.keySet().iterator();
 	}
 
 	class ContentReader implements Iterator<DustEntity> {
-		Iterator<ModelEntity> mi;
+		Iterator<ArkDockEntity> mi;
 
 		public ContentReader() {
 			mi = entities.values().iterator();

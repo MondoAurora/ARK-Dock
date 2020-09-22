@@ -6,6 +6,7 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockConsts;
+import dust.gen.DustGenVisitor;
 
 public interface ArkDockJsonConsts extends ArkDockConsts {
 
@@ -26,14 +27,14 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
         }
     }
 
-    public class JsonContentHandlerAgent implements ContentHandler {
+    public class JsonContentVisitor implements ContentHandler {
         JsonContext ctx;
-        DustGenAgent agent;
+        DustGenVisitor<JsonContext> visitor;
 
-        public JsonContentHandlerAgent(DustGenAgent agent, JsonContext ctx) {
+        public JsonContentVisitor(DustGenVisitor<JsonContext> visitor) {
             super();
-            this.agent = agent;
-            this.ctx = ctx;
+            this.visitor = visitor;
+            this.ctx = visitor.getEventCtx();
         }
 
         boolean processJsonEvent(DustAgentAction action, JsonBlock block, Object param) {
@@ -41,7 +42,7 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
             ctx.param = param;
 
             try {
-                DustResultType ret = agent.agentAction(action);
+                DustResultType ret = visitor.agentAction(action);
 
                 switch (ret) {
                 case NOTIMPLEMENTED:

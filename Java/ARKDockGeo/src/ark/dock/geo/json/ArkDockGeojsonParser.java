@@ -10,14 +10,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockUtils;
-import ark.dock.json.ArkDockJsonUtils;
-import ark.dock.json.ArkDockJsonValueAgent;
-import dust.gen.DustGenAgentSmart;
+import ark.dock.json.ArkDockJsonConsts;
+import ark.dock.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenCounter;
 import dust.gen.DustGenDevUtils;
 import dust.gen.DustGenLog;
+import dust.gen.DustGenVisitor;
 
-public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonConsts, DustGenDevUtils {
+public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonConsts, DustGenDevUtils {
 
     static class RootAgent implements DustGenAgent {
 
@@ -40,7 +40,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                             root = gjtOb;
                         }
                         builder.select(gjtOb);
-                        relayAgent.setCtxOb(gjtOb);
+                        jsonVisitor.setProcCtx(gjtOb);
                         typeCounter.add(gjt);
 
                         gjt = gjt.childType;
@@ -51,8 +51,8 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                 case END:
                     switch (ctx.getBlock()) {
                     case Array: {
-                        Object oc = relayAgent.getCtxOb();
-                        Object parent = relayAgent.getCtxNeighbor(true);
+                        Object oc = jsonVisitor.getProcCtx();
+                        Object parent = jsonVisitor.getProcCtxNeighbor(true);
 
                         builder.select(parent);
                         builder.addChild(oc);
@@ -89,9 +89,9 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
 
         GeojsonBuilder builder;
 
-        DustGenAgentSmart relayAgent;
+        DustGenVisitor<JsonContext> jsonVisitor;
         CoordinatesAgent coordAgent;
-        ArkDockJsonValueAgent propertiesAgent;
+        ArkDockJsonReaderAgent propertiesAgent;
 
         String keyStr;
         GeojsonKey keyGeoJSON = GeojsonKey.NULL;
@@ -102,16 +102,16 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
         public RootAgent(GeojsonBuilder builder, GeojsonObjectSource obSrc) {
             this.builder = builder;
             this.obSrc = obSrc;
-            relayAgent = new DustGenAgentSmart(this);
+            jsonVisitor = new DustGenVisitor<JsonContext>(ctx, this);
             coordAgent = new CoordinatesAgent();
-            propertiesAgent = new ArkDockJsonValueAgent(relayAgent, ctx);
+            propertiesAgent = new ArkDockJsonReaderAgent(jsonVisitor);
         }
 
         public void parse(Reader r, GeojsonBuilder builder) throws IOException, ParseException {
             DevTimer parseTimer = new DevTimer("Parse");
 
             JSONParser p = new JSONParser();
-            JsonContentHandlerAgent h = new JsonContentHandlerAgent(relayAgent, ctx);
+            JsonContentVisitor h = new JsonContentVisitor(jsonVisitor);
             p.parse(r, h);
             
             parseTimer.log();
@@ -130,11 +130,11 @@ public class ArkDockGeojsonParser implements ArkDockJsonUtils, ArkDockGeojsonCon
                     switch (keyGeoJSON) {
                     case coordinates:
                         coordAgent.init(currType);
-                        relayAgent.setRelay(coordAgent, true);
+                        jsonVisitor.setRelay(coordAgent, true);
                         break;
                     case properties:
                         propertiesAgent.agentAction(DustAgentAction.INIT);
-                        relayAgent.setRelay(propertiesAgent, true);
+                        jsonVisitor.setRelay(propertiesAgent, true);
                         break;
                     default:
                         break;

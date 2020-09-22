@@ -73,7 +73,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 	@Override
 	public DustEntity getMember(DustEntity type, String itemId) {
 		String globalId = DustGenUtils
-				.sbAppend(null, TOKEN_SEP, true, ((ModelEntity) type).globalId.replace(TYPE_TYPE, TYPE_MEMBER), itemId)
+				.sbAppend(null, TOKEN_SEP, true, ((ArkDockEntity) type).globalId.replace(TYPE_TYPE, TYPE_MEMBER), itemId)
 				.toString();
 		DustEntity ret = getEntity(globalId, true);
 		
