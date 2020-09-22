@@ -1,7 +1,6 @@
 package ark.dock.json;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import dust.gen.DustGenConsts.DustAgentAction;
 import dust.gen.DustGenConsts.DustEntityContext;
 import dust.gen.DustGenConsts.DustResultType;
 import dust.gen.DustGenLog;
+import dust.gen.DustGenUtils;
 
 public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContext> {
 	enum JsonHeader {
@@ -30,6 +30,8 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	Writer target;
 	
 	Map<Class<?>, JsonFormatter> formatters;
+	
+	boolean contEntity;
 	
 	public ArkDockJsonSerializerWriter(Writer target, Map<JsonHeader, Map<String, Object>> header) {
 		this.target = target;
@@ -58,11 +60,29 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
+		DustEntityContext ctx = getEventCtx();
+		StringBuilder line = null;
+		String closeLine = "";
+		
 		switch ( action ) {
 		case INIT:
 			writeHeader();
+			contEntity = false;
 			break;
 		case BEGIN:
+			switch ( ctx.block ) {
+			case Entity:
+				if ( contEntity ) {
+					closeLine = ",";
+				} else {
+					contEntity = true;
+				}
+				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n   \"", JSONValue.escape(ctx.member.toString()), "\" : ");
+				target.write(line.toString());
+				break;
+			case Member:
+				break;
+			}
 			break;
 		case END:
 			break;
