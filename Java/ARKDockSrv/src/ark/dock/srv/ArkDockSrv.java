@@ -34,7 +34,8 @@ import dust.gen.DustGenLog;
 public class ArkDockSrv implements ArkDockSrvConsts {
 
     ArkDockModelMeta model = new ArkDockModelMeta();
-    DustEntity eTestType = model.getType(model.mt.eUnitArk, "Test");
+    DustEntity eTestUnit = model.getUnit("Test");
+    DustEntity eTestType = model.getType(eTestUnit, "Test");
     DustEntity eTestMember = model.getMember(eTestType, "TestValue");
     
 	Server server;
@@ -97,13 +98,13 @@ public class ArkDockSrv implements ArkDockSrvConsts {
                 clientData = (JSONObject) data.get("data");
                 
                 id = (String) clientData.get("id");
-                e = model.getEntity(id, true);
+                e = model.getEntity(eTestUnit, eTestType, id, true);
                 model.accessMember(DustDialogCmd.SET, e, eTestMember, clientData, null);
                 
                 break;
             case get:
                 id = request.getParameter("id");
-                e = model.getEntity(id, false);
+                e = model.getEntity(eTestUnit, eTestType, id, false);
                 respData = (JSONObject) model.accessMember(DustDialogCmd.GET, e, eTestMember, null, null);
 
                 break;

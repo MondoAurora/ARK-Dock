@@ -7,6 +7,11 @@ public interface ArkDockTokens extends ArkDockConsts {
     String TYPE_UNIT = "Unit";
     String TYPE_TYPE = "Type";
     String TYPE_MEMBER = "Member";
+    String TYPE_ENTITY = "Entity";
+
+    String MEMBER_ENTITY_ID = "Id";
+    String MEMBER_ENTITY_GLOBALID = "GlobalId";
+    String MEMBER_ENTITY_PRIMARYTYPE = "PrimaryType";
     
     String TYPE_GEOM = "Geom";
 
@@ -24,11 +29,35 @@ public interface ArkDockTokens extends ArkDockConsts {
     	public final DustEntity eTypeType;
     	public final DustEntity eTypeMember;
 
+    	public final DustEntity eTypeEntity;
+    	public final DustEntity eEntityId;
+    	public final DustEntity eEntityGlobalId;
+    	public final DustEntity eEntityPrimType;
+    	
+    	
         public Meta(ArkDockModelMeta meta) {
-    		eUnitArk = meta.getEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_UNIT, UNIT_ARK), true);
-    		eTypeUnit = meta.getEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_UNIT), true);
-    		eTypeType = meta.getEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_TYPE), true);
-    		eTypeMember = meta.getEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_MEMBER), true);
+    		eUnitArk = meta.getBootEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_UNIT, UNIT_ARK));
+    		eTypeUnit = meta.getBootEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_UNIT));
+    		eTypeType = meta.getBootEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_TYPE));
+    		eTypeMember = meta.getBootEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_MEMBER));
+    		
+    		eTypeEntity = meta.getBootEntity(ArkDockUtils.buildGlobalId(UNIT_ARK, TYPE_TYPE, TYPE_ENTITY));
+    		
+    		eEntityId = meta.getMember(eTypeEntity, MEMBER_ENTITY_ID);
+    		eEntityGlobalId = meta.getMember(eTypeEntity, MEMBER_ENTITY_GLOBALID);
+    		eEntityPrimType = meta.getMember(eTypeEntity, MEMBER_ENTITY_PRIMARYTYPE);
+    		
+    		
+    		meta.initBootEntity(eUnitArk, eTypeUnit, this);
+    		
+    		meta.initBootEntity(eTypeType, eTypeType, this);
+    		meta.initBootEntity(eTypeUnit, eTypeType, this);
+    		meta.initBootEntity(eTypeMember, eTypeType, this);
+    		meta.initBootEntity(eTypeEntity, eTypeType, this);
+    		
+    		meta.initBootEntity(eEntityId, eTypeMember, this);
+    		meta.initBootEntity(eEntityGlobalId, eTypeMember, this);
+    		meta.initBootEntity(eEntityPrimType, eTypeMember, this);
         }
     }
     

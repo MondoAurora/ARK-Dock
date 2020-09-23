@@ -10,14 +10,14 @@ import dust.gen.DustGenUtils;
 
 public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
-	MetaProvider meta;
+	ArkDockModelMeta meta;
 	ArkDockModel parent;
 
 	Map<String, ArkDockEntity> entities = new HashMap<>();
 
 	public ArkDockModel(ArkDockModel parent_) {
 		this.parent = parent_;
-		meta = parent.getMeta();
+		meta = parent.meta;
 	}
 
 	protected ArkDockModel() {
@@ -33,22 +33,40 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 	public DustEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
 		String globalId = ArkDockUtils.buildGlobalId(((ArkDockEntity) unit).id, ((ArkDockEntity) type).id, itemId);
-		return getEntity(globalId, createIfMissing);
-	}
 
-	public DustEntity getEntity(String globalId, boolean createIfMissing) {
 		ArkDockEntity e = entities.get(globalId);
 
 		if ( createIfMissing && (null == e) ) {
 			e = new ArkDockEntity(this, globalId);
+			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityId, itemId, null);
+			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityGlobalId, globalId, null);
+			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityPrimType, type, null);
 			entities.put(globalId, e);
-			initEntity(e);
 		}
 
 		return e;
 	}
 
-	protected void initEntity(ArkDockEntity e) {
+	void initBootEntity(DustEntity entity, DustEntity type, ArkDockTokens.Meta mt) {
+		ArkDockEntity e = (ArkDockEntity) entity;
+		e.accessMember(DustDialogCmd.SET, mt.eEntityId, e.id, null);
+		e.accessMember(DustDialogCmd.SET, mt.eEntityGlobalId, e.globalId, null);
+		e.accessMember(DustDialogCmd.SET, mt.eEntityPrimType, type, null);
+	}
+
+	ArkDockEntity getBootEntity(String globalId) {
+		ArkDockEntity e = entities.get(globalId);
+
+		if ( null == e ) {
+			e = new ArkDockEntity(this, globalId);
+			entities.put(globalId, e);
+		}
+
+		return e;
+	}
+
+	public DustEntity getEntity(String globalId) {
+		return entities.get(globalId);
 	}
 
 	public int getCount(DustEntity e, DustEntity member) {
@@ -109,9 +127,8 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		ctx.block = EntityBlock.Member;
 		ret = visitor.agentAction(DustAgentAction.BEGIN);
 
-		try {
-			if ( DustGenUtils.isReadOn(ret) ) {
-
+		if ( DustGenUtils.isReadOn(ret) ) {
+			try {
 				Object val = entity.data.get(member);
 
 				DustCollType actCollType;
@@ -144,16 +161,16 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 				} else {
 					ret = doProcess(visitor, ArkDockUtils.resolveValue(mi, val, ctx.mKey), ctx.mKey);
 				}
+			} finally {
+				ctx.entity = entity;
+				ctx.member = mi.getMember();
+				ctx.valType = mi.getValType();
+				ctx.collType = mi.getCollType();
+				ctx.mKey = ctx.value = null;
+
+				ctx.block = EntityBlock.Member;
+				visitor.agentAction(DustAgentAction.END);
 			}
-		} finally {
-			ctx.entity = entity;
-			ctx.member = mi.getMember();
-			ctx.valType = mi.getValType();
-			ctx.collType = mi.getCollType();
-			ctx.mKey = ctx.value = null;
-			
-			ctx.block = EntityBlock.Member;
-			visitor.agentAction(DustAgentAction.END);
 		}
 
 		return ret;
@@ -170,8 +187,8 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		Object eKey = ctx.eKey;
 
-		try {
-			if ( DustGenUtils.isReadOn(ret) ) {
+		if ( DustGenUtils.isReadOn(ret) ) {
+			try {
 				if ( null == ctx.member ) {
 					for (DustEntity de : entity.data.keySet()) {
 						ret = doVisitMember(visitor, de);
@@ -183,16 +200,17 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 				} else {
 					ret = doVisitMember(visitor, ctx.member);
 				}
-			}
-		} finally {
-			ctx.entity = entity;
-			ctx.eKey = eKey;
-			ctx.member = null;
-			ctx.valType = null;
-			ctx.collType = null;
 
-			ctx.block = EntityBlock.Entity;
-			visitor.agentAction(DustAgentAction.END);
+			} finally {
+				ctx.entity = entity;
+				ctx.eKey = eKey;
+				ctx.member = null;
+				ctx.valType = null;
+				ctx.collType = null;
+
+				ctx.block = EntityBlock.Entity;
+				visitor.agentAction(DustAgentAction.END);
+			}
 		}
 
 		return ret;

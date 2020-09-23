@@ -1,8 +1,9 @@
 package ark.dock;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
@@ -40,9 +41,11 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 		final DustGenCtxAgent<SCType> target;
 		final DustGenCtxAgent<SCType> filter;
 
-		long nextId;
-		final Map<DustEntity, Long> serIDs = new HashMap<>();
-		final LinkedList<DustEntity> todo = new LinkedList<>();
+//		long nextId;
+//		final Map<DustEntity, Long> serIDs = new HashMap<>();
+//		final LinkedList<DustEntity> todo = new LinkedList<>();
+		final Map<DustEntity, Object> serIDs = new HashMap<>();
+		final Set<DustEntity> todo = new HashSet<>();
 
 		public ModelVisitor(ArkDockModel model, DustGenCtxAgent<SCType> target,
 				DustGenCtxAgent<SCType> filter) {
@@ -56,14 +59,15 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 				filter.setEventCtx(target.getEventCtx());
 			}
 
-			nextId = 1;
+//			nextId = 1;
 		}
 
-		long getSerId(DustEntity entity, boolean addTodo) {
-			Long ret = serIDs.get(entity);
+		Object getSerId(DustEntity entity, boolean addTodo) {
+			Object ret = serIDs.get(entity);
 
 			if ( null == ret ) {
-				ret = nextId++;
+//				ret = nextId++;
+				ret = ((ArkDockEntity)entity).globalId;
 				serIDs.put(entity, ret);
 				if ( addTodo ) {
 					todo.add(entity);
@@ -73,6 +77,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			}
 
 			return ret;
+			
 		}
 
 		@Override
@@ -102,7 +107,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 				break;
 			case RELEASE:
 				while (!todo.isEmpty()) {
-					ArkDockEntity next = (ArkDockEntity) todo.removeFirst();
+					ArkDockEntity next = (ArkDockEntity) todo.iterator().next();
 					model.doVisitEntity(this, next);
 				}
 

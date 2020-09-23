@@ -7,15 +7,13 @@ import dust.gen.DustGenUtils;
 public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkDockTokens {
 
 	public final ArkDockTokens.Meta mt;
-	
+
 	class MemberInfo implements MetaMemberInfo {
 		final DustEntity member;
 		final DustEntity type;
-		
+
 		DustValType vt;
 		DustCollType ct;
-		
-		
 
 		public MemberInfo(DustEntity member, DustEntity type) {
 			this.type = type;
@@ -41,9 +39,9 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		public DustValType getValType() {
 			return vt;
 		}
-		
+
 	}
-	
+
 	DustGenFactory<DustEntity, MemberInfo> factMemberInfo = new DustGenFactory<DustEntity, MemberInfo>(null) {
 		private static final long serialVersionUID = 1L;
 
@@ -52,7 +50,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 			return new MemberInfo(key, (DustEntity) hint);
 		}
 	};
-	
+
 	public ArkDockModelMeta() {
 		parent = null;
 		meta = this;
@@ -72,28 +70,36 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 
 	@Override
 	public DustEntity getMember(DustEntity type, String itemId) {
-		String globalId = DustGenUtils
-				.sbAppend(null, TOKEN_SEP, true, ((ArkDockEntity) type).globalId.replace(TYPE_TYPE, TYPE_MEMBER), itemId)
-				.toString();
-		DustEntity ret = getEntity(globalId, true);
-		
-		factMemberInfo.get(ret, type);
-		
+		String globalId = DustGenUtils.sbAppend(null, TOKEN_SEP, true,
+				((ArkDockEntity) type).globalId.replace(TYPE_TYPE, TYPE_MEMBER), itemId).toString();
+		DustEntity ret = getEntity(globalId);
+
+		if ( null == ret ) {
+			ArkDockEntity e = getBootEntity(globalId);
+
+			if ( null != mt ) {
+				initBootEntity(e, mt.eTypeMember, mt);
+			}
+
+			factMemberInfo.get(ret, type);
+			ret = e;
+		}
+
 		return ret;
 	}
-	
+
 	@Override
 	public MemberInfo getMemberInfo(DustEntity member, Object value, Object hint) {
 		MemberInfo mi = factMemberInfo.get(member);
-		
+
 		if ( (null == mi.ct) && (null != hint) ) {
 			mi.ct = ArkDockUtils.getCollTypeForHint(hint);
 		}
-		
+
 		if ( (null == mi.vt) && (null != value) ) {
 			mi.vt = ArkDockUtils.getValTypeForValue(value);
 		}
-		
+
 		return mi;
 	}
 }
