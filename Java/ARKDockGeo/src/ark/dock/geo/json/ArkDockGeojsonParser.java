@@ -1,8 +1,9 @@
 package ark.dock.geo.json;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 
@@ -201,7 +202,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
 
     public static void parse(File f, GeojsonBuilder builder, GeojsonObjectSource obSrc) throws Exception {
         DustGenLog.log("Parsing GeoJSON file", f.getName(), "size", f.length());
-        FileReader fr = new FileReader(f);
+        Reader fr = new InputStreamReader(new FileInputStream("DirectionResponse.xml"), "UTF-8");
         parse(fr, builder, obSrc);
     }
 

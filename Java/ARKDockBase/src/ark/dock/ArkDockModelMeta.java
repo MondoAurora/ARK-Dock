@@ -2,11 +2,14 @@ package ark.dock;
 
 import ark.dock.ArkDockConsts.MetaProvider;
 import dust.gen.DustGenFactory;
+import dust.gen.DustGenTranslator;
 import dust.gen.DustGenUtils;
 
 public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkDockTokens {
 
-	public final ArkDockTokens.Meta mt;
+	public final ArkDockTokens.Meta tokMeta;
+	public final ArkDockTokens.Text tokText;
+	public final ArkDockTokens.Gen tokGen;
 
 	class MemberInfo implements MetaMemberInfo {
 		final DustEntity member;
@@ -18,6 +21,9 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		public MemberInfo(DustEntity member, DustEntity type) {
 			this.type = type;
 			this.member = member;
+			if ( null == member ) {
+				DustException.throwException(null, "should not be here");
+			}
 		}
 
 		@Override
@@ -55,17 +61,19 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		parent = null;
 		meta = this;
 
-		mt = new Meta(this);
+		tokMeta = new ArkDockTokens.Meta(this);
+		tokText = new ArkDockTokens.Text(this);
+		tokGen = new ArkDockTokens.Gen(this);
 	}
 
 	@Override
 	public DustEntity getUnit(String unitId) {
-		return getEntity(mt.eUnitArk, mt.eTypeUnit, unitId, true);
+		return getEntity(tokMeta.eUnitArk, tokMeta.eTypeUnit, unitId, true);
 	}
 
 	@Override
 	public DustEntity getType(DustEntity unit, String typeId) {
-		return getEntity(unit, mt.eTypeType, typeId, true);
+		return getEntity(unit, tokMeta.eTypeType, typeId, true);
 	}
 
 	@Override
@@ -77,16 +85,25 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		if ( null == ret ) {
 			ArkDockEntity e = getBootEntity(globalId);
 
-			if ( null != mt ) {
-				initBootEntity(e, mt.eTypeMember, mt);
+			if ( null != tokMeta ) {
+				initBootEntity(e, tokMeta.eTypeMember, tokMeta);
 			}
 
-			factMemberInfo.get(ret, type);
+			factMemberInfo.get(e, type);
 			ret = e;
 		}
 
 		return ret;
 	}
+	
+	void initBootMember(DustEntity entity, ArkDockTokens.Meta mt, DustValType vt, DustCollType ct) {
+		initBootEntity(entity, mt.eTypeMember, mt);
+		
+		MemberInfo mi = getMemberInfo(entity, null, null);
+		mi.vt = vt;
+		mi.ct = ct;
+	}
+
 
 	@Override
 	public MemberInfo getMemberInfo(DustEntity member, Object value, Object hint) {
@@ -101,5 +118,25 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		}
 
 		return mi;
+	}
+	
+	public void consolidateMeta() {
+		DustGenTranslator<DustCollType, DustEntity> trCollType = new DustGenTranslator<DustCollType, DustEntity>(
+				DustCollType.values(), new DustEntity[] {tokMeta.eConstColltypeOne, tokMeta.eConstColltypeArr, tokMeta.eConstColltypeSet, tokMeta.eConstColltypeMap, });
+		DustGenTranslator<DustValType, DustEntity> trValType = new DustGenTranslator<DustValType, DustEntity>(
+				DustValType.values(), new DustEntity[] {tokMeta.eConstValtypeInt, tokMeta.eConstValtypeReal, tokMeta.eConstValtypeRef, tokMeta.eConstValtypeRaw});
+
+		for ( MetaMemberInfo mi : factMemberInfo.values() ) {
+			DustEntity eM = mi.getMember();
+			DustEntity eT = mi.getType();
+			
+			setMember(eM, tokMeta.eMemberCollType, trCollType.getRight(ArkDockUtils.getCollType(mi)), null);
+			setMember(eM, tokMeta.eMemberValType, trValType.getRight(ArkDockUtils.getValType(mi, DustValType.RAW)), null);
+			
+			boolean added = (boolean) accessMember(DustDialogCmd.CHK, eT, tokGen.eCollMember, eM, null);
+			if ( !added ) {
+				accessMember(DustDialogCmd.ADD, eT, tokGen.eCollMember, eM, KEY_APPEND);
+			}
+		}
 	}
 }

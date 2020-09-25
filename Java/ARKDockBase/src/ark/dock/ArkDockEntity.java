@@ -29,7 +29,7 @@ class ArkDockEntity implements DustEntity {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity member, RetType value, Object hint) {
+	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity member, Object value, Object hint) {
 		Object ret;
 
 		Object val = data.get(member);

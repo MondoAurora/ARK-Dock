@@ -94,7 +94,7 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		case ARR:
 			if ( v instanceof ArrayList ) {
 				ArrayList arr = (ArrayList) v;
-				int idx = ((Number) hint).intValue();
+				int idx = (null == hint) ? 0 : ((Number) hint).intValue();
 				return ((0 <= idx) && (idx < arr.size())) ? arr.get(idx) : null;
 			} else {
 				return v;

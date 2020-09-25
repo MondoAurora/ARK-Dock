@@ -38,9 +38,9 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		if ( createIfMissing && (null == e) ) {
 			e = new ArkDockEntity(this, globalId);
-			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityId, itemId, null);
-			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityGlobalId, globalId, null);
-			e.accessMember(DustDialogCmd.SET, meta.mt.eEntityPrimType, type, null);
+			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityId, itemId, null);
+			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityGlobalId, globalId, null);
+			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityPrimType, type, null);
 			entities.put(globalId, e);
 		}
 
@@ -86,7 +86,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity e, DustEntity member, RetType value,
+	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity e, DustEntity member, Object value,
 			Object hint) {
 		Object ret = (cmd == DustDialogCmd.GET) ? value : false;
 
