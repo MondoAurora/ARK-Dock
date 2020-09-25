@@ -13,6 +13,20 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, id).toString();
 	}
 
+	public static DustCollType getCollType(MetaMemberInfo mi, DustCollType def) {
+		DustCollType ret = (null == mi) ? null : mi.getCollType();
+		return (null == ret) ? def : ret;
+	}
+
+	public static DustCollType getCollType(MetaMemberInfo mi) {
+		return getCollType(mi, DustCollType.ONE);
+	}
+
+	public static DustValType getValType(MetaMemberInfo mi, DustValType def) {
+		DustValType ret = (null == mi) ? null : mi.getValType();
+		return (null == ret) ? def : ret;
+	}
+
 	static DustCollType getCollTypeForHint(Object hint) {
 		if ( null == hint ) {
 			return DustCollType.SET;
@@ -133,7 +147,7 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 				arr.add(currVal);
 			}
 
-			int idx = ((Number) hint).intValue();
+			int idx = (null == hint) ? 0 : ((Number) hint).intValue();
 			if ( (0 <= idx) && (idx < arr.size()) ) {
 				if ( cmd == DustDialogCmd.SET ) {
 					if ( DustGenUtils.isEqual(arr.get(idx), newVal) ) {

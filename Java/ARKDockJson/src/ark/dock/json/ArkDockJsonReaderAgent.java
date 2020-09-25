@@ -37,6 +37,8 @@ public class ArkDockJsonReaderAgent implements DustGenAgent {
 	@SuppressWarnings("unchecked")
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
+		Object ob;
+		
 		switch ( action ) {
 		case INIT:
 			root = null;
@@ -59,17 +61,20 @@ public class ArkDockJsonReaderAgent implements DustGenAgent {
 			}
 			break;
 		case END:
+			ob = visitor.getProcCtx();
 			blockOb = visitor.getProcCtxNeighbor(true);
 			if ( blockOb instanceof Map ) {
+//				((Map) blockOb).put(key, ob);
 				blockType = JsonBlock.Object;
 			} else if ( blockOb instanceof List ) {
+				((List) blockOb).add(ob);
 				blockType = JsonBlock.Array;
 			} else {
 				blockType = null;
 			}
 			break;
 		case PROCESS:
-			Object ob = ctx.getParam();
+			ob = ctx.getParam();
 			if ( blockType == JsonBlock.Object ) {
 				((Map) blockOb).put(key, ob);
 			} else if ( blockType == JsonBlock.Array ) {

@@ -23,7 +23,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	protected ArkDockModel() {
 	}
 
-	public MetaProvider getMeta() {
+	public ArkDockModelMeta getMeta() {
 		return meta;
 	}
 
@@ -66,7 +66,11 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	public DustEntity getEntity(String globalId) {
-		return entities.get(globalId);
+		DustEntity e = entities.get(globalId);
+		if ( (null == e) && (null != parent) ) {
+			e = parent.getEntity(globalId);
+		}
+		return e;
 	}
 
 	public int getCount(DustEntity e, DustEntity member) {

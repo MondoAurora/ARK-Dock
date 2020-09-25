@@ -7,6 +7,7 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockConsts;
+import dust.gen.DustGenUtils;
 import dust.gen.DustGenVisitor;
 
 public interface ArkDockJsonConsts extends ArkDockConsts {
@@ -18,6 +19,11 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
 	interface JsonFormatter {
 		Class<?> getDataClass();
 		void toJson(Object data, Writer target) throws Exception;
+		Object fromParsedData(Object data);
+	}
+
+	enum SerializeHeader {
+		ArkJsonInfo, VersionInfo
 	}
 
 
@@ -32,6 +38,13 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
         public Object getParam() {
             return param;
         }
+        
+		@Override
+		public String toString() {
+			StringBuilder sb = DustGenUtils.sbAppend(null, " ", true, block, param);
+			return sb.toString();
+		}
+
     }
 
     public class JsonContentVisitor implements ContentHandler {
