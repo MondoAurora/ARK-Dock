@@ -11,18 +11,19 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockUtils;
+import ark.dock.ArkDockVisitor;
 import ark.dock.json.ArkDockJsonConsts;
 import ark.dock.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenCounter;
 import dust.gen.DustGenDevUtils;
+import dust.gen.DustGenException;
 import dust.gen.DustGenLog;
-import dust.gen.DustGenVisitor;
 
 public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonConsts, DustGenDevUtils {
 
-    static class RootAgent implements DustGenAgent {
+    static class RootAgent implements DustAgent {
 
-        class CoordinatesAgent implements DustGenAgent {
+        class CoordinatesAgent implements DustAgent {
             private GeojsonType gjt;
             private Object root;
             
@@ -75,7 +76,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                     break;
                 }
 
-                return DustException.throwException(null, "Invalid GeoJSON parse state");
+                return DustGenException.throwException(null, "Invalid GeoJSON parse state");
             }
             
             public Object getRoot() {
@@ -90,7 +91,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
 
         GeojsonBuilder builder;
 
-        DustGenVisitor<JsonContext> jsonVisitor;
+        ArkDockVisitor<JsonContext> jsonVisitor;
         CoordinatesAgent coordAgent;
         ArkDockJsonReaderAgent propertiesAgent;
 
@@ -103,7 +104,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
         public RootAgent(GeojsonBuilder builder, GeojsonObjectSource obSrc) {
             this.builder = builder;
             this.obSrc = obSrc;
-            jsonVisitor = new DustGenVisitor<JsonContext>(ctx, this);
+            jsonVisitor = new ArkDockVisitor<JsonContext>(ctx, this);
             coordAgent = new CoordinatesAgent();
             propertiesAgent = new ArkDockJsonReaderAgent(jsonVisitor);
         }

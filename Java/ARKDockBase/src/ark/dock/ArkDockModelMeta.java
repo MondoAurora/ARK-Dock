@@ -1,6 +1,7 @@
 package ark.dock;
 
 import ark.dock.ArkDockConsts.MetaProvider;
+import dust.gen.DustGenException;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenTranslator;
 import dust.gen.DustGenUtils;
@@ -11,28 +12,28 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 	public final ArkDockTokens.Text tokText;
 	public final ArkDockTokens.Gen tokGen;
 
-	class MemberInfo implements MetaMemberInfo {
+	class ArkMemberDef implements DustMemberDef {
 		final DustEntity member;
 		final DustEntity type;
 
 		DustValType vt;
 		DustCollType ct;
 
-		public MemberInfo(DustEntity member, DustEntity type) {
+		public ArkMemberDef(DustEntity member, DustEntity type) {
 			this.type = type;
 			this.member = member;
 			if ( null == member ) {
-				DustException.throwException(null, "should not be here");
+				DustGenException.throwException(null, "should not be here");
 			}
 		}
 
 		@Override
-		public DustEntity getType() {
+		public DustEntity getTypeEntity() {
 			return type;
 		}
 
 		@Override
-		public DustEntity getMember() {
+		public DustEntity getDefEntity() {
 			return member;
 		}
 
@@ -48,12 +49,12 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 
 	}
 
-	DustGenFactory<DustEntity, MemberInfo> factMemberInfo = new DustGenFactory<DustEntity, MemberInfo>(null) {
+	DustGenFactory<DustEntity, ArkMemberDef> factMemberDef = new DustGenFactory<DustEntity, ArkMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		protected MemberInfo createItem(DustEntity key, Object hint) {
-			return new MemberInfo(key, (DustEntity) hint);
+		protected ArkMemberDef createItem(DustEntity key, Object hint) {
+			return new ArkMemberDef(key, (DustEntity) hint);
 		}
 	};
 
@@ -89,7 +90,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 				initBootEntity(e, tokMeta.eTypeMember, tokMeta);
 			}
 
-			factMemberInfo.get(e, type);
+			factMemberDef.get(e, type);
 			ret = e;
 		}
 
@@ -99,25 +100,25 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 	void initBootMember(DustEntity entity, ArkDockTokens.Meta mt, DustValType vt, DustCollType ct) {
 		initBootEntity(entity, mt.eTypeMember, mt);
 		
-		MemberInfo mi = getMemberInfo(entity, null, null);
-		mi.vt = vt;
-		mi.ct = ct;
+		ArkMemberDef amd = getMemberDef(entity, null, null);
+		amd.vt = vt;
+		amd.ct = ct;
 	}
 
 
 	@Override
-	public MemberInfo getMemberInfo(DustEntity member, Object value, Object hint) {
-		MemberInfo mi = factMemberInfo.get(member);
+	public ArkMemberDef getMemberDef(DustEntity member, Object value, Object hint) {
+		ArkMemberDef amd = factMemberDef.get(member);
 
-		if ( (null == mi.ct) && (null != hint) ) {
-			mi.ct = ArkDockUtils.getCollTypeForHint(hint);
+		if ( (null == amd.ct) && (null != hint) ) {
+			amd.ct = ArkDockUtils.getCollTypeForHint(hint);
 		}
 
-		if ( (null == mi.vt) && (null != value) ) {
-			mi.vt = ArkDockUtils.getValTypeForValue(value);
+		if ( (null == amd.vt) && (null != value) ) {
+			amd.vt = ArkDockUtils.getValTypeForValue(value);
 		}
 
-		return mi;
+		return amd;
 	}
 	
 	public void consolidateMeta() {
@@ -126,12 +127,12 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider, ArkD
 		DustGenTranslator<DustValType, DustEntity> trValType = new DustGenTranslator<DustValType, DustEntity>(
 				DustValType.values(), new DustEntity[] {tokMeta.eConstValtypeInt, tokMeta.eConstValtypeReal, tokMeta.eConstValtypeRef, tokMeta.eConstValtypeRaw});
 
-		for ( MetaMemberInfo mi : factMemberInfo.values() ) {
-			DustEntity eM = mi.getMember();
-			DustEntity eT = mi.getType();
+		for ( ArkMemberDef amd : factMemberDef.values() ) {
+			DustEntity eM = amd.getDefEntity();
+			DustEntity eT = amd.getTypeEntity();
 			
-			setMember(eM, tokMeta.eMemberCollType, trCollType.getRight(ArkDockUtils.getCollType(mi)), null);
-			setMember(eM, tokMeta.eMemberValType, trValType.getRight(ArkDockUtils.getValType(mi, DustValType.RAW)), null);
+			setMember(eM, tokMeta.eMemberCollType, trCollType.getRight(ArkDockUtils.getCollType(amd)), null);
+			setMember(eM, tokMeta.eMemberValType, trValType.getRight(ArkDockUtils.getValType(amd, DustValType.RAW)), null);
 			
 			boolean added = (boolean) accessMember(DustDialogCmd.CHK, eT, tokGen.eCollMember, eM, null);
 			if ( !added ) {

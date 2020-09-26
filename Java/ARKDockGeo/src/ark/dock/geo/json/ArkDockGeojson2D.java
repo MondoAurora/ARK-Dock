@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
+import dust.gen.DustGenException;
+
 public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 	enum FormatParam {
 		FakeZCoord
@@ -195,7 +197,7 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 					break;
 				default:
 					if ( 0.0 != (double) data ) {
-						DustException.throwException(null, "2DPoint losing coordinate", coordIdx, data);
+						DustGenException.throwException(null, "2DPoint losing coordinate", coordIdx, data);
 					}
 				}
 			} else if ( currObj instanceof Path2D.Double ) {

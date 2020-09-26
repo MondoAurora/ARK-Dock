@@ -29,7 +29,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	public ArkDockJsonSerializerWriter(Writer target, Map<JsonHeader, Object> header) {
 		this.target = target;
 		this.header = header;
-		setEventCtx(new DustEntityContext());
+		setActionCtx(new DustEntityContext());
 	}
 
 	public ArkDockJsonSerializerWriter(File file, Map<JsonHeader, Object> header) throws Exception {
@@ -51,7 +51,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
-		DustEntityContext ctx = getEventCtx();
+		DustEntityContext ctx = getActionCtx();
 		StringBuilder line = null;
 		String closeLine = "";
 
@@ -71,7 +71,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 				} else {
 					contEntity = true;
 				}
-				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n   ", JSONValue.toJSONString(ctx.eKey.toString()),
+				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n   ", JSONValue.toJSONString(ctx.entityId.toString()),
 						" : {");
 				target.write(line.toString());
 				contMember = false;

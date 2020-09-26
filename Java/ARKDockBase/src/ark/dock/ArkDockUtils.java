@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
 public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
@@ -13,17 +14,17 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, id).toString();
 	}
 
-	public static DustCollType getCollType(MetaMemberInfo mi, DustCollType def) {
-		DustCollType ret = (null == mi) ? null : mi.getCollType();
+	public static DustCollType getCollType(DustMemberDef md, DustCollType def) {
+		DustCollType ret = (null == md) ? null : md.getCollType();
 		return (null == ret) ? def : ret;
 	}
 
-	public static DustCollType getCollType(MetaMemberInfo mi) {
-		return getCollType(mi, DustCollType.ONE);
+	public static DustCollType getCollType(DustMemberDef md) {
+		return getCollType(md, DustCollType.ONE);
 	}
 
-	public static DustValType getValType(MetaMemberInfo mi, DustValType def) {
-		DustValType ret = (null == mi) ? null : mi.getValType();
+	public static DustValType getValType(DustMemberDef md, DustValType def) {
+		DustValType ret = (null == md) ? null : md.getValType();
 		return (null == ret) ? def : ret;
 	}
 
@@ -35,7 +36,7 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		} else if ( hint instanceof DustEntity ) {
 			return DustCollType.MAP;
 		}
-		return DustException.throwException(null, "Should never get here");
+		return DustGenException.throwException(null, "Should never get here");
 	}
 
 	static DustCollType getCollTypeForData(Object data) {
@@ -79,13 +80,13 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		case ONE:
 			return null;
 		default:
-			return DustException.throwException(null, "Should never get here");
+			return DustGenException.throwException(null, "Should never get here");
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	static Object resolveValue(MetaMemberInfo mi, Object v, Object hint) {
-		DustCollType ct = (null == mi) ? null : mi.getCollType();
+	static Object resolveValue(DustMemberDef md, Object v, Object hint) {
+		DustCollType ct = (null == md) ? null : md.getCollType();
 		if ( (null == ct) || (null == v) ) {
 			return v;
 		}
@@ -111,17 +112,17 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		case ONE:
 			return v;
 		default:
-			return DustException.throwException(null, "Should never get here");
+			return DustGenException.throwException(null, "Should never get here");
 		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static boolean setValue(DustDialogCmd cmd, MetaMemberInfo mi, Map<DustEntity, Object> data, DustEntity member,
+	static boolean setValue(DustDialogCmd cmd, DustMemberDef md, Map<DustEntity, Object> data, DustEntity member,
 			Object currVal, Object newVal, Object hint) {
-		DustCollType ct = (null == mi) ? null : mi.getCollType();
+		DustCollType ct = (null == md) ? null : md.getCollType();
 
 		if ( (cmd == DustDialogCmd.ADD) && (null == ct) ) {
-			((ArkDockModelMeta.MemberInfo) mi).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
+			((ArkDockModelMeta.ArkMemberDef) md).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
 		}
 
 		if ( (null == ct) || (ct == DustCollType.ONE) ) {
@@ -185,7 +186,7 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 
 			return set.add(newVal);
 		default:
-			return DustException.throwException(null, "Should never get here");
+			return DustGenException.throwException(null, "Should never get here");
 		}
 	}
 }

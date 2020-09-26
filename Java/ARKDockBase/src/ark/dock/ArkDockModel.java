@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import dust.gen.DustGenConsts.DustEntity;
+import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
 public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
@@ -97,9 +98,9 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return (RetType) ret;
 	}
 
-	private DustResultType doProcess(DustGenCtxAgent<? extends DustEntityContext> visitor, Object val, Object key)
+	private DustResultType doProcess(ArkAgent<? extends DustEntityContext> visitor, Object val, Object key)
 			throws Exception {
-		DustEntityContext ctx = visitor.getEventCtx();
+		DustEntityContext ctx = visitor.getActionCtx();
 
 		ctx.mKey = key;
 		ctx.value = val;
@@ -117,16 +118,16 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private DustResultType doVisitMember(DustGenCtxAgent<? extends DustEntityContext> visitor, DustEntity member)
+	private DustResultType doVisitMember(ArkAgent<? extends DustEntityContext> visitor, DustEntity member)
 			throws Exception {
 		DustResultType ret = null;
-		DustEntityContext ctx = visitor.getEventCtx();
+		DustEntityContext ctx = visitor.getActionCtx();
 		ArkDockEntity entity = (ArkDockEntity) ctx.entity;
 		ctx.member = member;
 
-		MetaMemberInfo mi = meta.getMemberInfo(member, ctx.value, ctx.mKey);
-		ctx.valType = mi.getValType();
-		ctx.collType = mi.getCollType();
+		DustMemberDef md = meta.getMemberDef(member, ctx.value, ctx.mKey);
+		ctx.valType = md.getValType();
+		ctx.collType = md.getCollType();
 
 		ctx.block = EntityBlock.Member;
 		ret = visitor.agentAction(DustAgentAction.BEGIN);
@@ -163,13 +164,13 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 					}
 					ctx.mKey = null;
 				} else {
-					ret = doProcess(visitor, ArkDockUtils.resolveValue(mi, val, ctx.mKey), ctx.mKey);
+					ret = doProcess(visitor, ArkDockUtils.resolveValue(md, val, ctx.mKey), ctx.mKey);
 				}
 			} finally {
 				ctx.entity = entity;
-				ctx.member = mi.getMember();
-				ctx.valType = mi.getValType();
-				ctx.collType = mi.getCollType();
+				ctx.member = md.getDefEntity();
+				ctx.valType = md.getValType();
+				ctx.collType = md.getCollType();
 				ctx.mKey = ctx.value = null;
 
 				ctx.block = EntityBlock.Member;
@@ -180,16 +181,16 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return ret;
 	}
 
-	DustResultType doVisitEntity(DustGenCtxAgent<? extends DustEntityContext> visitor, ArkDockEntity entity)
+	DustResultType doVisitEntity(ArkAgent<? extends DustEntityContext> visitor, ArkDockEntity entity)
 			throws Exception {
 		DustResultType ret = null;
-		DustEntityContext ctx = visitor.getEventCtx();
+		DustEntityContext ctx = visitor.getActionCtx();
 
 		ctx.entity = entity;
 		ctx.block = EntityBlock.Entity;
 		ret = visitor.agentAction(DustAgentAction.BEGIN);
 
-		Object eKey = ctx.eKey;
+		Object eKey = ctx.entityId;
 
 		if ( DustGenUtils.isReadOn(ret) ) {
 			try {
@@ -207,7 +208,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 			} finally {
 				ctx.entity = entity;
-				ctx.eKey = eKey;
+				ctx.entityId = eKey;
 				ctx.member = null;
 				ctx.valType = null;
 				ctx.collType = null;
@@ -220,11 +221,11 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return ret;
 	}
 
-	public DustResultType visit(DustGenCtxAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
+	public DustResultType visit(ArkAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
 			Object key) throws Exception {
 		DustResultType ret = null;
 
-		DustEntityContext ctx = visitor.getEventCtx();
+		DustEntityContext ctx = visitor.getActionCtx();
 		ctx.entity = e;
 		ctx.member = member;
 		ctx.mKey = key;
@@ -284,7 +285,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		@Override
 		public void remove() {
-			DustException.throwException(null, "Should not remove Entity in this way! Use the API.");
+			DustGenException.throwException(null, "Should not remove Entity in this way! Use the API.");
 		}
 	}
 

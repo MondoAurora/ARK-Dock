@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockUtils;
+import dust.gen.DustGenUtils;
 
 public interface ArkDockSrvConsts extends ArkDockConsts {
 	
@@ -21,7 +22,7 @@ public interface ArkDockSrvConsts extends ArkDockConsts {
 	}
 
 
-	public enum ArkSrvParams implements DustHasDefault<String> {
+	public enum ArkSrvParams implements DustGenUtils.HasDefault<String> {
 		port("8080"), root("webRoot"), logLevel(DustEventLevel.INFO.name()), logFile(null);
 
 		final String defVal;

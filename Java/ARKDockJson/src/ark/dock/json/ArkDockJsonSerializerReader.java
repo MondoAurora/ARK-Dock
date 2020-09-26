@@ -11,19 +11,20 @@ import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockUtils;
+import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
 import dust.gen.DustGenDevUtils.DevTimer;
+import dust.gen.DustGenException;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenLog;
-import dust.gen.DustGenVisitor;
 
-public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, ArkDockJsonConsts {
+public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, ArkDockJsonConsts {
 	enum ReadState {
 		Init, Header, HeaderContent, Entity, EntityContent, EntityContentValue, EntityContentCustom
 	}
 
 	private ArkDockModel target;
-	private final DustGenVisitor<JsonContext> visitor;
+	private final ArkDockVisitor<JsonContext> visitor;
 	private final JsonContext ctx = new JsonContext();
 
 	Map<DustEntity, JsonFormatter> formatters;
@@ -37,12 +38,12 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 	DustEntity eTarget;
 	Map<DustEntity, Object> newEntity = new HashMap<>();
 
-	DustGenFactory<DustEntity, MetaMemberInfo> factMemberInfo = new DustGenFactory<DustEntity, MetaMemberInfo>(null) {
+	DustGenFactory<DustEntity, DustMemberDef> factMemberDef = new DustGenFactory<DustEntity, DustMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		protected MetaMemberInfo createItem(DustEntity key, Object hint) {
-			return target.getMeta().getMemberInfo(key, hint, null);
+		protected DustMemberDef createItem(DustEntity key, Object hint) {
+			return target.getMeta().getMemberDef(key, hint, null);
 		}
 	};
 
@@ -58,10 +59,10 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 
 	String memberId;
 	DustEntity eMember;
-	MetaMemberInfo mi = null;
+	DustMemberDef md = null;
 
 	public ArkDockJsonSerializerReader() {
-		this.visitor = new DustGenVisitor<>(ctx, this);
+		this.visitor = new ArkDockVisitor<>(ctx, this);
 		jsonReader = new ArkDockJsonReaderAgent(visitor);
 	}
 
@@ -95,7 +96,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 				val = fmt.fromParsedData(val);
 			}
 		}
-		DustValType vt = mi.getValType();
+		DustValType vt = md.getValType();
 
 		if ( null != vt ) {
 			switch ( vt ) {
@@ -167,9 +168,9 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 
 					if ( null == eMember ) {
 						DustGenLog.log(DustEventLevel.WARNING, "Reading unknown member", memberId);
-						mi = null;
+						md = null;
 					} else {
-						mi = factMemberInfo.get(eMember);
+						md = factMemberDef.get(eMember);
 					}
 					newState = ReadState.EntityContentValue;
 					break;
@@ -230,7 +231,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 				break;
 			case EntityContentCustom:
 				Object r = jsonReader.getRoot();
-				DustCollType ct = ArkDockUtils.getCollType(mi);
+				DustCollType ct = ArkDockUtils.getCollType(md);
 				switch ( ct ) {
 				case ARR:
 				case SET:
@@ -277,7 +278,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustGenAgent, 
 		if ( null != newState ) {
 			readState = newState;
 		} else {
-			DustException.throwException(null, action, ctx, " Unhandled event from state", readState);
+			DustGenException.throwException(null, action, ctx, " Unhandled event from state", readState);
 		}
 
 		return DustResultType.ACCEPT_READ;

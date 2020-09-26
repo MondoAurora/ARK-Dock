@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import ark.dock.ArkDockConsts.MetaMemberInfo;
-import dust.gen.DustGenUtils;
-import dust.gen.DustGenConsts.DustCollType;
-import dust.gen.DustGenConsts.DustDialogCmd;
 import dust.gen.DustGenConsts.DustEntity;
+import dust.gen.DustGenUtils;
 
-class ArkDockEntity implements DustEntity {
+class ArkDockEntity implements DustEntity, ArkDockConsts {
 	final ArkDockModel model;
 	final String id;
 	final String globalId;
@@ -33,8 +30,8 @@ class ArkDockEntity implements DustEntity {
 		Object ret;
 
 		Object val = data.get(member);
-		MetaMemberInfo mi = model.meta.getMemberInfo(member, value, hint);
-		DustCollType ct = (null == mi) ? null : mi.getCollType();
+		DustMemberDef md = model.meta.getMemberDef(member, value, hint);
+		DustCollType ct = (null == md) ? null : md.getCollType();
 
 		Object rv;
 
@@ -42,7 +39,7 @@ class ArkDockEntity implements DustEntity {
 		case GET:
 			ret = value;
 
-			rv = ArkDockUtils.resolveValue(mi, val, hint);
+			rv = ArkDockUtils.resolveValue(md, val, hint);
 			if ( null != rv ) {
 				ret = rv;
 			}
@@ -61,20 +58,20 @@ class ArkDockEntity implements DustEntity {
 				if ( (cmd == DustDialogCmd.SET) && DustGenUtils.isEqual(val, value) ) {
 					ret = false;
 				} else {
-					ret = ArkDockUtils.setValue(cmd, mi, data, member, val, value, hint);
+					ret = ArkDockUtils.setValue(cmd, md, data, member, val, value, hint);
 				}
 			}
 			break;
 		case CHK:
-			ret = DustGenUtils.isEqual(value, ArkDockUtils.resolveValue(mi, val, hint));
+			ret = DustGenUtils.isEqual(value, ArkDockUtils.resolveValue(md, val, hint));
 			break;
 		case DEL:
-			if ( (null == hint) || (null == mi) || (ct == DustCollType.ONE) ) {
+			if ( (null == hint) || (null == md) || (ct == DustCollType.ONE) ) {
 				ret = (null != data.remove(member));
 			} else {
-				rv = ArkDockUtils.resolveValue(mi, val, hint);
+				rv = ArkDockUtils.resolveValue(md, val, hint);
 				if ( null != rv ) {
-					switch ( mi.getCollType() ) {
+					switch ( md.getCollType() ) {
 					case ARR:
 						((ArrayList) val).remove((int) hint);
 						break;
@@ -106,8 +103,8 @@ class ArkDockEntity implements DustEntity {
 		Object val = data.get(member);
 
 		if ( null != val ) {
-			MetaMemberInfo mi = model.meta.getMemberInfo(member, null, null);
-			DustCollType ct = (null == mi) ? null : mi.getCollType();
+			DustMemberDef md = model.meta.getMemberDef(member, null, null);
+			DustCollType ct = (null == md) ? null : md.getCollType();
 
 			if ( (null != ct) ) {
 				switch ( ct ) {

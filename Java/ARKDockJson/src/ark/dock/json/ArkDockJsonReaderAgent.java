@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ark.dock.ArkDockVisitor;
 import ark.dock.json.ArkDockJsonConsts.JsonBlock;
 import ark.dock.json.ArkDockJsonConsts.JsonContext;
-import dust.gen.DustGenVisitor;
 import dust.gen.DustGenConsts.DustAgentAction;
-import dust.gen.DustGenConsts.DustGenAgent;
+import dust.gen.DustGenConsts.DustAgent;
 import dust.gen.DustGenConsts.DustResultType;
 
 @SuppressWarnings("rawtypes")
-public class ArkDockJsonReaderAgent implements DustGenAgent {
+public class ArkDockJsonReaderAgent implements DustAgent {
 
-	private final DustGenVisitor<JsonContext> visitor;
+	private final ArkDockVisitor<JsonContext> visitor;
 
 	private final JsonContext ctx;
 
@@ -25,9 +25,9 @@ public class ArkDockJsonReaderAgent implements DustGenAgent {
 	private JsonBlock blockType;
 	private Object blockOb;
 
-	public ArkDockJsonReaderAgent(DustGenVisitor<JsonContext> visitor) {
+	public ArkDockJsonReaderAgent(ArkDockVisitor<JsonContext> visitor) {
 		this.visitor = visitor;
-		this.ctx = visitor.getEventCtx();
+		this.ctx = visitor.getActionCtx();
 	}
 
 	public Object getRoot() {

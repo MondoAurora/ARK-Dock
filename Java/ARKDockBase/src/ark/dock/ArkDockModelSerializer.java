@@ -10,36 +10,36 @@ import dust.gen.DustGenUtils;
 
 public abstract class ArkDockModelSerializer implements ArkDockConsts {
 
-	public static abstract class SerializeAgent<SCType extends DustEntityContext> implements DustGenCtxAgent<SCType> {
+	public static abstract class SerializeAgent<SCType extends DustEntityContext> implements ArkAgent<SCType> {
 		protected SCType ctx;
 
 		@Override
-		public SCType getEventCtx() {
+		public SCType getActionCtx() {
 			return ctx;
 		}
 
 		@Override
-		public void setEventCtx(SCType ctx) {
+		public void setActionCtx(SCType ctx) {
 			this.ctx = ctx;
 		}
 	}
 
 	public static class Dump extends SerializeAgent<DustEntityContext> {
 		public Dump() {
-			setEventCtx(new DustEntityContext());
+			setActionCtx(new DustEntityContext());
 		}
 
 		@Override
 		public DustResultType agentAction(DustAgentAction action) throws Exception {
-			DustGenLog.log(action, getEventCtx());
+			DustGenLog.log(action, getActionCtx());
 			return DustResultType.ACCEPT_READ;
 		}
 	}
 
 	public static class ModelVisitor<SCType extends DustEntityContext> extends SerializeAgent<SCType> {
 		final ArkDockModel model;
-		final DustGenCtxAgent<SCType> target;
-		final DustGenCtxAgent<SCType> filter;
+		final ArkAgent<SCType> target;
+		final ArkAgent<SCType> filter;
 
 //		long nextId;
 //		final Map<DustEntity, Long> serIDs = new HashMap<>();
@@ -47,16 +47,16 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 		final Map<DustEntity, Object> serIDs = new HashMap<>();
 		final Set<DustEntity> todo = new HashSet<>();
 
-		public ModelVisitor(ArkDockModel model, DustGenCtxAgent<SCType> target,
-				DustGenCtxAgent<SCType> filter) {
-			setEventCtx(target.getEventCtx());
+		public ModelVisitor(ArkDockModel model, ArkAgent<SCType> target,
+				ArkAgent<SCType> filter) {
+			setActionCtx(target.getActionCtx());
 
 			this.model = model;
 			this.target = target;
 			this.filter = filter;
 			
 			if ( null != filter ) {
-				filter.setEventCtx(target.getEventCtx());
+				filter.setActionCtx(target.getActionCtx());
 			}
 
 //			nextId = 1;
@@ -95,7 +95,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			switch ( action ) {
 			case BEGIN:
 				if ( ctx.block == EntityBlock.Entity ) {
-					ctx.eKey = getSerId(ctx.entity, false);
+					ctx.entityId = getSerId(ctx.entity, false);
 				}
 				break;
 			case PROCESS:
@@ -121,14 +121,14 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(ArkDockModel model,
-			DustGenCtxAgent<SCType> target, DustGenCtxAgent<SCType> filter) throws Exception {
+			ArkAgent<SCType> target, ArkAgent<SCType> filter) throws Exception {
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(model, target, filter);
 		model.visit(mv, null, null, null);
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(DustEntity entity,
-			DustGenCtxAgent<SCType> target, DustGenCtxAgent<SCType> filter) throws Exception {
+			ArkAgent<SCType> target, ArkAgent<SCType> filter) throws Exception {
 		ArkDockEntity e = (ArkDockEntity) entity;
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
