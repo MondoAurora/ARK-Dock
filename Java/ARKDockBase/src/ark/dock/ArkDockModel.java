@@ -32,42 +32,25 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return parent;
 	}
 
-	public DustEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
+	public ArkDockEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
 		String globalId = ArkDockUtils.buildGlobalId(((ArkDockEntity) unit).id, ((ArkDockEntity) type).id, itemId);
 
 		ArkDockEntity e = entities.get(globalId);
 
 		if ( createIfMissing && (null == e) ) {
 			e = new ArkDockEntity(this, globalId);
-			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityId, itemId, null);
-			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityGlobalId, globalId, null);
-			e.accessMember(DustDialogCmd.SET, meta.tokMeta.eEntityPrimType, type, null);
+			meta.initEntity(e, type);
+//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityId, itemId, null);
+//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityGlobalId, globalId, null);
+//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityPrimType, type, null);
 			entities.put(globalId, e);
 		}
 
 		return e;
 	}
 
-	void initBootEntity(DustEntity entity, DustEntity type, ArkDockTokens.Meta mt) {
-		ArkDockEntity e = (ArkDockEntity) entity;
-		e.accessMember(DustDialogCmd.SET, mt.eEntityId, e.id, null);
-		e.accessMember(DustDialogCmd.SET, mt.eEntityGlobalId, e.globalId, null);
-		e.accessMember(DustDialogCmd.SET, mt.eEntityPrimType, type, null);
-	}
-
-	ArkDockEntity getBootEntity(String globalId) {
+	public ArkDockEntity getEntity(String globalId) {
 		ArkDockEntity e = entities.get(globalId);
-
-		if ( null == e ) {
-			e = new ArkDockEntity(this, globalId);
-			entities.put(globalId, e);
-		}
-
-		return e;
-	}
-
-	public DustEntity getEntity(String globalId) {
-		DustEntity e = entities.get(globalId);
 		if ( (null == e) && (null != parent) ) {
 			e = parent.getEntity(globalId);
 		}

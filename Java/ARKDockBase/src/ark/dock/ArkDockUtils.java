@@ -10,7 +10,8 @@ import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
 public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
-	public static String buildGlobalId(String unitId, String typeId, String id) {
+	
+	static String buildGlobalId(String unitId, String typeId, String id) {
 		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, id).toString();
 	}
 

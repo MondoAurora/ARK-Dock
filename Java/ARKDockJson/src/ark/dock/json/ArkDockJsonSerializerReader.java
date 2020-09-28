@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockModel;
+import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
@@ -24,6 +25,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	}
 
 	private ArkDockModel target;
+	private ArkDockModelMeta meta;
+
 	private final ArkDockVisitor<JsonContext> visitor;
 	private final JsonContext ctx = new JsonContext();
 
@@ -78,6 +81,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		DevTimer parseTimer = new DevTimer("Parse");
 
 		this.target = target;
+		this.meta = target.getMeta();
+
 		JSONParser p = new JSONParser();
 		JsonContentVisitor h = new JsonContentVisitor(visitor);
 		p.parse(r, h);
@@ -101,14 +106,17 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		if ( null != vt ) {
 			switch ( vt ) {
 			case REF: {
-				String refId = (String) val;
-				DustEntity eRef = target.getEntity(refId);
+				if ( val instanceof String ) {
+					String refId = (String) val;
+					DustEntity eRef = target.getEntity(refId);
 
-				if ( null == eRef ) {
-					factPostponedDelta.get(refId).add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
-					return;
-				} else {
-					val = eRef;
+					if ( null == eRef ) {
+						factPostponedDelta.get(refId)
+								.add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
+						return;
+					} else {
+						val = eRef;
+					}
 				}
 			}
 				break;
@@ -129,10 +137,11 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	}
 
 	/**
-	 * As reading JSON, types "should be OK", state management is checked by setting newState in all valid cases.
-	 * Everything else is an error in the JSON input and exception is thrown.
+	 * As reading JSON, types "should be OK", state management is checked by setting
+	 * newState in all valid cases. Everything else is an error in the JSON input
+	 * and exception is thrown.
 	 */
-	@SuppressWarnings({ "rawtypes", "incomplete-switch" })
+	@SuppressWarnings({ "incomplete-switch" })
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
 		ReadState newState = null;
@@ -164,14 +173,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				switch ( ctx.block ) {
 				case Entry:
 					memberId = (String) ctx.param;
-					eMember = target.getMeta().getEntity(memberId);
-
-					if ( null == eMember ) {
-						DustGenLog.log(DustEventLevel.WARNING, "Reading unknown member", memberId);
-						md = null;
-					} else {
-						md = factMemberDef.get(eMember);
-					}
+					setCurrMember(meta.getEntity(memberId));
 					newState = ReadState.EntityContentValue;
 					break;
 				case Array:
@@ -221,6 +223,21 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				newState = ReadState.Init;
 				break;
 			case Entity:
+				if ( null == eTarget ) {
+					String unit = globalId.split("_")[0];
+
+					DustEntity eT = (DustEntity) newEntity.get(meta.tokModel.eEntityPrimType);
+					DustEntity eU = meta.getUnit(unit);
+					String id = (String) newEntity.get(meta.tokModel.eEntityId);
+
+					eTarget = target.getEntity(eU, eT, id, true);
+
+					for (Map.Entry<DustEntity, Object> e : newEntity.entrySet()) {
+						setCurrMember(e.getKey());
+						setValueCustom(e.getValue());
+					}
+				}
+				meta.optUpdateMeta(eTarget);
 				newState = ReadState.Init;
 				break;
 			case EntityContent:
@@ -231,25 +248,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				break;
 			case EntityContentCustom:
 				Object r = jsonReader.getRoot();
-				DustCollType ct = ArkDockUtils.getCollType(md);
-				switch ( ct ) {
-				case ARR:
-				case SET:
-					ArrayList al = (ArrayList) r;
-					for (int i = 0; i < al.size(); ++i) {
-						setValue(al.get(i), DustDialogCmd.ADD, (ct == DustCollType.ARR) ? i : null);
-					}
-					break;
-				case MAP:
-					for (Object o : ((Map) r).entrySet()) {
-						Map.Entry e = (Map.Entry) o;
-						setValue(e.getValue(), DustDialogCmd.ADD, e.getKey());
-					}
-					break;
-				case ONE:
-					setValue(r);
-					break;
-				}
+				setValueCustom(r);
 
 				newState = ReadState.EntityContent;
 				break;
@@ -274,7 +273,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 			newState = ReadState.Init;
 			break;
 		}
-		
+
 		if ( null != newState ) {
 			readState = newState;
 		} else {
@@ -282,6 +281,40 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		}
 
 		return DustResultType.ACCEPT_READ;
+	}
+
+	private void setCurrMember(DustEntity eM) {
+		eMember = eM;
+
+		if ( null == eMember ) {
+			DustGenLog.log(DustEventLevel.WARNING, "Reading unknown member", memberId);
+			md = null;
+		} else {
+			md = factMemberDef.get(eMember);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void setValueCustom(Object object) {
+		DustCollType ct = ArkDockUtils.getCollType(md);
+		switch ( ct ) {
+		case ARR:
+		case SET:
+			ArrayList al = (ArrayList) object;
+			for (int i = 0; i < al.size(); ++i) {
+				setValue(al.get(i), DustDialogCmd.ADD, (ct == DustCollType.ARR) ? i : null);
+			}
+			break;
+		case MAP:
+			for (Object o : ((Map) object).entrySet()) {
+				Map.Entry e = (Map.Entry) o;
+				setValue(e.getValue(), DustDialogCmd.ADD, e.getKey());
+			}
+			break;
+		case ONE:
+			setValue(object);
+			break;
+		}
 	}
 
 }
