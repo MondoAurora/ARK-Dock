@@ -12,12 +12,13 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		public final DustEntity eEntityId;
 		public final DustEntity eEntityGlobalId;
 		public final DustEntity eEntityPrimType;
+		public final DustEntity eEntityOwner;
 
 		public Model(ArkDockModelMeta meta) {
-			eUnit = meta.getBootEntity(ArkDockUtils.buildGlobalId("Model", "Unit", "Model"));
+			eUnit = meta.getBootEntity("Model", "Unit", "Model");
 			
-			eTypeUnit = meta.getBootEntity(ArkDockUtils.buildGlobalId("Model", "Type", "Unit"));
-			eTypeEntity = meta.getBootEntity(ArkDockUtils.buildGlobalId("Model", "Type", "Entity"));
+			eTypeUnit = meta.getBootEntity("Model", "Type", "Unit");
+			eTypeEntity = meta.getBootEntity("Model", "Type", "Entity");
 			
 			meta.factTypeDef.get(eTypeUnit, eUnit);
 			meta.factTypeDef.get(eTypeEntity, eUnit);
@@ -26,6 +27,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 			eEntityId = meta.getMember(eTypeEntity, "Id");
 			eEntityGlobalId = meta.getMember(eTypeEntity, "GlobalId");
 			eEntityPrimType = meta.getMember(eTypeEntity, "PrimaryType");
+			eEntityOwner = meta.getMember(eTypeEntity, "Owner");
 		}
 	}
 	
@@ -54,10 +56,10 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		public final DustEntity eConstColltypeMap;
 
 		public Idea(ArkDockModelMeta meta) {
-			eUnit = meta.getBootEntity(ArkDockUtils.buildGlobalId("Idea", "Unit", "Idea"));
+			eUnit = meta.getBootEntity("Idea", "Unit", "Idea");
 
-			eTypeType = meta.getBootEntity(ArkDockUtils.buildGlobalId("Idea", "Type", "Type"));
-			eTypeMember = meta.getBootEntity(ArkDockUtils.buildGlobalId("Idea", "Type", "Member"));
+			eTypeType = meta.getBootEntity("Idea", "Type", "Type");
+			eTypeMember = meta.getBootEntity("Idea", "Type", "Member");
 
 			meta.factTypeDef.get(eTypeType, eUnit);
 			meta.factTypeDef.get(eTypeMember, eUnit);
@@ -68,7 +70,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 			eMemberCollType = meta.getMember(eTypeMember, "CollType");
 			eMemberValType = meta.getMember(eTypeMember, "ValType");
 
-			eTypeConst = meta.getBootEntity(ArkDockUtils.buildGlobalId("Idea", "Type", "Const"));
+			eTypeConst = meta.getBootEntity("Idea", "Type", "Const");
 			eConstFalse = meta.getEntity(eUnit, eTypeConst, "False", true);
 			eConstTrue = meta.getEntity(eUnit, eTypeConst, "True", true);
 			

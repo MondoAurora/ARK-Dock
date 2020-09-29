@@ -14,10 +14,15 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 	final String globalId;
 	Map<DustEntity, Object> data = new HashMap<>();
 
-	public ArkDockEntity(ArkDockModel model, String globalId) {
+	public ArkDockEntity(ArkDockModel model, String globalId, String id) {
 		this.model = model;
 		this.globalId = globalId;
-		this.id = globalId.substring(globalId.lastIndexOf(ArkDockModel.TOKEN_SEP) + 1);
+//		this.id = globalId.substring(globalId.lastIndexOf(ArkDockModel.TOKEN_SEP) + 1);
+		this.id = id;
+		
+//		if ( "Rtms_Member_Frequency".equals(globalId) ) {
+//			DustGenLog.log(DustEventLevel.WARNING, "What");
+//		}
 	}
 
 	@Override

@@ -11,8 +11,8 @@ import dust.gen.DustGenUtils;
 
 public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 	
-	static String buildGlobalId(String unitId, String typeId, String id) {
-		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, id).toString();
+	static String buildGlobalId(String unitId, String typeId, String itemId) {
+		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, itemId).toString();
 	}
 
 	public static DustCollType getCollType(DustMemberDef md, DustCollType def) {

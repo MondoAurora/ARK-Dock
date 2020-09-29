@@ -38,7 +38,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		ArkDockEntity e = entities.get(globalId);
 
 		if ( createIfMissing && (null == e) ) {
-			e = new ArkDockEntity(this, globalId);
+			e = new ArkDockEntity(this, globalId, itemId);
 			meta.initEntity(e, type);
 //			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityId, itemId, null);
 //			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityGlobalId, globalId, null);

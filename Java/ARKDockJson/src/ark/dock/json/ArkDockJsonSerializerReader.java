@@ -301,7 +301,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		case ARR:
 		case SET:
 			ArrayList al = (ArrayList) object;
-			for (int i = 0; i < al.size(); ++i) {
+			int size = al.size();
+			for (int i = 0; i < size; ++i) {
 				setValue(al.get(i), DustDialogCmd.ADD, (ct == DustCollType.ARR) ? i : null);
 			}
 			break;
