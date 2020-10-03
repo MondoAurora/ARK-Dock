@@ -168,6 +168,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                             currObj = obSrc.getObToFill();
                         }
                         currObj.put(keyGeoJSON, content);
+                        currObj.put(GeojsonKey.type, currType);
                     }
 
                     break;
@@ -203,7 +204,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
 
     public static void parse(File f, GeojsonBuilder builder, GeojsonObjectSource obSrc) throws Exception {
         DustGenLog.log("Parsing GeoJSON file", f.getName(), "size", f.length());
-        Reader fr = new InputStreamReader(new FileInputStream("DirectionResponse.xml"), "UTF-8");
+        Reader fr = new InputStreamReader(new FileInputStream(f), "UTF-8");
         parse(fr, builder, obSrc);
     }
 

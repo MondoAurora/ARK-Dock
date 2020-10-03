@@ -5,6 +5,10 @@ import dust.gen.DustGenConsts;
 public interface ArkDockConsts extends DustGenConsts {
     public static final String TOKEN_SEP = "_";
     
+    enum TokenSegment {
+    	UNIT, TYPE, ID;
+    }
+    
     interface MetaProvider {
         DustEntity getUnit(String unitId);
         DustEntity getType(DustEntity unit, String typeId);
@@ -13,7 +17,7 @@ public interface ArkDockConsts extends DustGenConsts {
         DustMemberDef getMemberDef(DustEntity member, Object value, Object hint);
     }
 
-    public interface ArkAgent<ActionCtxType> extends DustAgent {
+    public interface ArkDockAgent<ActionCtxType> extends DustAgent {
     	void setActionCtx(ActionCtxType ctx);
     	ActionCtxType getActionCtx();
     }

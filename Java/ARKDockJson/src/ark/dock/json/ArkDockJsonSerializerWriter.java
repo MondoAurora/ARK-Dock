@@ -128,7 +128,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 				}
 
 				if ( ctx.collType == DustCollType.MAP ) {
-					JSONValue.writeJSONString(ctx.mKey.toString(), target);
+					JSONValue.writeJSONString(ctx.key.toString(), target);
 					target.write(": ");
 				}
 

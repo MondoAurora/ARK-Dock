@@ -11,7 +11,35 @@ import dust.gen.DustGenUtils;
 
 public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 	
-	static String buildGlobalId(String unitId, String typeId, String itemId) {
+    public static class TokenSplitter {
+    	Map<TokenSegment, String> strs = new HashMap<>();
+    	
+    	public void split(String globalId) {
+    		int off = 0;
+    		int loc = globalId.indexOf(TOKEN_SEP, off);
+    		
+    		strs.put(TokenSegment.UNIT, globalId.substring(off, loc));
+    		off = loc+1;
+    		loc = globalId.indexOf(TOKEN_SEP, off);
+    		
+    		strs.put(TokenSegment.TYPE, globalId.substring(off, loc));
+    		strs.put(TokenSegment.ID, globalId.substring(loc+1));    		
+		}
+    	
+    	public String getSegment(TokenSegment sg) {
+			return strs.get(sg);
+		}
+    	
+    	public DustEntity resolvePrimaryType(ArkDockModel model, DustEntity unit) {
+    		if ( null == unit ) {
+    			unit = model.getMeta().getUnit(getSegment(TokenSegment.UNIT));
+    		}
+    		
+    		return model.getMeta().getType(unit, strs.get(TokenSegment.ID));
+    	}
+    }
+	
+	public static String buildGlobalId(String unitId, String typeId, String itemId) {
 		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, itemId).toString();
 	}
 

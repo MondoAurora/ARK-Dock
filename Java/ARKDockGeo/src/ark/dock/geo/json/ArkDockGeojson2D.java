@@ -1,5 +1,7 @@
 package ark.dock.geo.json;
 
+import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -19,6 +21,7 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 		FakeZCoord
 	}
 
+	@SuppressWarnings("rawtypes")
 	abstract class Formatter implements JsonFormatter {
 		BitSet params = new BitSet(FormatParam.values().length);
 
@@ -41,8 +44,6 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 			target.write(" ]");
 		}
 		
-		
-
 		void pathToJson(Path2D.Double path, Writer target) throws Exception {
 			double d[] = new double[6];
 			boolean hasContent = false;
@@ -63,11 +64,25 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 			}
 		}
 		
-		@SuppressWarnings("rawtypes")
 		void loadPoint(Object data, Point2D.Double pt) {
 			ArrayList al = (ArrayList) data;
 			pt.x = (Double) al.get(0);
 			pt.y = (Double) al.get(1);
+		}
+		
+		protected Object jsonToPath(Object data) {
+			Path2D.Double path = null;
+			for ( Object pd : (ArrayList) data ) {
+				Point2D.Double pt = new Point2D.Double();
+				loadPoint(pd, pt);
+				if ( null == path ) {
+					path = new Path2D.Double();
+					path.moveTo(pt.x, pt.y);
+				} else {
+					path.lineTo(pt.x, pt.y);
+				}
+			}
+			return path;
 		}
 	}
 
@@ -105,26 +120,55 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 			pathToJson((Path2D.Double) data, target);
 		}
 		
-		@SuppressWarnings("rawtypes")
 		@Override
 		public Object fromParsedData(Object data) {
-			Path2D.Double path = null;
-			for ( Object pd : (ArrayList) data ) {
-				Point2D.Double pt = new Point2D.Double();
-				loadPoint(pd, pt);
-				if ( null == path ) {
-					path = new Path2D.Double();
-					path.moveTo(pt.x, pt.y);
-				} else {
-					path.lineTo(pt.x, pt.y);
-				}
-			}
-			return path;
+			return jsonToPath(data);
 		}
 
 		@Override
 		public Class<?> getDataClass() {
 			return Path2D.Double.class;
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	class PolygonFormatter extends Formatter {
+		public PolygonFormatter(EnumSet<FormatParam> params) {
+			super(params);
+		}
+
+		@Override
+		public void toJson(Object data, Writer target) throws Exception {
+			GeojsonPolygon poly = (GeojsonPolygon) data;
+
+			target.write("[ ");
+			pathToJson((Path2D.Double) poly.getExterior(), target);
+			
+			ArrayList al = poly.getHoles();
+
+			if ( null != al ) {
+				for (Object h : al) {
+					target.write(", ");
+					pathToJson((Path2D.Double) h, target);
+				}
+			}
+
+			target.write(" ]");
+		}
+		
+		@Override
+		public Object fromParsedData(Object data) {
+			GeojsonPolygon poly = new GeojsonPolygon();
+			
+			for ( Object pd : (ArrayList) data ) {
+				poly.addChild(jsonToPath(pd));
+			}
+			return poly;
+		}
+
+		@Override
+		public Class<?> getDataClass() {
+			return GeojsonPolygon.class;
 		}
 	}
 
@@ -154,8 +198,18 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 	}
 
 	public class GeojsonBuilder2DDouble extends GeojsonBuilder {
+		boolean useArea;
 		// static Map<Class, GeojsonType> classToType = new HashMap<>();
 		int coordIdx;
+		double[] temp = new double[6];
+
+		public GeojsonBuilder2DDouble() {
+			this(false);
+		}
+		
+		public GeojsonBuilder2DDouble(boolean useArea) {
+			this.useArea = useArea;
+		}
 
 		@Override
 		public Object newGeojsonObj(GeojsonType gjt) {
@@ -163,10 +217,10 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 			case Point:
 				coordIdx = 0;
 				return new Point2D.Double();
-			case Polygon:
-				return new GeojsonPolygon<Path2D.Double>();
 			case LineString:
 				return new Path2D.Double();
+			case Polygon:
+				return useArea ? new Area() : new GeojsonPolygon<Path2D.Double>();
 			default:
 				return super.newGeojsonObj(gjt);
 			}
@@ -178,6 +232,8 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 				return GeojsonType.Point;
 			} else if ( geoObj instanceof Path2D.Double ) {
 				return GeojsonType.LineString;
+			} else if ( geoObj instanceof Area ) {
+				return GeojsonType.Polygon;
 			}
 
 			return super.getObjType(geoObj);
@@ -207,6 +263,14 @@ public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
 					path.moveTo(pt.x, pt.y);
 				} else {
 					path.lineTo(pt.x, pt.y);
+				}
+			} else if ( currObj instanceof Area ) {
+				Area area = (Area) currObj;
+				Shape shp = (Shape) data;
+				if ( area.isEmpty() ) {
+					area.add(new Area(shp));
+				} else {
+					area.subtract(new Area(shp));
 				}
 			} else {
 				return super.addChild(data);

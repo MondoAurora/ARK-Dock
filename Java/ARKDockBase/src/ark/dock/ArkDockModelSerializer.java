@@ -10,7 +10,7 @@ import dust.gen.DustGenUtils;
 
 public abstract class ArkDockModelSerializer implements ArkDockConsts {
 
-	public static abstract class SerializeAgent<SCType extends DustEntityContext> implements ArkAgent<SCType> {
+	public static abstract class SerializeAgent<SCType extends DustEntityContext> implements ArkDockAgent<SCType> {
 		protected SCType ctx;
 
 		@Override
@@ -38,17 +38,14 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 
 	public static class ModelVisitor<SCType extends DustEntityContext> extends SerializeAgent<SCType> {
 		final ArkDockModel model;
-		final ArkAgent<SCType> target;
-		final ArkAgent<SCType> filter;
+		final ArkDockAgent<SCType> target;
+		final ArkDockAgent<SCType> filter;
 
-//		long nextId;
-//		final Map<DustEntity, Long> serIDs = new HashMap<>();
-//		final LinkedList<DustEntity> todo = new LinkedList<>();
 		final Map<DustEntity, Object> serIDs = new HashMap<>();
 		final Set<DustEntity> todo = new HashSet<>();
 
-		public ModelVisitor(ArkDockModel model, ArkAgent<SCType> target,
-				ArkAgent<SCType> filter) {
+		public ModelVisitor(ArkDockModel model, ArkDockAgent<SCType> target,
+				ArkDockAgent<SCType> filter) {
 			setActionCtx(target.getActionCtx());
 
 			this.model = model;
@@ -58,15 +55,12 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			if ( null != filter ) {
 				filter.setActionCtx(target.getActionCtx());
 			}
-
-//			nextId = 1;
 		}
 
 		Object getSerId(DustEntity entity, boolean addTodo) {
 			Object ret = serIDs.get(entity);
 
 			if ( null == ret ) {
-//				ret = nextId++;
 				ret = ((ArkDockEntity)entity).globalId;
 				serIDs.put(entity, ret);
 				if ( addTodo ) {
@@ -121,14 +115,14 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(ArkDockModel model,
-			ArkAgent<SCType> target, ArkAgent<SCType> filter) throws Exception {
+			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(model, target, filter);
 		model.visit(mv, null, null, null);
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(DustEntity entity,
-			ArkAgent<SCType> target, ArkAgent<SCType> filter) throws Exception {
+			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
 		ArkDockEntity e = (ArkDockEntity) entity;
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);

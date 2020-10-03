@@ -1,0 +1,230 @@
+package com.dustcomp.dust.servlet.jetty;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.Servlet;
+
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Password;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+
+import com.dustcomp.DustCompServices.DustUtilsStateful;
+import com.dustcomp.api.DustCompApiHacks;
+import com.dustcomp.api.DustCompApiUtils;
+
+public class DustCompJettyServer implements DustUtilsStateful, DustCompJettyComponents {
+	Server jetty;
+
+	class HandlerVisitor extends DustValueVisitorDefault {
+		Set<Handler> handlers;
+
+		@Override
+		protected void start(DustIdentifier path) throws Exception {
+			handlers = new HashSet<>();
+		}
+
+		@Override
+		protected void process(Object value, int idx) throws Exception {
+			super.process(value, idx);
+		}
+
+		void initServer(Server srv) {
+			// DustCompApiUtils.visit(FLD_HANDLERS, this);
+
+			if (null != handlers) {
+				Handler h = null;
+				if (1 < handlers.size()) {
+					HandlerList hl = new HandlerList();
+					for (Handler hh : handlers) {
+						hl.addHandler(hh);
+					}
+					h = hl;
+				} else {
+					h = handlers.iterator().next();
+				}
+
+				srv.setHandler(h);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void start() throws Exception {
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		context.setContextPath("/api");
+		context.addServlet((Class<? extends Servlet>) Class.forName("com.dustcomp.dust.servlet.DustCompServletEntityGetter"), "/getEntity");
+		context.addServlet((Class<? extends Servlet>) Class.forName("com.dustcomp.dust.servlet.DustCompServletEntityUploaderSimple"), "/putEntity");
+		context.addServlet((Class<? extends Servlet>) Class.forName("com.dustcomp.dust.servlet.DustCompServletCommandSimple"), "/cmd");
+		// context.addServlet((Class<? extends Servlet>)
+		// Class.forName("com.dustcomp.dust.servlet.DustCompServletEntityUploadFileSimple"),
+		// "/putSingleFile");
+
+		ServletHolder fileUploadServletHolder = new ServletHolder((Class<? extends Servlet>) Class.forName("com.dustcomp.dust.servlet.DustCompServletFileUploadSimple"));
+		fileUploadServletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement("data/tmp"));
+		context.addServlet(fileUploadServletHolder, "/putSingleFile");
+		context.addServlet((Class<? extends Servlet>) Class.forName("com.dustcomp.dust.servlet.DustCompServletFileDownloadSimple"), "/getFile");
+
+		ResourceHandler resHandler = new ResourceHandler();
+		resHandler.setDirectoriesListed(true);
+		resHandler.setWelcomeFiles(new String[] { "index.html" });
+		resHandler.setResourceBase("./webroot");
+
+		// Add the ResourceHandler to the server.
+		HandlerList handlers = new HandlerList();
+		handlers.setHandlers(new Handler[] { resHandler, context });
+
+		jetty = new Server();
+
+		initConnectors();
+
+		HandlerVisitor hv = new HandlerVisitor();
+		hv.initServer(jetty);
+
+		jetty.setHandler(handlers);
+
+		initSecurity();
+
+		jetty.start();
+	}
+
+	public void initSecurity() throws Exception {
+		if (null != DustCompApiUtils.getValue(FLD_ACCESSCTRL)) {
+			String str;
+
+			str = (String) DustCompApiUtils.getValue(FLD_ACCESSCTRL, TYPE_IDENTIFIED, FLD_ID);
+			HashLoginService loginService = new HashLoginService(str);
+
+			ArrayList<String> roles = new ArrayList<>();
+
+			final ArrayList<String> usrRoles = new ArrayList<>();
+
+			DustCompApiUtils.visit(PATH_ROLES, new DustValueVisitorDefault() {
+				@Override
+				protected void process(Object value, int idx) throws Exception {
+					roles.add((String) DustCompApiUtils.getValue(DustIdentifier.ICTX_VISIT, PA_ID));
+				}
+			});
+
+			DustCompApiUtils.visit(PATH_USERS, new DustValueVisitorDefault() {
+				@Override
+				protected void process(Object value, int idx) throws Exception {
+					String uid = (String) DustCompApiUtils.getValue(DustIdentifier.ICTX_VISIT, PA_ID);
+					String pass = (String) DustCompApiUtils.getValue(DustIdentifier.ICTX_VISIT, FLD_PASSWORD);
+					usrRoles.clear();
+
+					DustCompApiUtils.visit(PA_VI_ROLES, new DustValueVisitorDefault() {
+						@Override
+						protected void process(Object value, int idx) throws Exception {
+							usrRoles.add((String) DustCompApiUtils.getValue(DustIdentifier.ICTX_VISIT, PA_ID));
+						}
+					});
+
+					loginService.putUser(uid, new Password(pass), usrRoles.toArray(new String[usrRoles.size()]));
+					usrRoles.clear();
+				}
+			});
+
+			jetty.addBean(loginService);
+
+			ConstraintSecurityHandler security = new ConstraintSecurityHandler();
+
+			Constraint constraint = new Constraint();
+			constraint.setName("auth");
+			constraint.setAuthenticate(true);
+			constraint.setRoles(roles.toArray(new String[roles.size()]));
+
+			ConstraintMapping mapping = new ConstraintMapping();
+			mapping.setPathSpec("/*");
+			mapping.setConstraint(constraint);
+
+			security.setConstraintMappings(Collections.singletonList(mapping));
+			security.setAuthenticator(new BasicAuthenticator());
+			security.setLoginService(loginService);
+
+			security.setHandler(jetty.getHandler());
+			jetty.setHandler(security);
+		}
+	}
+
+	public void initConnectors() throws Exception {
+		int portSsl = DustCompApiHacks.getInt(DustIdentifier.ICTX_THIS, FLD_PORTSSL, PORT_UNSET);
+		int portPublic = DustCompApiHacks.getInt(DustIdentifier.ICTX_THIS, FLD_PORTPUBLIC, PORT_UNSET);
+
+		if (PORT_UNSET != portPublic) {
+			HttpConfiguration http = new HttpConfiguration();
+			http.addCustomizer(new SecureRequestCustomizer());
+
+			if (PORT_UNSET != portSsl) {
+				http.setSecurePort(portSsl);
+				http.setSecureScheme("https");
+			}
+
+			ServerConnector connector = new ServerConnector(jetty);
+			connector.addConnectionFactory(new HttpConnectionFactory(http));
+			connector.setPort(portPublic);
+
+			jetty.addConnector(connector);
+		}
+
+		if (PORT_UNSET != portSsl) {
+			HttpConfiguration https = new HttpConfiguration();
+			https.addCustomizer(new SecureRequestCustomizer());
+
+			// Configuring SSL
+			SslContextFactory sslContextFactory = new SslContextFactory();
+
+			String str;
+			str = (String) DustCompApiUtils.getValue(FLD_SSLCONFIG, TYPE_SECURITY_SSLCONTEXT, FLD_KEYSTOREPATH);
+			sslContextFactory.setKeyStorePath(ClassLoader.getSystemResource(str).toExternalForm());
+			str = (String) DustCompApiUtils.getValue(FLD_SSLCONFIG, TYPE_SECURITY_SSLCONTEXT, FLD_KEYSTOREPASS);
+			sslContextFactory.setKeyStorePassword(str);
+			str = (String) DustCompApiUtils.getValue(FLD_SSLCONFIG, TYPE_SECURITY_SSLCONTEXT, FLD_KEYMANAGERPASS);
+			sslContextFactory.setKeyManagerPassword(str);
+
+			ServerConnector sslConnector = new ServerConnector(jetty, new SslConnectionFactory(sslContextFactory, "http/1.1"), new HttpConnectionFactory(https));
+			sslConnector.setPort(portSsl);
+
+			jetty.addConnector(sslConnector);
+		}
+	}
+
+	@Override
+	public void dust_utils_stateful_init() throws Exception {
+		start();
+	}
+
+	@Override
+	public void dust_utils_stateful_release() throws Exception {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					DustCompApiUtils.reportEvent(DustEventLevel.EVENT_DEBUG, "Shutting down Jetty server...");
+					jetty.stop();
+					DustCompApiUtils.reportEvent(DustEventLevel.EVENT_INFO, "Jetty server shutdown succeeded.");
+				} catch (Exception ex) {
+					DustCompApiUtils.reportEvent(DustEventLevel.EVENT_ERROR, "Failed to stop Jetty");
+				}
+			}
+		}.start();
+	}
+}

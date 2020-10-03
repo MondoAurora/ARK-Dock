@@ -11,14 +11,18 @@ import dust.gen.DustGenUtils;
 
 public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
-	ArkDockModelMeta meta;
-	ArkDockModel parent;
+	protected ArkDockModelMeta meta;
+	protected ArkDockModel parent;
 
-	Map<String, ArkDockEntity> entities = new HashMap<>();
+	protected final Map<String, ArkDockEntity> entities = new HashMap<>();
 
-	public ArkDockModel(ArkDockModel parent_) {
-		this.parent = parent_;
-		meta = parent.meta;
+	public ArkDockModel(ArkDockModel parent_) {		
+		if ( null == parent_ ) { 
+			parent = meta = new ArkDockModelMeta();
+		} else {
+			this.parent = parent_;
+			meta = parent.meta;
+		}
 	}
 
 	protected ArkDockModel() {
@@ -81,11 +85,15 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return (RetType) ret;
 	}
 
-	private DustResultType doProcess(ArkAgent<? extends DustEntityContext> visitor, Object val, Object key)
+	public <RetType> RetType accessMember(DustEntity entity, DustEntityDelta delta) {
+		return accessMember(delta.cmd, entity, delta.member, delta.value, delta.key);
+	}
+
+	private DustResultType doProcess(ArkDockAgent<? extends DustEntityContext> visitor, Object val, Object key)
 			throws Exception {
 		DustEntityContext ctx = visitor.getActionCtx();
 
-		ctx.mKey = key;
+		ctx.key = key;
 		ctx.value = val;
 
 		DustResultType ret = visitor.agentAction(DustAgentAction.PROCESS);
@@ -101,14 +109,14 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private DustResultType doVisitMember(ArkAgent<? extends DustEntityContext> visitor, DustEntity member)
+	private DustResultType doVisitMember(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity member)
 			throws Exception {
 		DustResultType ret = null;
 		DustEntityContext ctx = visitor.getActionCtx();
 		ArkDockEntity entity = (ArkDockEntity) ctx.entity;
 		ctx.member = member;
 
-		DustMemberDef md = meta.getMemberDef(member, ctx.value, ctx.mKey);
+		DustMemberDef md = meta.getMemberDef(member, ctx.value, ctx.key);
 		ctx.valType = md.getValType();
 		ctx.collType = md.getCollType();
 
@@ -121,7 +129,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 				DustCollType actCollType;
 
-				if ( (null == ctx.mKey) && (null != (actCollType = ArkDockUtils.getCollTypeForData(val))) ) {
+				if ( (null == ctx.key) && (null != (actCollType = ArkDockUtils.getCollTypeForData(val))) ) {
 					int idx = 0;
 					switch ( actCollType ) {
 					case ARR:
@@ -145,16 +153,16 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 					default:
 						break;
 					}
-					ctx.mKey = null;
+					ctx.key = null;
 				} else {
-					ret = doProcess(visitor, ArkDockUtils.resolveValue(md, val, ctx.mKey), ctx.mKey);
+					ret = doProcess(visitor, ArkDockUtils.resolveValue(md, val, ctx.key), ctx.key);
 				}
 			} finally {
 				ctx.entity = entity;
 				ctx.member = md.getDefEntity();
 				ctx.valType = md.getValType();
 				ctx.collType = md.getCollType();
-				ctx.mKey = ctx.value = null;
+				ctx.key = ctx.value = null;
 
 				ctx.block = EntityBlock.Member;
 				visitor.agentAction(DustAgentAction.END);
@@ -164,7 +172,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return ret;
 	}
 
-	DustResultType doVisitEntity(ArkAgent<? extends DustEntityContext> visitor, ArkDockEntity entity)
+	DustResultType doVisitEntity(ArkDockAgent<? extends DustEntityContext> visitor, ArkDockEntity entity)
 			throws Exception {
 		DustResultType ret = null;
 		DustEntityContext ctx = visitor.getActionCtx();
@@ -204,14 +212,14 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return ret;
 	}
 
-	public DustResultType visit(ArkAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
+	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
 			Object key) throws Exception {
 		DustResultType ret = null;
 
 		DustEntityContext ctx = visitor.getActionCtx();
 		ctx.entity = e;
 		ctx.member = member;
-		ctx.mKey = key;
+		ctx.key = key;
 
 		visitor.agentAction(DustAgentAction.INIT);
 
@@ -230,7 +238,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 			ctx.reset();
 			ctx.entity = e;
 			ctx.member = member;
-			ctx.mKey = key;
+			ctx.key = key;
 			visitor.agentAction(DustAgentAction.RELEASE);
 		}
 

@@ -15,9 +15,13 @@ public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
     }
 
     enum GeojsonType {
-        Point, MultiPoint(true, Point), LineString(false, Point), MultiLineString(true, LineString), Polygon(false, LineString), MultiPolygon(true,
-                Polygon), GeometryCollection(true, null,
-                        GeojsonKey.geometries), Feature(false), FeatureCollection(true, Feature, GeojsonKey.features), NULL;
+        Point, MultiPoint(true, Point), 
+        LineString(false, Point), MultiLineString(true, LineString), 
+        Polygon(false, LineString), MultiPolygon(true, Polygon), 
+        
+        GeometryCollection(true, null, GeojsonKey.geometries), 
+        
+        Feature(false), FeatureCollection(true, Feature, GeojsonKey.features), NULL;
 
         public final boolean container;
         public final GeojsonType childType;
@@ -178,7 +182,10 @@ public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
             if (null == exterior) {
                 exterior = lr;
             } else {
-                getHoles().add(lr);
+                if (null == holes) {
+                    holes = new ArrayList<>();
+                }
+                holes.add(lr);
             }
             return true;
         }
@@ -188,9 +195,6 @@ public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
         }
 
         public ArrayList<NativeLineRing> getHoles() {
-            if (null == holes) {
-                holes = new ArrayList<>();
-            }
             return holes;
         }
     }

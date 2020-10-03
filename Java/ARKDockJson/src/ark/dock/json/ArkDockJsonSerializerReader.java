@@ -90,52 +90,6 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		parseTimer.log();
 	}
 
-	void setValue(Object val) {
-		setValue(val, DustDialogCmd.SET, null);
-	}
-
-	void setValue(Object val, DustDialogCmd cmd, Object key) {
-		if ( null != formatters ) {
-			JsonFormatter fmt = formatters.get(eMember);
-			if ( null != fmt ) {
-				val = fmt.fromParsedData(val);
-			}
-		}
-		DustValType vt = md.getValType();
-
-		if ( null != vt ) {
-			switch ( vt ) {
-			case REF: {
-				if ( val instanceof String ) {
-					String refId = (String) val;
-					DustEntity eRef = target.getEntity(refId);
-
-					if ( null == eRef ) {
-						factPostponedDelta.get(refId)
-								.add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
-						return;
-					} else {
-						val = eRef;
-					}
-				}
-			}
-				break;
-			default:
-				break;
-			}
-		}
-
-		if ( null == eTarget ) {
-			if ( cmd == DustDialogCmd.SET ) {
-				newEntity.put(eMember, val);
-			} else {
-				factPostponedDelta.get(globalId).add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
-			}
-		} else {
-			target.accessMember(cmd, eTarget, eMember, val, key);
-		}
-	}
-
 	/**
 	 * As reading JSON, types "should be OK", state management is checked by setting
 	 * newState in all valid cases. Everything else is an error in the JSON input
@@ -199,6 +153,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					eTarget = target.getEntity(globalId);
 					if ( null == eTarget ) {
 						DustGenLog.log(DustEventLevel.INFO, "Reading new entity", globalId);
+						newEntity.clear();
 					}
 					break;
 				case Object:
@@ -235,6 +190,13 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					for (Map.Entry<DustEntity, Object> e : newEntity.entrySet()) {
 						setCurrMember(e.getKey());
 						setValueCustom(e.getValue());
+					}
+					
+					ArrayList<DustEntityDelta> pl = factPostponedDelta.peek(globalId);
+					if ( null != pl ) {
+						for ( DustEntityDelta d : pl ) {
+							target.accessMember(eTarget, d);
+						}
 					}
 				}
 				meta.optUpdateMeta(eTarget);
@@ -309,12 +271,58 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		case MAP:
 			for (Object o : ((Map) object).entrySet()) {
 				Map.Entry e = (Map.Entry) o;
-				setValue(e.getValue(), DustDialogCmd.ADD, e.getKey());
+				DustEntity k = target.getEntity((String) e.getKey());
+				setValue(e.getValue(), DustDialogCmd.ADD, k);
 			}
 			break;
 		case ONE:
 			setValue(object);
 			break;
+		}
+	}
+	void setValue(Object val) {
+		setValue(val, DustDialogCmd.SET, null);
+	}
+
+	void setValue(Object val, DustDialogCmd cmd, Object key) {
+		if ( null != formatters ) {
+			JsonFormatter fmt = formatters.get(eMember);
+			if ( null != fmt ) {
+				val = fmt.fromParsedData(val);
+			}
+		}
+		DustValType vt = md.getValType();
+
+		if ( null != vt ) {
+			switch ( vt ) {
+			case REF: {
+				if ( val instanceof String ) {
+					String refId = (String) val;
+					DustEntity eRef = target.getEntity(refId);
+
+					if ( null == eRef ) {
+						factPostponedDelta.get(refId)
+								.add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
+						return;
+					} else {
+						val = eRef;
+					}
+				}
+			}
+				break;
+			default:
+				break;
+			}
+		}
+
+		if ( null == eTarget ) {
+			if ( cmd == DustDialogCmd.SET ) {
+				newEntity.put(eMember, val);
+			} else {
+				factPostponedDelta.get(globalId).add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
+			}
+		} else {
+			target.accessMember(cmd, eTarget, eMember, val, key);
 		}
 	}
 

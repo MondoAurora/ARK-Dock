@@ -13,6 +13,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 
 	DustEntity eTypeType;
 	DustEntity eTypeMember;
+	DustEntity eTypeTag;
 
 	public final ArkDockTokensTools.Text tokText;
 	public final ArkDockTokensTools.Generic tokGeneric;
@@ -100,19 +101,24 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		initEntity(tokIdea.eUnit, tokModel.eTypeUnit);
 
 		initEntity(tokIdea.eTypeType, tokIdea.eTypeType);
+		initEntity(tokIdea.eTypeAgent, tokIdea.eTypeType);
 		initEntity(tokModel.eTypeUnit, tokIdea.eTypeType);
 		initEntity(tokIdea.eTypeMember, tokIdea.eTypeType);
 		initEntity(tokModel.eTypeEntity, tokIdea.eTypeType);
 		initEntity(tokIdea.eTypeConst, tokIdea.eTypeType);
+		initEntity(tokIdea.eTypeTag, tokIdea.eTypeType);
 
-		initBootMember(tokIdea.eMemberOptions, DustValType.REF, DustCollType.SET);
-		initBootMember(tokIdea.eMemberCollType, DustValType.REF, DustCollType.ONE);
-		initBootMember(tokIdea.eMemberValType, DustValType.REF, DustCollType.ONE);
+		initMember(tokIdea.eAgentUpdates, DustValType.REF, DustCollType.SET);
 
-		initBootMember(tokModel.eEntityId, DustValType.RAW, DustCollType.ONE);
-		initBootMember(tokModel.eEntityGlobalId, DustValType.RAW, DustCollType.ONE);
-		initBootMember(tokModel.eEntityPrimType, DustValType.REF, DustCollType.ONE);
-		initBootMember(tokModel.eEntityOwner, DustValType.REF, DustCollType.ONE);
+		initMember(tokIdea.eMemberOptions, DustValType.REF, DustCollType.SET);
+		initMember(tokIdea.eMemberCollType, DustValType.REF, DustCollType.ONE);
+		initMember(tokIdea.eMemberValType, DustValType.REF, DustCollType.ONE);
+
+		initMember(tokModel.eEntityId, DustValType.RAW, DustCollType.ONE);
+		initMember(tokModel.eEntityGlobalId, DustValType.RAW, DustCollType.ONE);
+		initMember(tokModel.eEntityPrimType, DustValType.REF, DustCollType.ONE);
+		initMember(tokModel.eEntityOwner, DustValType.REF, DustCollType.ONE);
+		initMember(tokModel.eEntityTags, DustValType.REF, DustCollType.SET);
 
 		initEntity(tokIdea.eConstFalse, tokIdea.eTypeConst);
 		initEntity(tokIdea.eConstTrue, tokIdea.eTypeConst);
@@ -125,10 +131,8 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		initEntity(tokIdea.eConstColltypeArr, tokIdea.eTypeConst);
 		initEntity(tokIdea.eConstColltypeSet, tokIdea.eTypeConst);
 		initEntity(tokIdea.eConstColltypeMap, tokIdea.eTypeConst);
-		
-		
-		initBootMember(tokGeneric.eCollMember, DustValType.REF, DustCollType.ARR);
 
+		initMember(tokGeneric.eCollMember, DustValType.REF, DustCollType.ARR);
 
 		trCollType = new DustGenTranslator<DustCollType, DustEntity>(DustCollType.values(),
 				new DustEntity[] { tokIdea.eConstColltypeOne, tokIdea.eConstColltypeArr, tokIdea.eConstColltypeSet,
@@ -155,14 +159,11 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 	@Override
 	public DustEntity getMember(DustEntity type, String itemId) {
 		String memberId = getId(type) + TOKEN_SEP + itemId;
-		
+
 		ArkDockEntity ret = getEntity(factTypeDef.get(type).unit, eTypeMember, memberId, false);
 
 		if ( null == ret ) {
 			ret = getEntity(factTypeDef.get(type).unit, eTypeMember, memberId, true);
-//			if ( null != tokModel ) {
-//				ret.data.put(tokModel.eEntityPrimType, eTypeMember);
-//			}
 			factMemberDef.get(ret, type);
 		}
 
@@ -191,7 +192,23 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		}
 	}
 
-	private void initBootMember(DustEntity entity, DustValType vt, DustCollType ct) {
+	public DustEntity defineMember(DustEntity type, String itemId, DustValType vt, DustCollType ct) {
+		DustEntity entity = getMember(type, itemId);
+		initMember(entity, vt, ct);
+		return entity;
+	}
+
+	public DustEntity defineTag(DustEntity unit, String tagId, DustEntity parent) {
+		DustEntity entity = getEntity(unit, eTypeTag, tagId, true);
+		
+		if ( null != parent ) {
+			setMember(entity, tokModel.eEntityOwner, parent, null);
+		}
+		
+		return entity;
+	}
+
+	public void initMember(DustEntity entity, DustValType vt, DustCollType ct) {
 		initEntity(entity, tokIdea.eTypeMember);
 
 		ArkMemberDef amd = getMemberDef(entity, null, null);
@@ -226,26 +243,28 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 				factTypeDef.get(e, eU);
 			} else if ( eTypeMember == pt ) {
 				DustEntity eT = getMember(e, tokModel.eEntityOwner, null, null);
-				
-				if (null == eT) {
-					DustGenLog.log(DustEventLevel.WARNING, "Missing type for", e.globalId);						
+
+				if ( null == eT ) {
+					DustGenLog.log(DustEventLevel.WARNING, "Missing type for", e.globalId);
 				}
 				ArkMemberDef amd = factMemberDef.get(e, eT);
-				
+
 				DustCollType ct = trCollType.getLeft((DustEntity) e.data.get(tokIdea.eMemberCollType));
-				if (null != ct) {
-					if (null == amd.ct) {
+				if ( null != ct ) {
+					if ( null == amd.ct ) {
 						amd.ct = ct;
-					} else if (ct != amd.ct) {
-						DustGenLog.log(DustEventLevel.WARNING, "Conflict in member", e.globalId, "new Collection type", ct, "original", amd.ct);						
+					} else if ( ct != amd.ct ) {
+						DustGenLog.log(DustEventLevel.WARNING, "Conflict in member", e.globalId, "new Collection type",
+								ct, "original", amd.ct);
 					}
 				}
 				DustValType vt = trValType.getLeft((DustEntity) e.data.get(tokIdea.eMemberValType));
-				if (null != vt) {
-					if (null == amd.vt) {
+				if ( null != vt ) {
+					if ( null == amd.vt ) {
 						amd.vt = vt;
-					} else if (vt != amd.vt) {
-						DustGenLog.log(DustEventLevel.WARNING, "Conflict in member", e.globalId, "new Value type", vt, "original", amd.vt);						
+					} else if ( vt != amd.vt ) {
+						DustGenLog.log(DustEventLevel.WARNING, "Conflict in member", e.globalId, "new Value type", vt,
+								"original", amd.vt);
 					}
 				}
 			}

@@ -13,6 +13,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		public final DustEntity eEntityGlobalId;
 		public final DustEntity eEntityPrimType;
 		public final DustEntity eEntityOwner;
+		public final DustEntity eEntityTags;
 
 		public Model(ArkDockModelMeta meta) {
 			eUnit = meta.getBootEntity("Model", "Unit", "Model");
@@ -28,6 +29,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 			eEntityGlobalId = meta.getMember(eTypeEntity, "GlobalId");
 			eEntityPrimType = meta.getMember(eTypeEntity, "PrimaryType");
 			eEntityOwner = meta.getMember(eTypeEntity, "Owner");
+			eEntityTags = meta.getMember(eTypeEntity, "Tags");
 		}
 	}
 	
@@ -35,13 +37,21 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		public final DustEntity eUnit;
 
 		public final DustEntity eTypeType;
+		
+		public final DustEntity eTypeAgent;
+		public final DustEntity eAgentUpdates;
 
 		public final DustEntity eTypeMember;
 		public final DustEntity eMemberOptions;
 		public final DustEntity eMemberCollType;
 		public final DustEntity eMemberValType;
 
+		public final DustEntity eTypeTag;
+
 		public final DustEntity eTypeConst;
+		
+		
+		public final DustEntity tagBoolean;
 		public final DustEntity eConstTrue;
 		public final DustEntity eConstFalse;
 
@@ -59,18 +69,28 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 			eUnit = meta.getBootEntity("Idea", "Unit", "Idea");
 
 			eTypeType = meta.getBootEntity("Idea", "Type", "Type");
+			eTypeAgent = meta.getBootEntity("Idea", "Type", "Agent");
 			eTypeMember = meta.getBootEntity("Idea", "Type", "Member");
+			eTypeTag = meta.getBootEntity("Idea", "Type", "Tag");
 
 			meta.factTypeDef.get(eTypeType, eUnit);
+			meta.factTypeDef.get(eTypeAgent, eUnit);
 			meta.factTypeDef.get(eTypeMember, eUnit);
+			meta.factTypeDef.get(eTypeTag, eUnit);
+			
 			meta.eTypeType = eTypeType;
 			meta.eTypeMember = eTypeMember;
+			meta.eTypeTag = eTypeTag;
 			
 			eMemberOptions = meta.getMember(eTypeMember, "Options");
 			eMemberCollType = meta.getMember(eTypeMember, "CollType");
 			eMemberValType = meta.getMember(eTypeMember, "ValType");
 
+			eAgentUpdates = meta.getMember(eTypeAgent, "Updates");
+
 			eTypeConst = meta.getBootEntity("Idea", "Type", "Const");
+			
+			tagBoolean = meta.defineTag(eUnit, "Boolean", null);
 			eConstFalse = meta.getEntity(eUnit, eTypeConst, "False", true);
 			eConstTrue = meta.getEntity(eUnit, eTypeConst, "True", true);
 			

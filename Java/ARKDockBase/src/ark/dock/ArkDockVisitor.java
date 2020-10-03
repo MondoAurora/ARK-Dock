@@ -6,7 +6,7 @@ import java.util.Stack;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
-public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConsts.ArkAgent<EventCtxType> {
+public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConsts.ArkDockAgent<EventCtxType> {
     class RelayInfo {
         int start;
         DustAgent parent;

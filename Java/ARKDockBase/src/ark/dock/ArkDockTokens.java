@@ -1,3 +1,3 @@
 package ark.dock;
 
-public interface ArkDockTokens extends ArkDockTokensMind, ArkDockTokensTools {}
+public interface ArkDockTokens extends ArkDockTokensMind, ArkDockTokensTools, ArkDockTokensDust {}
