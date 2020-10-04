@@ -10,6 +10,8 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 
 	public final ArkDockTokensMind.Model tokModel;
 	public final ArkDockTokensMind.Idea tokIdea;
+	public final ArkDockTokensMind.Narrative tokNarrative;
+	public final ArkDockTokensMind.Dialog tokDialog;
 
 	DustEntity eTypeType;
 	DustEntity eTypeMember;
@@ -94,6 +96,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 
 		tokIdea = new ArkDockTokensMind.Idea(this);
 		tokModel = new ArkDockTokensMind.Model(this);
+		
 		tokText = new ArkDockTokensTools.Text(this);
 		tokGeneric = new ArkDockTokensTools.Generic(this);
 
@@ -140,6 +143,9 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		trValType = new DustGenTranslator<DustValType, DustEntity>(DustValType.values(),
 				new DustEntity[] { tokIdea.eConstValtypeInt, tokIdea.eConstValtypeReal, tokIdea.eConstValtypeRef,
 						tokIdea.eConstValtypeRaw });
+		
+		tokNarrative = new ArkDockTokensMind.Narrative(this);
+		tokDialog = new ArkDockTokensMind.Dialog(this);
 	}
 
 	@Override

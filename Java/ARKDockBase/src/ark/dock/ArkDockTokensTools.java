@@ -123,6 +123,21 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 		public final DustEntity memServicePath;
 		public final DustEntity memServicePort;
 		
+		public final DustEntity typClient;
+		public final DustEntity memClientPath;
+		public final DustEntity memClientMethod;
+		
+		public final DustEntity tagHttpMethod;
+		public final DustEntity tagHttpMethodGET;
+		public final DustEntity tagHttpMethodHEAD;
+		public final DustEntity tagHttpMethodPOST;
+		public final DustEntity tagHttpMethodPUT;
+		public final DustEntity tagHttpMethodDELETE;
+		public final DustEntity tagHttpMethodCONNECT;
+		public final DustEntity tagHttpMethodOPTIONS;
+		public final DustEntity tagHttpMethodTRACE;
+		public final DustEntity tagHttpMethodPATCH;
+				
 		public Net(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Net");
 			
@@ -135,6 +150,21 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 			memServiceHost = meta.defineMember(typService, "Host", DustValType.REF, DustCollType.ONE);
 			memServicePath = meta.defineMember(typService, "Path", DustValType.RAW, DustCollType.ONE);
 			memServicePort = meta.defineMember(typService, "Port", DustValType.INT, DustCollType.ONE);
+			
+			typClient = meta.getType(eUnit, "Client");
+			memClientPath = meta.defineMember(typClient, "Path", DustValType.RAW, DustCollType.ONE);
+			memClientMethod = meta.defineMember(typClient, "Method", DustValType.REF, DustCollType.ONE);
+			
+			tagHttpMethod = meta.defineTag(eUnit, "Method", null);
+			tagHttpMethodGET = meta.defineTag(eUnit, "GET", tagHttpMethod);
+			tagHttpMethodHEAD = meta.defineTag(eUnit, "HEAD", tagHttpMethod);
+			tagHttpMethodPOST = meta.defineTag(eUnit, "POST", tagHttpMethod);
+			tagHttpMethodPUT = meta.defineTag(eUnit, "PUT", tagHttpMethod);
+			tagHttpMethodDELETE = meta.defineTag(eUnit, "DELETE", tagHttpMethod);
+			tagHttpMethodCONNECT = meta.defineTag(eUnit, "CONNECT", tagHttpMethod);
+			tagHttpMethodOPTIONS = meta.defineTag(eUnit, "OPTIONS", tagHttpMethod);
+			tagHttpMethodTRACE = meta.defineTag(eUnit, "TRACE", tagHttpMethod);
+			tagHttpMethodPATCH = meta.defineTag(eUnit, "PATCH", tagHttpMethod);
 		}
 	};
 

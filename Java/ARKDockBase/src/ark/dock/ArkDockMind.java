@@ -90,9 +90,13 @@ public class ArkDockMind implements ArkDockConsts {
 	
 	public final ArkDockTokens.Idea tokIdea;
 	public final ArkDockTokens.Model tokModel;
+	public final ArkDockTokensMind.Narrative tokNarrative;
+	public final ArkDockTokensMind.Dialog tokDialog;
+
 	public final ArkDockTokens.Generic tokGeneric;
-	public final ArkDockTokens.Native tokNative;
 	public final ArkDockTokens.Text tokText;
+	
+	public final ArkDockTokens.Native tokNative;
 
 	private DustEntity eUnitMain;
 
@@ -102,8 +106,11 @@ public class ArkDockMind implements ArkDockConsts {
 		modMain = modMain_;
 		modMeta = modMain.getMeta();
 		
-		tokIdea = modMeta.tokIdea;
 		tokModel = modMeta.tokModel;
+		tokIdea = modMeta.tokIdea;
+		tokNarrative = modMeta.tokNarrative;
+		tokDialog = modMeta.tokDialog;
+		
 		tokGeneric = modMeta.tokGeneric;
 		tokText = modMeta.tokText;
 		
@@ -141,11 +148,7 @@ public class ArkDockMind implements ArkDockConsts {
 		return agent;
 	}
 
-	public final DustResultType initAgent(String agentName) throws Exception {
-		if ( agentName.startsWith("-") ) {
-			return DustResultType.REJECT;
-		}
-		
+	public final DustResultType initAgent(String agentName) throws Exception {		
 		MindAgent agent = createAgent(agentName);
 
 		DustEntity eAgent = getAgent(agentName);

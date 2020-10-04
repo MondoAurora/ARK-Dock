@@ -1,5 +1,12 @@
 package ark.dock.srv;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -8,6 +15,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import ark.dock.ArkDockMind.BaseAgent;
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockTokens;
+import ark.dock.ArkDockUtils;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenShutdown;
 
@@ -15,6 +23,39 @@ import dust.gen.DustGenShutdown;
 public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
 	ArkDockTokens.Net tokNet;
 	Server server;
+
+	class CtrlHandler extends AbstractHandler {
+		@Override
+		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+				throws IOException, ServletException {
+			
+			String prefix = "/srvctl/";
+
+			if ( target.startsWith(prefix) ) {
+				String str = target.substring(prefix.length());
+				ArkDockSrvCmd cmd = ArkDockUtils.fromString(str, ArkDockSrvCmd.ping);
+				
+				response.setContentType("text/html; charset=utf-8");
+				response.setStatus(HttpServletResponse.SC_OK);
+
+				try {
+					switch ( cmd ) {
+					case stop:
+						stopSrv();
+						break;
+					default:
+						break;
+					}
+					baseRequest.setHandled(true);
+				} catch (Throwable ex) {
+					throw new ServletException(ex);
+				}
+			} else {
+				baseRequest.setHandled(false);
+				return;
+			}
+		}
+	}
 
 	DustGenFactory<Integer, ServerConnector> factChannels = new DustGenFactory<Integer, ServerConnector>(null) {
 		private static final long serialVersionUID = 1L;
@@ -38,7 +79,6 @@ public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.Shu
 		case BEGIN:
 			break;
 		case END:
-			DustGenShutdown.remove(this);
 			stopSrv();
 			break;
 		default:
@@ -68,6 +108,7 @@ public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.Shu
 				if ( null == server ) {
 					server = new Server();
 					handlers = new HandlerList();
+					handlers.addHandler(new CtrlHandler());
 				}
 				handlers.addHandler(ha.getWrapOb());
 
@@ -88,13 +129,14 @@ public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.Shu
 
 	@Override
 	public void shutdown() throws Exception {
-		stopSrv();
-	}
-
-	void stopSrv() throws Exception {
 		if ( (null != server) && (!server.isStopping()) ) {
 			server.stop();
 			server = null;
 		}
+	}
+
+	void stopSrv() throws Exception {
+		DustGenShutdown.remove(this);
+		shutdown();
 	}
 }

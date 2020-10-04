@@ -105,4 +105,29 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 			eConstColltypeMap = meta.getEntity(eUnit, eTypeConst, "Map", true);
 		}
 	}
+	
+	public class Narrative implements ArkDockConsts {
+		public final DustEntity eUnit;
+
+		public Narrative(ArkDockModelMeta meta) {
+			eUnit = meta.getUnit("Narrative");
+		}
+	}
+	
+	public class Dialog implements ArkDockConsts {
+		public final DustEntity eUnit;
+
+		public final DustEntity typAction;
+
+		public final DustEntity memActionResponse;
+
+		public Dialog(ArkDockModelMeta meta) {
+			eUnit = meta.getUnit("Dialog");
+			
+			typAction = meta.getType(eUnit, "Action");
+
+			memActionResponse = meta.getMember(typAction, "Response");
+		}
+	}
+	
 }
