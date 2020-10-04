@@ -94,7 +94,9 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 				break;
 			case PROCESS:
 				if ( ctx.valType == DustValType.REF ) {
-					ctx.value = getSerId((DustEntity) ctx.value, true);
+					if ( ctx.value instanceof DustEntity ) {
+						ctx.value = getSerId((DustEntity) ctx.value, true);
+					}
 					target.agentAction(action);
 					return DustResultType.ACCEPT;
 				}

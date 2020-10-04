@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDockTokens;
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
@@ -40,6 +41,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	String globalId;
 	DustEntity eTarget;
 	Map<DustEntity, Object> newEntity = new HashMap<>();
+	
+	ArkDockTokens.Native tokNative;
 
 	DustGenFactory<DustEntity, DustMemberDef> factMemberDef = new DustGenFactory<DustEntity, DustMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
@@ -82,6 +85,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 
 		this.target = target;
 		this.meta = target.getMeta();
+		
+		tokNative = new ArkDockTokens.Native(meta);
 
 		JSONParser p = new JSONParser();
 		JsonContentVisitor h = new JsonContentVisitor(visitor);
@@ -186,10 +191,29 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					String id = (String) newEntity.get(meta.tokModel.eEntityId);
 
 					eTarget = target.getEntity(eU, eT, id, true);
+					
+					DustEntity nativeKey = null;
+					Object nativeOb = null;
 
 					for (Map.Entry<DustEntity, Object> e : newEntity.entrySet()) {
-						setCurrMember(e.getKey());
-						setValueCustom(e.getValue());
+						DustEntity key = e.getKey();
+						
+						if ( (key == tokNative.eNativeValueOne) || (key == tokNative.eNativeValueArr)) {
+							nativeKey = key;
+							nativeOb = e.getValue();
+						} else {
+							setCurrMember(key);
+							setValueCustom(e.getValue());
+						}
+					}
+					
+					if ( null != nativeOb ) {
+						DustEntity nt = target.getMember(eTarget, tokNative.eNativeValType, null, null);
+						JsonFormatter fmt = formatters.get(nt);
+						if ( null != fmt ) {
+							nativeOb = fmt.fromParsedData(nativeOb);
+						}
+						target.setMember(eTarget, nativeKey, nativeOb, null);
 					}
 					
 					ArrayList<DustEntityDelta> pl = factPostponedDelta.peek(globalId);
