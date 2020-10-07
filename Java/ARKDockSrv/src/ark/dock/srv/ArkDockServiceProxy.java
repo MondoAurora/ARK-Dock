@@ -48,8 +48,6 @@ public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvCo
 			break;
 		}
 		
-        response.setStatus(HttpServletResponse.SC_OK);
-
         if ( null != e ) {
             response.setContentType("text/json; charset=utf-8");
 
@@ -65,12 +63,15 @@ public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvCo
 
     		try {
 				ArkDockModelSerializer.modelToAgent(e, sw, null);
+		        response.setStatus(HttpServletResponse.SC_OK);
+				baseRequest.setHandled(true);
 			} catch (Exception e1) {
 				throw new ServletException(e1);
 			}    		
+        } else {
+    		baseRequest.setHandled(false);
         }
 		
-		baseRequest.setHandled(true);
 	}
 	
 
