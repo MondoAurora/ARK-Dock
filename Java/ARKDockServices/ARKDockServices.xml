@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_all" name="ARKDock Service Bundle">
+
+	<property environment="env" />
+	<include file="${env.ARK_ROOT}/ide/eclipse/dust/ant_props.xml" />
+
+	<property name="dir.project" value="." />
+	<property name="dir.extlib" value="${ARK_EXT}" />
+
+	<target name="create_services">
+		<jar destfile="${dir.project}/ARKDockServices.jar">
+			<fileset dir="${ARK_API}/DustApiGen/bin" />
+			<fileset dir="${dir.project}/../ARKDockBase/bin" />
+			<fileset dir="${dir.project}/../ARKDockGeo/bin" />
+			<fileset dir="${dir.project}/../ARKDockJson/bin" />
+			<fileset dir="${dir.project}/../ARKDockText/bin" />
+			<fileset dir="${dir.project}/../ARKDockGuiSwing/bin" />
+			<fileset dir="${dir.project}/../ARKDockNet/bin" />
+		</jar>
+	</target>
+
+	<target name="create_sources">
+		
+		<jar destfile="${dir.project}/ARKDockServices.src.jar">
+			<fileset dir="${ARK_JAVA_ROOT}/api/gen/src" />
+			<fileset dir="${dir.project}/../ARKDockBase/src" />
+			<fileset dir="${dir.project}/../ARKDockGeo/src" />
+			<fileset dir="${dir.project}/../ARKDockJson/src" />
+			<fileset dir="${dir.project}/../ARKDockText/src" />
+			<fileset dir="${dir.project}/../ARKDockGuiSwing/src" />
+			<fileset dir="${dir.project}/../ARKDockNet/src" />
+		</jar>
+	</target>
+
+	<target name="create_all" depends="create_services, create_sources">
+	</target>
+
+</project>

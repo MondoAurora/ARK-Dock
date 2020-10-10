@@ -22,4 +22,19 @@ public interface ArkDockConsts extends DustGenConsts {
     	ActionCtxType getActionCtx();
     }
 
+    public abstract class ArkDockAgentBase<ActionCtxType> implements ArkDockAgent<ActionCtxType> {
+    	ActionCtxType ctx;
+    	
+    	public void setActionCtx(ActionCtxType ctx) {
+    		this.ctx = ctx;
+    	}
+    	public ActionCtxType getActionCtx() {
+    		return ctx;
+    	}
+    }
+
+    public interface HintProvider {
+    	Object getHint(DustEntity target, DustEntity token, Object val);
+    }
+
 }
