@@ -21,6 +21,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	Map<JsonHeader, Object> header;
 
 	Map<Class<?>, JsonFormatter> formatters;
+	boolean pretty = true;
 
 	boolean contEntity;
 	boolean contMember;
@@ -47,7 +48,21 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 
 		formatters.put(fmt.getDataClass(), fmt);
 	}
+	
+	public void setPretty(boolean pretty) {
+		this.pretty = pretty;
+	}
 
+	private Writer endLine(String close) throws Exception {
+		target.append(close);	
+		if ( pretty ) {
+			target.append("/n");	
+			target.append((getActionCtx().block == EntityBlock.Member) ? "    " : "  ");
+		} else {
+			target.append(" ");
+		}
+		return target;
+	}
 
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
@@ -57,9 +72,11 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 
 		switch ( action ) {
 		case INIT:
-			target.write("[\n  ");
+//			target.write("[\n  ");
+			endLine("[");
 			JSONValue.writeJSONString(header, target);
-			target.write(",\n  {");
+//			target.write(",\n  {");
+			endLine(",").write('{');
 			contEntity = contMember = false;
 			valueClose = null;
 			break;
@@ -71,9 +88,10 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 				} else {
 					contEntity = true;
 				}
-				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n   ", JSONValue.toJSONString(ctx.entityId.toString()),
-						" : {");
-				target.write(line.toString());
+				endLine(closeLine).write(JSONValue.toJSONString(ctx.entityId.toString()) + " : {");
+//				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n  ", JSONValue.toJSONString(ctx.entityId.toString()),
+//						" : {");
+//				target.write(line.toString());
 				contMember = false;
 
 				break;
@@ -83,9 +101,10 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 				} else {
 					contMember = true;
 				}
-				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n     \"",
-						JSONValue.escape(ctx.member.toString()), "\" : ");
-				target.write(line.toString());
+				endLine(closeLine).write(JSONValue.toJSONString(ctx.member.toString()) + " : ");
+//				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n     \"",
+//						JSONValue.escape(ctx.member.toString()), "\" : ");
+//				target.write(line.toString());
 				valueClose = null;
 				break;
 			}
@@ -98,7 +117,8 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 
 			switch ( ctx.block ) {
 			case Entity:
-				target.write("\n  }");
+				endLine("").write("}");
+//				target.write("\n  }");
 				break;
 			case Member:
 				break;
@@ -144,7 +164,9 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 			}
 			break;
 		case RELEASE:
-			target.write("\n  }\n]");
+			endLine("").write("}");
+			endLine("").write("]");
+//			target.write("\n  }\n]");
 			
 			target.flush();
 			target.close();

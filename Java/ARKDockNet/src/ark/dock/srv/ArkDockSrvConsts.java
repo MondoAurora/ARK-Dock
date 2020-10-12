@@ -8,6 +8,10 @@ import dust.gen.DustGenUtils;
 
 public interface ArkDockSrvConsts extends ArkDockConsts {
 	
+	String CONTENT_TYPE_TEXT_UTF8 = "text/html; charset=utf-8";
+	String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
+
+	
 	public enum ArkDockSrvCmd {
 		stop, send, ping, put, get
 	}
