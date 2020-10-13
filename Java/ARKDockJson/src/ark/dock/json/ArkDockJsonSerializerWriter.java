@@ -56,7 +56,7 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	private Writer endLine(String close) throws Exception {
 		target.append(close);	
 		if ( pretty ) {
-			target.append("/n");	
+			target.append("\n");	
 			target.append((getActionCtx().block == EntityBlock.Member) ? "    " : "  ");
 		} else {
 			target.append(" ");
@@ -67,15 +67,12 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
 		DustEntityContext ctx = getActionCtx();
-		StringBuilder line = null;
 		String closeLine = "";
 
 		switch ( action ) {
 		case INIT:
-//			target.write("[\n  ");
 			endLine("[");
 			JSONValue.writeJSONString(header, target);
-//			target.write(",\n  {");
 			endLine(",").write('{');
 			contEntity = contMember = false;
 			valueClose = null;
@@ -89,9 +86,6 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 					contEntity = true;
 				}
 				endLine(closeLine).write(JSONValue.toJSONString(ctx.entityId.toString()) + " : {");
-//				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n  ", JSONValue.toJSONString(ctx.entityId.toString()),
-//						" : {");
-//				target.write(line.toString());
 				contMember = false;
 
 				break;
@@ -102,9 +96,6 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 					contMember = true;
 				}
 				endLine(closeLine).write(JSONValue.toJSONString(ctx.member.toString()) + " : ");
-//				line = DustGenUtils.sbAppend(null, "", true, closeLine, "\n     \"",
-//						JSONValue.escape(ctx.member.toString()), "\" : ");
-//				target.write(line.toString());
 				valueClose = null;
 				break;
 			}
@@ -118,7 +109,6 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 			switch ( ctx.block ) {
 			case Entity:
 				endLine("").write("}");
-//				target.write("\n  }");
 				break;
 			case Member:
 				break;
@@ -166,7 +156,6 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 		case RELEASE:
 			endLine("").write("}");
 			endLine("").write("]");
-//			target.write("\n  }\n]");
 			
 			target.flush();
 			target.close();

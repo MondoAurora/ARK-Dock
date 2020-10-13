@@ -205,6 +205,9 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 	}
 
 	public DustEntity defineTag(DustEntity unit, String tagId, DustEntity parent) {
+		if ( null != parent ) {
+			tagId = getId(parent) + TOKEN_SEP + tagId;
+		}
 		DustEntity entity = getEntity(unit, eTypeTag, tagId, true);
 		
 		if ( null != parent ) {
