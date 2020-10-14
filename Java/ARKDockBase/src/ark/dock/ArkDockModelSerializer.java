@@ -120,7 +120,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(model, target, filter);
-		model.visit(mv, null, null, null);
+		model.visit(mv);
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(DustEntity entity,
@@ -129,6 +129,14 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
 		e.model.visit(mv, entity, null, null);
+	}
+
+	public static <SCType extends DustEntityContext> void modelToAgent(Iterable<DustEntity> eIt,
+			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
+		ArkDockEntity e = (ArkDockEntity) eIt.iterator().next();
+
+		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
+		e.model.visit(mv, eIt, null, null);
 	}
 
 }

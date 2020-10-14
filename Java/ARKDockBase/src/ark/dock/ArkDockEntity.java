@@ -17,17 +17,13 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 	public ArkDockEntity(ArkDockModel model, String globalId, String id) {
 		this.model = model;
 		this.globalId = globalId;
-//		this.id = globalId.substring(globalId.lastIndexOf(ArkDockModel.TOKEN_SEP) + 1);
 		this.id = id;
-		
-//		if ( "Rtms_Member_Frequency".equals(globalId) ) {
-//			DustGenLog.log(DustEventLevel.WARNING, "What");
-//		}
 	}
 
 	@Override
 	public String toString() {
-		return globalId;
+		String ret = (String) data.get(model.meta.tokText.eTextName);
+		return (null == ret) ? globalId : ret;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -78,13 +74,23 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 				if ( null != rv ) {
 					switch ( md.getCollType() ) {
 					case ARR:
-						((ArrayList) val).remove((int) hint);
+						if ( (0 == (int) hint) && !(val instanceof ArrayList) ) {
+							data.remove(member);
+							ret = true;
+						} else {
+							((ArrayList) val).remove((int) hint);
+						}
 						break;
 					case MAP:
 						((Map) val).remove(hint);
 						break;
 					case SET:
-						((Set) val).remove(hint);
+						if ( DustGenUtils.isEqual(val, hint) ) {
+							data.remove(member);
+							ret = true;
+						} else {
+							ret = ((Set) val).remove(hint);
+						}
 						break;
 					default:
 						break;

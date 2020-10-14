@@ -33,6 +33,10 @@ public class ArkDockSrvUtils implements ArkDockSrvConsts {
 		}
 	}
 	
+	public static boolean getBoolParam(HttpServletRequest request, String parName) {
+		return "true".equalsIgnoreCase(request.getParameter(parName));
+	}
+	
 	public static void setNoCache(HttpServletResponse response) {
 		response.setHeader("Cache-Control", "no-cache, no-store");
 	    response.setHeader("Pragma", "no-cache");

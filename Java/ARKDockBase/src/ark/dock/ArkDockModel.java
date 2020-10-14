@@ -211,8 +211,22 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		return ret;
 	}
+	
+	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor) throws Exception {
+		return visit(visitor, null, null, null, null);
+	}
 
 	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity e, DustEntity member,
+			Object key) throws Exception {
+		return visit(visitor, e, null, member, key);
+	}
+
+	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, Iterable<DustEntity> eIt, DustEntity member,
+			Object key) throws Exception {
+		return visit(visitor, null, eIt, member, key);
+	}
+
+	private DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity e, Iterable<DustEntity> eIt, DustEntity member,
 			Object key) throws Exception {
 		DustResultType ret = null;
 
@@ -225,8 +239,9 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		try {
 			if ( null == e ) {
-				for (ArkDockEntity me : entities.values()) {
-					ret = doVisitEntity(visitor, me);
+				Iterable<? extends DustEntity> root = (null == eIt) ? entities.values() : eIt;
+				for ( DustEntity me : root) {
+					ret = doVisitEntity(visitor, (ArkDockEntity) me);
 					if ( DustGenUtils.isReject(ret) ) {
 						break;
 					}
