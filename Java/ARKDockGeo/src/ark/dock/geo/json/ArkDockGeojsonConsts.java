@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.json.simple.parser.ContentHandler;
 
@@ -93,6 +94,14 @@ public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
 
     public interface GeojsonObjectSource {
         Map<GeojsonKey, Object> getObToFill();
+    }
+
+    public class GeojsonData extends TreeMap<GeojsonKey, Object> implements GeojsonObjectSource {
+		private static final long serialVersionUID = 1L;
+
+		public Map<GeojsonKey, Object> getObToFill() {
+        	return this;
+        }
     }
 
     public interface GeojsonObjectContainer {

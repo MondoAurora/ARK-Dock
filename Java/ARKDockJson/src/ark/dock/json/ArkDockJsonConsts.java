@@ -7,7 +7,6 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockConsts;
-import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
@@ -50,9 +49,9 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
 
     public class JsonContentVisitor implements ContentHandler {
         JsonContext ctx;
-        ArkDockVisitor<JsonContext> visitor;
+        ArkDockAgent<JsonContext> visitor;
 
-        public JsonContentVisitor(ArkDockVisitor<JsonContext> visitor) {
+        public JsonContentVisitor(ArkDockAgent<JsonContext> visitor) {
             super();
             this.visitor = visitor;
             this.ctx = visitor.getActionCtx();

@@ -9,6 +9,12 @@ import dust.gen.DustGenConsts.DustEntity;
 import dust.gen.DustGenUtils;
 
 class ArkDockEntity implements DustEntity, ArkDockConsts {
+	static long uniqueId = 0;
+	
+	public static synchronized String getNextUniqueId() {
+		return String.valueOf(++uniqueId);
+	}
+	
 	final ArkDockModel model;
 	final String id;
 	final String globalId;

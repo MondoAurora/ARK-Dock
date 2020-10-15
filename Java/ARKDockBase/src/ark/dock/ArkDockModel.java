@@ -36,7 +36,14 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return parent;
 	}
 
+	public ArkDockEntity getNewEntity(DustEntity unit, DustEntity type) {
+		return getEntity(unit, type, null, true);
+	}
+
 	public ArkDockEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
+		if ( null == itemId ) {
+			itemId = ArkDockEntity.getNextUniqueId();
+		}
 		String globalId = ArkDockUtils.buildGlobalId(((ArkDockEntity) unit).id, ((ArkDockEntity) type).id, itemId);
 
 		ArkDockEntity e = entities.get(globalId);
