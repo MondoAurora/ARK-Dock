@@ -47,9 +47,9 @@ public class ArkDockJsonReaderAgent implements DustAgent {
 			blockOb = null;
 			break;
 		case BEGIN:
-			switch ( ctx.getBlock() ) {
+			switch ( ctx.block ) {
 			case Entry:
-				key = (String) ctx.getParam();
+				key = (String) ctx.param;
 				visitor.setProcCtx(blockOb);
 				break;
 			case Array:
@@ -74,7 +74,7 @@ public class ArkDockJsonReaderAgent implements DustAgent {
 			}
 			break;
 		case PROCESS:
-			ob = ctx.getParam();
+			ob = ctx.param;
 			if ( blockType == JsonBlock.Object ) {
 				((Map) blockOb).put(key, ob);
 			} else if ( blockType == JsonBlock.Array ) {

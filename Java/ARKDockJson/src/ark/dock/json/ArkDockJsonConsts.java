@@ -28,16 +28,8 @@ public interface ArkDockJsonConsts extends ArkDockConsts {
 
 
     public class JsonContext {
-        JsonBlock block;
-        Object param;
-        
-        public JsonBlock getBlock() {
-            return block;
-        }
-        
-        public Object getParam() {
-            return param;
-        }
+        public JsonBlock block;
+        public Object param;
         
 		@Override
 		public String toString() {

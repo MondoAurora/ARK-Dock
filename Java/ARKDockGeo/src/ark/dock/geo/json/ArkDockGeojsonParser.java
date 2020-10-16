@@ -36,7 +36,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
             public DustResultType agentAction(DustAgentAction action) throws Exception {
                 switch (action) {
                 case BEGIN:
-                    if (ctx.getBlock() == JsonBlock.Array) {
+                    if (ctx.block == JsonBlock.Array) {
                         Object gjtOb = builder.newGeojsonObj(gjt);
                         if ( null == root ) {
                             root = gjtOb;
@@ -51,7 +51,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                     }
                     break;
                 case END:
-                    switch (ctx.getBlock()) {
+                    switch (ctx.block) {
                     case Array: {
                         Object oc = jsonVisitor.getProcCtx();
                         Object parent = jsonVisitor.getProcCtxNeighbor(true);
@@ -70,7 +70,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                     }
                     break;
                 case PROCESS:
-                    builder.addChild(ctx.getParam());
+                    builder.addChild(ctx.param);
                     return DustResultType.ACCEPT_READ;
                 default:
                     break;
@@ -124,9 +124,9 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
         public DustResultType agentAction(DustAgentAction action) throws Exception {
             switch (action) {
             case BEGIN:
-                switch (ctx.getBlock()) {
+                switch (ctx.block) {
                 case Entry:
-                    keyStr = (String) ctx.getParam();
+                    keyStr = (String) ctx.param;
                     keyGeoJSON = ArkDockUtils.fromString(keyStr, GeojsonKey.NULL);
                     
                     switch (keyGeoJSON) {
@@ -148,7 +148,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                 }
                 break;
             case END:
-                switch (ctx.getBlock()) {
+                switch (ctx.block) {
                 case Entry:
                     Object content = null;
 
@@ -180,7 +180,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
                 break;
             case PROCESS:
                 if (GeojsonKey.type == keyGeoJSON) {
-                    currType = ArkDockUtils.fromString((String) ctx.getParam(), GeojsonType.NULL);
+                    currType = ArkDockUtils.fromString((String) ctx.param, GeojsonType.NULL);
 
                     if (GeojsonType.Feature == currType) {
                         currObj = obSrc.getObToFill();
