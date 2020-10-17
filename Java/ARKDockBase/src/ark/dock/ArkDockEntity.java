@@ -70,7 +70,7 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 			}
 			break;
 		case CHK:
-			ret = DustGenUtils.isEqual(value, ArkDockUtils.resolveValue(md, val, hint));
+			ret = DustGenUtils.isEqual(value, ArkDockUtils.resolveValue(md, val, (ct == DustCollType.SET) ? value : hint));
 			break;
 		case DEL:
 			if ( (null == hint) || (null == md) || (ct == DustCollType.ONE) ) {

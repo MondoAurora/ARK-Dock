@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import dust.gen.DustGenConsts.DustEntity;
+import dust.gen.DustGenCounter;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
@@ -86,7 +87,27 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		Object ret = (cmd == DustDialogCmd.GET) ? value : false;
 
 		if ( null != e ) {
-			ret = ((ArkDockEntity) e).accessMember(cmd, member, value, hint);
+			if ( null == member ) {
+				switch ( cmd ) {
+				case ADD:
+					break;
+				case CHK:
+					break;
+				case DEL:
+					Object o = entities.remove(getGlobalId(e));
+					o.toString();
+					break;
+				case GET:
+					break;
+				case SET:
+					break;
+				default:
+					break;
+				
+				}
+			} else {
+				ret = ((ArkDockEntity) e).accessMember(cmd, member, value, hint);
+			}
 		}
 
 		return (RetType) ret;
@@ -305,5 +326,16 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	@Override
 	public Iterator<DustEntity> iterator() {
 		return new ContentReader();
+	}
+	
+	@Override
+	public String toString() {
+		DustGenCounter counter = new DustGenCounter(true);
+		
+		for ( ArkDockEntity me : entities.values()) {
+			counter.add(me.data.get(meta.tokModel.eEntityPrimType).toString());
+		}
+		
+		return counter.toString();
 	}
 }
