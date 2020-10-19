@@ -173,6 +173,8 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 
 		public final DustEntity eTypeColl;
 		public final DustEntity eCollMember;
+		public final DustEntity eCollSize;
+		public final DustEntity eCollCount;
 
 		public final DustEntity eTypeLink;
 		public final DustEntity eLinkSource;
@@ -182,11 +184,23 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 		public final DustEntity eConnectedRequires;
 		public final DustEntity eConnectedExtends;
 
+		public final DustEntity typRange;
+		public final DustEntity memMinInt;
+		public final DustEntity memMaxInt;
+		public final DustEntity memMinReal;
+		public final DustEntity memMaxReal;
+		public final DustEntity memMinRef;
+		public final DustEntity memMaxRef;
+		public final DustEntity memMinRaw;
+		public final DustEntity memMaxRaw;
+
 		public Generic(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Generic");
 
 			eTypeColl = meta.getType(eUnit, "Collection");
 			eCollMember = meta.defineMember(eTypeColl, "Members", DustValType.REF, DustCollType.ARR);
+			eCollSize = meta.defineMember(eTypeColl, "Size", DustValType.INT, DustCollType.ONE);
+			eCollCount = meta.defineMember(eTypeColl, "Count", DustValType.INT, DustCollType.ONE);
 			
 			eTypeLink = meta.getType(eUnit, "Link");
 			eLinkSource = meta.defineMember(eTypeLink, "Source", DustValType.REF, DustCollType.ONE);
@@ -195,6 +209,16 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 			eTypeConnected = meta.getType(eUnit, "Connected");
 			eConnectedRequires = meta.defineMember(eTypeConnected, "Requires", DustValType.REF, DustCollType.SET);
 			eConnectedExtends = meta.defineMember(eTypeConnected, "Extends", DustValType.REF, DustCollType.SET);
+
+			typRange = meta.getType(eUnit, "Range");
+			memMinInt = meta.defineMember(typRange, "MinInt", DustValType.INT, DustCollType.ONE);
+			memMaxInt = meta.defineMember(typRange, "MaxInt", DustValType.REF, DustCollType.ONE);
+			memMinReal = meta.defineMember(typRange, "MinReal", DustValType.REAL, DustCollType.ONE);
+			memMaxReal = meta.defineMember(typRange, "MaxReal", DustValType.REAL, DustCollType.ONE);
+			memMinRef = meta.defineMember(typRange, "MinRef", DustValType.REF, DustCollType.ONE);
+			memMaxRef = meta.defineMember(typRange, "MaxRef", DustValType.REF, DustCollType.ONE);
+			memMinRaw = meta.defineMember(typRange, "MinRaw", DustValType.RAW, DustCollType.ONE);
+			memMaxRaw = meta.defineMember(typRange, "MaxRaw", DustValType.RAW, DustCollType.ONE);
 		}
 	}
 
