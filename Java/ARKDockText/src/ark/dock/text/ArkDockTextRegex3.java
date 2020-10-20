@@ -4,46 +4,47 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dust.gen.DustGenUtils;
 
-public class ArkDockTextRegex implements ArkDockTextConsts {
+public class ArkDockTextRegex3 implements ArkDockTextConsts {
 
 	Pattern pattern;
-	Set<String> reader = new TreeSet<>();
+	Map<String, StringConverter> reader = new TreeMap<String, StringConverter>();
 
-	public ArkDockTextRegex(String regex, int regexFlags, Map<String, StringConverter> converters) {
+	public ArkDockTextRegex3(String regex, int regexFlags, Map<String, StringConverter> converters) {
 		this.pattern = Pattern.compile(regex, regexFlags);
 
 		Matcher m = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>").matcher(regex);
 		while (m.find()) {
-			reader.add( m.group(1));
+			String name = m.group(1);
+			reader.put(name, (null == converters) ? null : converters.get(name));
 		}
 	}
 
-	public ArkDockTextRegex(String regex, int regexFlags) {
+	public ArkDockTextRegex3(String regex, int regexFlags) {
 		this(regex, regexFlags, null);
 	}
 
-	public ArkDockTextRegex(String regex) {
+	public ArkDockTextRegex3(String regex) {
 		this(regex, 0, null);
 	}
 
-	public boolean matchAndRead(String from, Map<String, String> target) {
+	public boolean matchAndRead(String from, Map<String, Object> target) {
 		Matcher m = pattern.matcher(from);
 		if ( !m.matches() ) {
 			return false;
 		}
 
-		for (String key : reader) {
+		for (Map.Entry<String, StringConverter> re : reader.entrySet()) {
+			String key = re.getKey();
 			String gs = m.group(key);
 			if ( !DustGenUtils.isEmpty(key) ) {
-				target.put(key, gs);
+				StringConverter sc = re.getValue();
+				target.put(key, (null == sc) ? gs : sc.fromStr(gs));
 			}
 		}
 
@@ -62,20 +63,17 @@ public class ArkDockTextRegex implements ArkDockTextConsts {
 	public static class Parser {
 		TextMatchListener listener;
 		boolean callOnFail;
-		Map<String, String> content;
+		Map<String, Object> content;
 		int count;
-		ArrayList<ArkDockTextRegex> arrRx;
+		ArrayList<ArkDockTextRegex3> arrRx;
 		
-		public Parser(TextMatchListener listener, boolean callOnFail, ArkDockTextRegex... rxs) {
-			this.listener = listener;
-			this.callOnFail = callOnFail;
+		public Parser(TextMatchListener listener, boolean callOnFail, ArkDockTextRegex3... rxs) {
+			this.content = new TreeMap<>();
 			
 			arrRx = new ArrayList<>(count = rxs.length);
-			for (ArkDockTextRegex rx : rxs) {
+			for (ArkDockTextRegex3 rx : rxs) {
 				arrRx.add(rx);
 			}
-			
-			this.content = new TreeMap<>();
 		}
 
 		public void read(Reader reader) throws Exception {
@@ -92,7 +90,7 @@ public class ArkDockTextRegex implements ArkDockTextConsts {
 					}
 					
 					if ( callOnFail || (-1 != match) ) {
-						listener.processMatch(match, content);
+//						listener.processMatch(match, content);
 					}
 				}
 			}

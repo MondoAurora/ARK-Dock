@@ -100,6 +100,7 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 		public final DustEntity eTypeText;
 
 		public final DustEntity eTextName;
+		public final DustEntity eTextDesc;
 
 		public Text(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Text");
@@ -107,6 +108,7 @@ public interface ArkDockTokensTools extends ArkDockConsts {
 			eTypeText = meta.getType(eUnit, "Text");
 
 			eTextName = meta.getMember(eTypeText, "Name");
+			eTextDesc = meta.getMember(eTypeText, "Desc");
 		}
 	}
 

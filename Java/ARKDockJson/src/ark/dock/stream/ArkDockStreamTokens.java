@@ -1,4 +1,4 @@
-package ark.dock.stream.binary;
+package ark.dock.stream;
 
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockModelMeta;
@@ -6,7 +6,21 @@ import ark.dock.ArkDockTokensDust;
 import ark.dock.ArkDockTokensMind;
 import ark.dock.ArkDockTokensTools;
 
-public interface ArkDockStreamBinTokens extends ArkDockTokensMind, ArkDockTokensTools, ArkDockTokensDust {
+public interface ArkDockStreamTokens extends ArkDockTokensMind, ArkDockTokensTools, ArkDockTokensDust {
+	
+	public class Stream implements ArkDockConsts{
+		public final DustEntity eUnit;
+
+		public final DustEntity typStream;
+		public final DustEntity memStreamUrl;
+		
+		public Stream(ArkDockModelMeta meta) {
+			eUnit = meta.getUnit("Stream");
+
+			typStream = meta.getType(eUnit, "Stream");
+			memStreamUrl = meta.defineMember(typStream, "Url", DustValType.RAW, DustCollType.ONE);
+		}
+	}
 	
 	public class StreamBin implements ArkDockConsts{
 		public final DustEntity eUnit;

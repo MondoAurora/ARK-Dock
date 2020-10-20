@@ -32,7 +32,7 @@ public class ArkDockTextEditorConfig implements ArkDockTextConsts, ArkDockTextCo
 			data.clear();
 		}
 
-		void load(Map<String, Object> src, String... keys) {
+		void load(Map<String, String> src, String... keys) {
 			for (String k : keys) {
 				data.put(k, src.get(k));
 			}
@@ -80,7 +80,7 @@ public class ArkDockTextEditorConfig implements ArkDockTextConsts, ArkDockTextCo
 
 			target.agentAction(DustAgentAction.INIT);
 
-			Map<String, Object> rxData = new TreeMap<>();
+			Map<String, String> rxData = new TreeMap<>();
 
 			for (String line = br.readLine(); null != line; line = br.readLine()) {
 				++ctx.lineNum;
