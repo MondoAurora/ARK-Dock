@@ -16,11 +16,11 @@ public class ArkDockJsonWriterAgent extends ArkDockAgentBase<ArkDockJsonConsts.J
 	Map<Class<?>, JsonFormatter> formatters;
 	boolean pretty = true;
 	boolean closeOnRelease;
-	StringBuilder sbIndent = new StringBuilder();
+	StringBuilder sbIndent;
 
 	boolean cont;
 
-	public ArkDockJsonWriterAgent(Writer target, boolean closeOnRelease) {
+	public void setWriter(Writer target, boolean closeOnRelease) {
 		this.target = target;
 		this.closeOnRelease = closeOnRelease;
 	}
@@ -54,6 +54,7 @@ public class ArkDockJsonWriterAgent extends ArkDockAgentBase<ArkDockJsonConsts.J
 
 		switch ( action ) {
 		case INIT:
+			sbIndent = new StringBuilder();
 			cont = false;
 			break;
 		case BEGIN:

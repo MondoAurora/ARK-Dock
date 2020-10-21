@@ -135,7 +135,7 @@ public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
         private final GeojsonType type;
         protected Object bbox;
 
-        GeojsonObjectArray(GeojsonType t) {
+        public GeojsonObjectArray(GeojsonType t) {
             this.type = t;
         }
 

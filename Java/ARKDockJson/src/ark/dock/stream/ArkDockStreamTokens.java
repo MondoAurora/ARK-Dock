@@ -13,12 +13,16 @@ public interface ArkDockStreamTokens extends ArkDockTokensMind, ArkDockTokensToo
 
 		public final DustEntity typStream;
 		public final DustEntity memStreamUrl;
+
+		public final DustEntity tagFileMissing;
 		
 		public Stream(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Stream");
 
 			typStream = meta.getType(eUnit, "Stream");
 			memStreamUrl = meta.defineMember(typStream, "Url", DustValType.RAW, DustCollType.ONE);
+			
+			tagFileMissing = meta.defineTag(eUnit, "FileMissing", null);
 		}
 	}
 	
