@@ -121,6 +121,7 @@ public class ArkDockJsonWriterAgent extends ArkDockAgentBase<ArkDockJsonConsts.J
 			break;
 		case RELEASE:
 			target.flush();
+			cont = false;
 
 			if ( closeOnRelease ) {
 				target.close();

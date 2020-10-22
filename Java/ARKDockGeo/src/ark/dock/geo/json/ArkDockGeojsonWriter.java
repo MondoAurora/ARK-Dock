@@ -142,5 +142,8 @@ public class ArkDockGeojsonWriter implements ArkDockJsonConsts, ArkDockGeojsonCo
 		if ( null == listType ) {
 			jsonAgent.agentAction(DustAgentAction.RELEASE);
 		}
+		
+		ctx = null;
+		jsonAgent.setActionCtx(null);
 	}
 }
