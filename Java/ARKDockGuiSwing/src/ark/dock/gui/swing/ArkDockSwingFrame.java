@@ -5,6 +5,8 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ark.dock.ArkDockDsl;
+
 public class ArkDockSwingFrame extends JFrame implements ArkDockSwingConsts {
 	private static final long serialVersionUID = 1L;
 	
@@ -19,7 +21,7 @@ public class ArkDockSwingFrame extends JFrame implements ArkDockSwingConsts {
 
 			DustEntity def = getDef();
 
-			String title = getMind().modMain.getMember(def, getMind().tokText.eTextName, "App frame", null);
+			String title = getMind().modMain.getMember(def, getDsl(ArkDockDsl.Text.class).eTextName, "App frame", null);
 
 			frm.setTitle(title);
 
@@ -40,7 +42,7 @@ public class ArkDockSwingFrame extends JFrame implements ArkDockSwingConsts {
 				JPanel cp = new JPanel(new BorderLayout());
 				frame.setContentPane(cp);
 				
-				m = getMind().tokGeneric.eCollMember;
+				m = getDsl(ArkDockDsl.Generic.class).eCollMember;
 				
 				int cnt = getMind().modMain.getCount(def, m);
 				

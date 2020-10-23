@@ -1,6 +1,6 @@
 package ark.dock;
 
-public interface ArkDockTokensMind extends ArkDockConsts {
+public interface ArkDockDslMind extends ArkDockConsts {
 	
 	public class Model {
 		public final DustEntity eUnit;
@@ -106,7 +106,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		}
 	}
 	
-	public class Narrative implements ArkDockConsts {
+	public class Narrative {
 		public final DustEntity eUnit;
 
 		public Narrative(ArkDockModelMeta meta) {
@@ -114,7 +114,7 @@ public interface ArkDockTokensMind extends ArkDockConsts {
 		}
 	}
 	
-	public class Dialog implements ArkDockConsts {
+	public class Dialog {
 		public final DustEntity eUnit;
 
 		public final DustEntity typAction;

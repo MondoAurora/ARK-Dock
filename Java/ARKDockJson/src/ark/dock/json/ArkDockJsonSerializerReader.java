@@ -11,7 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockTokens;
+import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
@@ -42,7 +42,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	DustEntity eTarget;
 	Map<DustEntity, Object> newEntity = new HashMap<>();
 	
-	ArkDockTokens.Native tokNative;
+	ArkDockDsl.Native tokNative;
 
 	DustGenFactory<DustEntity, DustMemberDef> factMemberDef = new DustGenFactory<DustEntity, DustMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
@@ -86,7 +86,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		this.target = target;
 		this.meta = target.getMeta();
 		
-		tokNative = new ArkDockTokens.Native(meta);
+		tokNative = new ArkDockDsl.Native(meta);
 
 		JSONParser p = new JSONParser();
 		JsonContentVisitor h = new JsonContentVisitor(visitor);

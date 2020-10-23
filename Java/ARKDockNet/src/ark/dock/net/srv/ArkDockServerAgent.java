@@ -1,4 +1,4 @@
-package ark.dock.srv;
+package ark.dock.net.srv;
 
 import java.io.IOException;
 
@@ -12,16 +12,16 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 
+import ark.dock.ArkDockDsl;
+import ark.dock.ArkDockMind.ArkDockMindContext;
 import ark.dock.ArkDockMind.BaseAgent;
 import ark.dock.ArkDockModel;
-import ark.dock.ArkDockTokens;
 import ark.dock.ArkDockUtils;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenShutdown;
 
-@SuppressWarnings("rawtypes")
-public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
-	ArkDockTokens.Net tokNet;
+public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
+	ArkDockDsl.Net tokNet;
 	Server server;
 
 	class CtrlHandler extends AbstractHandler {
@@ -90,11 +90,11 @@ public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.Shu
 
 	public void init() throws Exception {
 		ArkDockModel mod = getMind().modMain;
-		tokNet = new ArkDockTokens.Net(mod.getMeta());
+		tokNet = new ArkDockDsl.Net(mod.getMeta());
 
 		DustEntity def = getDef();
 		DustEntity eSvc;
-		DustEntity m = getMind().tokGeneric.eCollMember;
+		DustEntity m = getDsl(ArkDockDsl.Generic.class).eCollMember;
 		DustEntity e;
 
 		HandlerList handlers = null;
@@ -112,7 +112,7 @@ public class ArkDockServerAgent extends BaseAgent implements DustGenShutdown.Shu
 				}
 				handlers.addHandler(ha.getWrapOb());
 
-				eSvc = mod.getMember(e, getMind().tokGeneric.eLinkTarget, null, null);
+				eSvc = mod.getMember(e, getDsl(ArkDockDsl.Generic.class).eLinkTarget, null, null);
 				Long port = mod.getMember(eSvc, tokNet.memServicePort, 8080L, null);
 
 				factChannels.get(port.intValue());

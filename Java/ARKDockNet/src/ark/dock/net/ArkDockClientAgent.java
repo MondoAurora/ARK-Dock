@@ -1,4 +1,4 @@
-package ark.dock.srv;
+package ark.dock.net;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -6,13 +6,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import ark.dock.ArkDockMind.BaseAgent;
+import ark.dock.net.srv.ArkDockSrvConsts;
 import ark.dock.ArkDockModel;
-import ark.dock.ArkDockTokens;
+import ark.dock.ArkDockDsl;
 
 @SuppressWarnings("rawtypes")
 public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
-	ArkDockTokens.Net tokNet;
-	ArkDockTokens.Native tokNative;
+	ArkDockModel mod;
+	
+	ArkDockDsl.Net tokNet;
+	ArkDockDsl.Native tokNative;
+	ArkDockDsl.Dialog tokDialog;
+	
 	URL url;
 	String method;
 
@@ -22,9 +27,10 @@ public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
 
 		switch ( action ) {
 		case INIT:
-			ArkDockModel mod = getMind().modMain;
-			tokNet = new ArkDockTokens.Net(mod.getMeta());
-			tokNative = new ArkDockTokens.Native(mod.getMeta());
+			mod = getMind().modMain;
+			tokNet = mod.getDsl(ArkDockDsl.Net.class);
+			tokNative = mod.getDsl(ArkDockDsl.Native.class);
+			tokDialog = mod.getDsl(ArkDockDsl.Dialog.class);
 
 			DustEntity def = getDef();
 			DustEntity eSvc = mod.getMember(def, mod.getMeta().tokGeneric.eLinkSource, null, null);
@@ -48,7 +54,7 @@ public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
 			} catch (Exception ex) {
 				// no problem, may get no response
 			}
-			getMind().modMain.setMember(getDef(), getMind().tokDialog.memActionResponse, r, null);
+			mod.setMember(getDef(), tokDialog.memActionResponse, r, null);
 
 			break;
 		default:

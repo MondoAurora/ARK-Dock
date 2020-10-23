@@ -1,6 +1,6 @@
 package ark.dock;
 
-public interface ArkDockTokensDust extends ArkDockConsts {
+public interface ArkDockDslDust extends ArkDockConsts {
 
 	public class Native implements ArkDockConsts {
 		public final DustEntity eUnit;

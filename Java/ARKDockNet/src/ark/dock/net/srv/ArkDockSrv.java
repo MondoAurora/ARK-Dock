@@ -1,4 +1,4 @@
-package ark.dock.srv;
+package ark.dock.net.srv;
 
 import java.awt.geom.Path2D;
 import java.io.File;

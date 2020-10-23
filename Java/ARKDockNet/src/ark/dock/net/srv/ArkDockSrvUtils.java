@@ -1,4 +1,4 @@
-package ark.dock.srv;
+package ark.dock.net.srv;
 
 import java.io.File;
 import java.io.IOException;

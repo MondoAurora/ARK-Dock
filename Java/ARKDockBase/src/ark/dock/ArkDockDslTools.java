@@ -1,6 +1,6 @@
 package ark.dock;
 
-public interface ArkDockTokensTools extends ArkDockConsts {
+public interface ArkDockDslTools extends ArkDockConsts {
 
 	public class Geometry implements ArkDockConsts {
 		public final DustEntity eUnit;

@@ -2,13 +2,13 @@ package ark.dock.geo.las;
 
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockTokensDust;
-import ark.dock.ArkDockTokensMind;
-import ark.dock.ArkDockTokensTools;
+import ark.dock.ArkDockDslDust;
+import ark.dock.ArkDockDslMind;
+import ark.dock.ArkDockDslTools;
 
 // https://support.geocue.com/what-is-the-las-format/
 
-public interface ArkDockGeoLasTokens extends ArkDockTokensMind, ArkDockTokensTools, ArkDockTokensDust {
+public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
 	public class LasHeader implements ArkDockConsts{
 		public final DustEntity eUnit;

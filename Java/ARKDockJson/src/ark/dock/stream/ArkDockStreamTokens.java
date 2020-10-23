@@ -2,11 +2,11 @@ package ark.dock.stream;
 
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockTokensDust;
-import ark.dock.ArkDockTokensMind;
-import ark.dock.ArkDockTokensTools;
+import ark.dock.ArkDockDslDust;
+import ark.dock.ArkDockDslMind;
+import ark.dock.ArkDockDslTools;
 
-public interface ArkDockStreamTokens extends ArkDockTokensMind, ArkDockTokensTools, ArkDockTokensDust {
+public interface ArkDockStreamTokens extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
 	public class Stream implements ArkDockConsts{
 		public final DustEntity eUnit;

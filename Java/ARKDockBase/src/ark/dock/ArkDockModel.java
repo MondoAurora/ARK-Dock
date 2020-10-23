@@ -29,6 +29,10 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	protected ArkDockModel() {
 	}
 
+	public <DslType> DslType getDsl(Class<DslType> dslClass) {
+		return meta.getDsl(dslClass);
+	}
+
 	public ArkDockModelMeta getMeta() {
 		return meta;
 	}

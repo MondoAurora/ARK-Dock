@@ -3,6 +3,8 @@ package ark.dock;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ark.dock.ArkDockDslDust.Native;
+import ark.dock.ArkDockDslMind.Idea;
 import dust.gen.DustGenUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -31,6 +33,10 @@ public class ArkDockMind implements ArkDockConsts {
 		
 		public ArkDockMind getMind() {
 			return ctx.mind;
+		}
+		
+		public <DslType> DslType getDsl(Class<DslType> dslClass) {
+			return ctx.mind.getDsl(dslClass);
 		}
 
 		@Override
@@ -85,18 +91,11 @@ public class ArkDockMind implements ArkDockConsts {
 		}
 	}
 
-	public final ArkDockModelMeta modMeta;
+	public final ArkDockModelMeta meta;
 	public final ArkDockModel modMain;
 	
-	public final ArkDockTokens.Idea tokIdea;
-	public final ArkDockTokens.Model tokModel;
-	public final ArkDockTokensMind.Narrative tokNarrative;
-	public final ArkDockTokensMind.Dialog tokDialog;
-
-	public final ArkDockTokens.Generic tokGeneric;
-	public final ArkDockTokens.Text tokText;
-	
-	public final ArkDockTokens.Native tokNative;
+	public final ArkDockDsl.Idea tokIdea;
+	public final ArkDockDsl.Native tokNative;
 
 	private DustEntity eUnitMain;
 
@@ -104,19 +103,16 @@ public class ArkDockMind implements ArkDockConsts {
 	
 	public ArkDockMind(ArkDockModel modMain_) {
 		modMain = modMain_;
-		modMeta = modMain.getMeta();
+		meta = modMain.getMeta();
 		
-		tokModel = modMeta.tokModel;
-		tokIdea = modMeta.tokIdea;
-		tokNarrative = modMeta.tokNarrative;
-		tokDialog = modMeta.tokDialog;
-		
-		tokGeneric = modMeta.tokGeneric;
-		tokText = modMeta.tokText;
-		
-		tokNative = new ArkDockTokens.Native(modMeta);
+		tokIdea = getDsl(Idea.class);
+		tokNative = getDsl(Native.class);
 	}
 	
+	public <DslType> DslType getDsl(Class<DslType> dslClass) {
+		return meta.getDsl(dslClass);
+	}
+
 	public final DustEntity getUnit() {
 		return eUnitMain;
 	}

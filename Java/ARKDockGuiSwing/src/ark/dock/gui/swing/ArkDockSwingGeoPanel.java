@@ -29,7 +29,7 @@ import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockModelSerializer.SerializeAgent;
-import ark.dock.ArkDockTokens;
+import ark.dock.ArkDockDsl;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonPolygon;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
@@ -45,7 +45,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 
 	private JPanel drawingPane;
 
-	private final ArkDockTokens.Native tokNative;
+	private final ArkDockDsl.Native tokNative;
 	private final ArkDockModel modMain;
 
 	DustGenTranslator<DustEntity, Shape> trContent = new DustGenTranslator<DustEntity, Shape>();
@@ -104,7 +104,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 		this.modMain = modMain_;
 
 		ArkDockModelMeta modMeta = modMain.getMeta();
-		tokNative = new ArkDockTokens.Native(modMeta);
+		tokNative = new ArkDockDsl.Native(modMeta);
 
 		JLabel instructionsLeft = new JLabel("Click left mouse button to select.");
 		JLabel instructionsRight = new JLabel("Click right mouse button to reload.");

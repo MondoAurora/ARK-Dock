@@ -7,7 +7,7 @@ import java.util.Map;
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockTokens;
+import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockUtils;
 import ark.dock.geo.json.ArkDockGeojson2D.GeojsonBuilder2DDouble;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonKey;
@@ -30,10 +30,10 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 	
 	private final DustEntity eMainUnit;
 	
-	private final ArkDockTokens.Idea tokIdea;
-	private final ArkDockTokens.Model tokModel;
-	private final ArkDockTokens.Native tokNative;
-	private final ArkDockTokens.Geometry tokGeo;
+	private final ArkDockDsl.Idea tokIdea;
+	private final ArkDockDsl.Model tokModel;
+	private final ArkDockDsl.Native tokNative;
+	private final ArkDockDsl.Geometry tokGeo;
 	
 	private DustEntity eContainer;
 	
@@ -45,8 +45,8 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 
 		this.tokIdea = modMeta.tokIdea;
 		this.tokModel = modMeta.tokModel;
-		tokGeo = new ArkDockTokens.Geometry(modMeta);
-		tokNative = new ArkDockTokens.Native(modMeta);
+		tokGeo = new ArkDockDsl.Geometry(modMeta);
+		tokNative = new ArkDockDsl.Native(modMeta);
 		
 		specKeys.add(LoadSpecKey.PrimaryType, modMeta.getGlobalId(tokModel.eEntityPrimType));
 		specKeys.add(LoadSpecKey.EntityId, modMeta.getGlobalId(tokModel.eEntityId));

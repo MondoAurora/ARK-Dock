@@ -8,21 +8,21 @@ import dust.gen.DustGenTranslator;
 
 public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 
-	public final ArkDockTokensMind.Model tokModel;
-	public final ArkDockTokensMind.Idea tokIdea;
-	public final ArkDockTokensMind.Narrative tokNarrative;
-	public final ArkDockTokensMind.Dialog tokDialog;
+	public final ArkDockDslMind.Model tokModel;
+	public final ArkDockDslMind.Idea tokIdea;
+	public final ArkDockDslMind.Narrative tokNarrative;
+	public final ArkDockDslMind.Dialog tokDialog;
 
 	DustEntity eTypeType;
 	DustEntity eTypeMember;
 	DustEntity eTypeTag;
 
-	public final ArkDockTokensTools.Text tokText;
-	public final ArkDockTokensTools.Generic tokGeneric;
+	public final ArkDockDslTools.Text tokText;
+	public final ArkDockDslTools.Generic tokGeneric;
 
 	DustGenTranslator<DustCollType, DustEntity> trCollType;
 	DustGenTranslator<DustValType, DustEntity> trValType;
-
+	
 	class ArkMemberDef implements DustMemberDef {
 		final DustEntity member;
 		final DustEntity type;
@@ -90,15 +90,27 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		}
 	};
 
+	final DustGenFactory<Class<?>, Object> factTokens = new DustGenFactory<Class<?>, Object>(null) {
+		private static final long serialVersionUID = 1L;
+
+		protected Object createItem(Class<?> key, Object hint) {
+			try {
+				return key.getConstructor(ArkDockModelMeta.class).newInstance(ArkDockModelMeta.this);
+			} catch (Throwable e) {
+				return DustGenException.throwException(e, "Failed to instantiate token container for class", key);
+			}
+		};
+	};
+
 	public ArkDockModelMeta() {
 		parent = null;
 		meta = this;
 
-		tokIdea = new ArkDockTokensMind.Idea(this);
-		tokModel = new ArkDockTokensMind.Model(this);
+		tokIdea = getDsl(ArkDockDslMind.Idea.class);
+		tokModel = getDsl(ArkDockDslMind.Model.class);
 		
-		tokText = new ArkDockTokensTools.Text(this);
-		tokGeneric = new ArkDockTokensTools.Generic(this);
+		tokText = getDsl(ArkDockDslTools.Text.class);
+		tokGeneric = getDsl(ArkDockDslTools.Generic.class);
 
 		initEntity(tokModel.eUnit, tokModel.eTypeUnit);
 		initEntity(tokIdea.eUnit, tokModel.eTypeUnit);
@@ -144,8 +156,13 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 				new DustEntity[] { tokIdea.eConstValtypeInt, tokIdea.eConstValtypeReal, tokIdea.eConstValtypeRef,
 						tokIdea.eConstValtypeRaw });
 		
-		tokNarrative = new ArkDockTokensMind.Narrative(this);
-		tokDialog = new ArkDockTokensMind.Dialog(this);
+		tokNarrative = getDsl( ArkDockDslMind.Narrative.class);
+		tokDialog = getDsl( ArkDockDslMind.Dialog.class);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <DslType> DslType getDsl(Class<DslType> dslClass) {
+		return (DslType) factTokens.get(dslClass);
 	}
 
 	@Override
