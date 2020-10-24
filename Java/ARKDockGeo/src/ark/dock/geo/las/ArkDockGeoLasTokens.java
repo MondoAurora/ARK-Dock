@@ -10,7 +10,7 @@ import ark.dock.ArkDockDslTools;
 
 public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
-	public class LasHeader implements ArkDockConsts{
+	public class DslLasHeader implements ArkDockConsts{
 		public final DustEntity eUnit;
 
 		public final DustEntity typLasHeader;
@@ -70,7 +70,7 @@ public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 		public final DustEntity tagHeaderVer14;
 		
 
-		public LasHeader(ArkDockModelMeta meta) {
+		public DslLasHeader(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Las");
 
 			typLasHeader = meta.getType(eUnit, "Header");

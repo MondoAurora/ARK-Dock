@@ -121,60 +121,60 @@ public class ArkDockGeoLasParser implements ArkDockGeoLasConsts {
 	}
 
 	ArkDockModelMeta meta;
-	LasHeader tokLasHdr;
+	DslLasHeader dslLasHdr;
 
 	public ArkDockGeoLasParser(ArkDockModelMeta meta) {
 		this.meta = meta;
-		tokLasHdr = new LasHeader(meta);
+		dslLasHdr = new DslLasHeader(meta);
 	}
 
 	public void loadHeader(InputStream in, SerializeAgent<DustEntityContext> receiver) throws Exception {
 		ReadContext ctx = new ReadContext(receiver, in, ByteOrder.LITTLE_ENDIAN);
 
 		try {
-			ctx.sendEntityAction(tokLasHdr.typLasHeader, DustAgentAction.BEGIN);
+			ctx.sendEntityAction(dslLasHdr.typLasHeader, DustAgentAction.BEGIN);
 			
-			ctx.sendString(tokLasHdr.memFileSignature, 4);
-			ctx.sendNum(tokLasHdr.memFileSourceID, BinNumType.Short);
-			ctx.sendNum(tokLasHdr.memGlobalEncoding, BinNumType.Short);
+			ctx.sendString(dslLasHdr.memFileSignature, 4);
+			ctx.sendNum(dslLasHdr.memFileSourceID, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memGlobalEncoding, BinNumType.Short);
 
-			ctx.sendNum(tokLasHdr.memProjIdGUID1, BinNumType.Int);
-			ctx.sendNum(tokLasHdr.memProjIdGUID2, BinNumType.Short);
-			ctx.sendNum(tokLasHdr.memProjIdGUID3, BinNumType.Short);
-			ctx.sendString(tokLasHdr.memProjIdGUID4, 8);
+			ctx.sendNum(dslLasHdr.memProjIdGUID1, BinNumType.Int);
+			ctx.sendNum(dslLasHdr.memProjIdGUID2, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memProjIdGUID3, BinNumType.Short);
+			ctx.sendString(dslLasHdr.memProjIdGUID4, 8);
 
-			ctx.sendNum(tokLasHdr.memVerMajor, BinNumType.Byte);
-			ctx.sendNum(tokLasHdr.memVerMinor, BinNumType.Byte);
+			ctx.sendNum(dslLasHdr.memVerMajor, BinNumType.Byte);
+			ctx.sendNum(dslLasHdr.memVerMinor, BinNumType.Byte);
 
-			ctx.sendString(tokLasHdr.memSysId, 32);
-			ctx.sendString(tokLasHdr.memGenSw, 32);
+			ctx.sendString(dslLasHdr.memSysId, 32);
+			ctx.sendString(dslLasHdr.memGenSw, 32);
 
-			ctx.sendNum(tokLasHdr.memCreateDayOfYear, BinNumType.Short);
-			ctx.sendNum(tokLasHdr.memCreateYear, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memCreateDayOfYear, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memCreateYear, BinNumType.Short);
 
-			ctx.sendNum(tokLasHdr.memHdrSize, BinNumType.Short);
-			ctx.sendNum(tokLasHdr.memPtDataOffset, BinNumType.Int);
-			ctx.sendNum(tokLasHdr.memVLRNum, BinNumType.Int);
-			ctx.sendNum(tokLasHdr.memPtDataRecFmt, BinNumType.Byte);
-			ctx.sendNum(tokLasHdr.memPtDataRecLen, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memHdrSize, BinNumType.Short);
+			ctx.sendNum(dslLasHdr.memPtDataOffset, BinNumType.Int);
+			ctx.sendNum(dslLasHdr.memVLRNum, BinNumType.Int);
+			ctx.sendNum(dslLasHdr.memPtDataRecFmt, BinNumType.Byte);
+			ctx.sendNum(dslLasHdr.memPtDataRecLen, BinNumType.Short);
 
-			ctx.sendNum(tokLasHdr.memPtRecNum, BinNumType.Int);
-			ctx.sendNumArr(tokLasHdr.memPtByRetNum, BinNumType.Int, 5);
+			ctx.sendNum(dslLasHdr.memPtRecNum, BinNumType.Int);
+			ctx.sendNumArr(dslLasHdr.memPtByRetNum, BinNumType.Int, 5);
 
-			ctx.sendNum(tokLasHdr.memScaleX, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memScaleY, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memScaleZ, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memOffsetX, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memOffsetY, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memOffsetZ, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMaxX, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMinX, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMaxY, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMinY, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMaxZ, BinNumType.Double);
-			ctx.sendNum(tokLasHdr.memMinZ, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memScaleX, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memScaleY, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memScaleZ, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memOffsetX, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memOffsetY, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memOffsetZ, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMaxX, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMinX, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMaxY, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMinY, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMaxZ, BinNumType.Double);
+			ctx.sendNum(dslLasHdr.memMinZ, BinNumType.Double);
 		} finally {
-			ctx.sendEntityAction(tokLasHdr.typLasHeader, DustAgentAction.END);
+			ctx.sendEntityAction(dslLasHdr.typLasHeader, DustAgentAction.END);
 
 			ctx.release();
 		}

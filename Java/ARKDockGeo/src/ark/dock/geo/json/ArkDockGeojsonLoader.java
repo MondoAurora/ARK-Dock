@@ -17,7 +17,7 @@ import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonType;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
 
-public class ArkDockGeojsonLoader implements ArkDockConsts {
+public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 	enum LoadSpecKey {
 		PrimaryType, EntityId
 	}
@@ -30,10 +30,11 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 	
 	private final DustEntity eMainUnit;
 	
-	private final ArkDockDsl.Idea tokIdea;
-	private final ArkDockDsl.Model tokModel;
-	private final ArkDockDsl.Native tokNative;
-	private final ArkDockDsl.Geometry tokGeo;
+	private final DslIdea dslIdea;
+	private final DslModel dslModel;
+	private final DslGeneric dslGeneric;
+	private final DslNative dslNative;
+	private final DslGeometry dslGeo;
 	
 	private DustEntity eContainer;
 	
@@ -43,13 +44,14 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 		
 		this.modMeta = modMain.getMeta();
 
-		this.tokIdea = modMeta.tokIdea;
-		this.tokModel = modMeta.tokModel;
-		tokGeo = new ArkDockDsl.Geometry(modMeta);
-		tokNative = new ArkDockDsl.Native(modMeta);
+		dslIdea = modMeta.getDsl(DslIdea.class);
+		dslModel = modMeta.getDsl(DslModel.class);
+		dslGeo = modMeta.getDsl(DslGeometry.class);
+		dslGeneric = modMeta.getDsl(DslGeneric.class);
+		dslNative = modMeta.getDsl(DslNative.class);
 		
-		specKeys.add(LoadSpecKey.PrimaryType, modMeta.getGlobalId(tokModel.eEntityPrimType));
-		specKeys.add(LoadSpecKey.EntityId, modMeta.getGlobalId(tokModel.eEntityId));
+		specKeys.add(LoadSpecKey.PrimaryType, modMeta.getGlobalId(dslModel.memEntityPrimType));
+		specKeys.add(LoadSpecKey.EntityId, modMeta.getGlobalId(dslModel.memEntityId));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -103,22 +105,22 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 
 			switch ( gjType ) {
 			case Point:
-				setNative(eFeature, true, tokGeo.tagNativePoint, geometry);
+				setNative(eFeature, true, dslGeo.tagNativePoint, geometry);
 				break;
 			case MultiPoint:
-				setNative(eFeature, false, tokGeo.tagNativePoint, geometry);
+				setNative(eFeature, false, dslGeo.tagNativePoint, geometry);
 				break;
 			case LineString:
-				setNative(eFeature, true, tokGeo.tagNativePath, geometry);
+				setNative(eFeature, true, dslGeo.tagNativePath, geometry);
 				break;
 			case MultiLineString:
-				setNative(eFeature, false, tokGeo.tagNativePath, geometry);
+				setNative(eFeature, false, dslGeo.tagNativePath, geometry);
 				break;
 			case Polygon:
-				setNative(eFeature, true, tokGeo.tagNativePolygon, geometry);
+				setNative(eFeature, true, dslGeo.tagNativePolygon, geometry);
 				break;
 			case MultiPolygon:
-				setNative(eFeature, false, tokGeo.tagNativePolygon, geometry);
+				setNative(eFeature, false, dslGeo.tagNativePolygon, geometry);
 				break;
 			default:
 				DustGenLog.log(DustEventLevel.WARNING, "Geometry not processed", eFeature, gjType, geometry);
@@ -126,20 +128,20 @@ public class ArkDockGeojsonLoader implements ArkDockConsts {
 			}
 			
 			if ( null != eContainer ) {
-				modMain.setMember(eContainer, modMeta.tokGeneric.eCollMember, eFeature, KEY_APPEND);
+				modMain.setMember(eContainer, dslGeneric.memCollMember, eFeature, KEY_APPEND);
 			}
 		}
 	}
 
 	private void setNative(DustEntity eFeature, boolean isSingle, DustEntity geoValType, Object geometry) {
-		modMain.setMember(eFeature, tokNative.eNativeValType, geoValType, null);
-		modMain.setMember(eFeature, tokNative.eNativeCollType,
-				isSingle ? tokIdea.eConstColltypeOne : tokIdea.eConstColltypeArr, null);
+		modMain.setMember(eFeature, dslNative.memNativeValType, geoValType, null);
+		modMain.setMember(eFeature, dslNative.memNativeCollType,
+				isSingle ? dslIdea.tagColltypeOne : dslIdea.tagColltypeArr, null);
 		if ( isSingle ) {
-			modMain.setMember(eFeature, tokNative.eNativeValueOne, geometry, null);
+			modMain.setMember(eFeature, dslNative.memNativeValueOne, geometry, null);
 		} else {
 			for (Object p : (GeojsonObjectArray) geometry) {
-				modMain.accessMember(DustDialogCmd.ADD, eFeature, tokNative.eNativeValueArr, p, KEY_APPEND);
+				modMain.accessMember(DustDialogCmd.ADD, eFeature, dslNative.memNativeValueArr, p, KEY_APPEND);
 			}
 		}
 	}

@@ -3,8 +3,8 @@ package ark.dock;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ark.dock.ArkDockDslDust.Native;
-import ark.dock.ArkDockDslMind.Idea;
+import ark.dock.ArkDockDslDust.DslNative;
+import ark.dock.ArkDockDslMind.DslIdea;
 import dust.gen.DustGenUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -94,8 +94,8 @@ public class ArkDockMind implements ArkDockConsts {
 	public final ArkDockModelMeta meta;
 	public final ArkDockModel modMain;
 	
-	public final ArkDockDsl.Idea tokIdea;
-	public final ArkDockDsl.Native tokNative;
+	public final ArkDockDsl.DslIdea dslIdea;
+	public final ArkDockDsl.DslNative dslNative;
 
 	private DustEntity eUnitMain;
 
@@ -105,8 +105,8 @@ public class ArkDockMind implements ArkDockConsts {
 		modMain = modMain_;
 		meta = modMain.getMeta();
 		
-		tokIdea = getDsl(Idea.class);
-		tokNative = getDsl(Native.class);
+		dslIdea = getDsl(DslIdea.class);
+		dslNative = getDsl(DslNative.class);
 	}
 	
 	public <DslType> DslType getDsl(Class<DslType> dslClass) {
@@ -126,7 +126,7 @@ public class ArkDockMind implements ArkDockConsts {
 	}
 
 	public final DustEntity getAgent(String agentName) {
-		return getEntity(tokIdea.eTypeAgent, agentName, false);
+		return getEntity(dslIdea.typAgent, agentName, false);
 	}
 
 	protected ArkDockMindContext createCtx() {
@@ -136,7 +136,7 @@ public class ArkDockMind implements ArkDockConsts {
 	protected MindAgent createAgent(String agentName) throws Exception {
 		DustEntity eAgent = getAgent(agentName);
 
-		String cName = modMain.getMember(eAgent, tokNative.eBinaryId, null, null);
+		String cName = modMain.getMember(eAgent, dslNative.memBinaryId, null, null);
 		Class<?> c = Class.forName(cName);
 		
 		MindAgent agent = (MindAgent) c.newInstance();
@@ -149,8 +149,8 @@ public class ArkDockMind implements ArkDockConsts {
 
 		DustEntity eAgent = getAgent(agentName);
 
-		modMain.setMember(eAgent, tokNative.eNativeCollType, tokIdea.eConstColltypeOne, null);
-		modMain.setMember(eAgent, tokNative.eNativeValueOne, agent, null);
+		modMain.setMember(eAgent, dslNative.memNativeCollType, dslIdea.tagColltypeOne, null);
+		modMain.setMember(eAgent, dslNative.memNativeValueOne, agent, null);
 
 		DustResultType res = sendAgent(agent, DustAgentAction.INIT, eAgent, null, null, null);
 

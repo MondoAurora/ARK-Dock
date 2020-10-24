@@ -21,7 +21,7 @@ public class ArkDockSwingFrame extends JFrame implements ArkDockSwingConsts {
 
 			DustEntity def = getDef();
 
-			String title = getMind().modMain.getMember(def, getDsl(ArkDockDsl.Text.class).eTextName, "App frame", null);
+			String title = getMind().modMain.getMember(def, getDsl(ArkDockDsl.DslText.class).memTextName, "App frame", null);
 
 			frm.setTitle(title);
 
@@ -42,14 +42,14 @@ public class ArkDockSwingFrame extends JFrame implements ArkDockSwingConsts {
 				JPanel cp = new JPanel(new BorderLayout());
 				frame.setContentPane(cp);
 				
-				m = getDsl(ArkDockDsl.Generic.class).eCollMember;
+				m = getDsl(ArkDockDsl.DslGeneric.class).memCollMember;
 				
 				int cnt = getMind().modMain.getCount(def, m);
 				
 				for ( int i = 0; i < cnt; ++i ) {
 					e = getMind().modMain.getMember(def, m, null, i);
 					
-					SwingAgent<?> a = getMind().modMain.getMember(e, getMind().tokNative.eNativeValueOne, null, i);
+					SwingAgent<?> a = getMind().modMain.getMember(e, getMind().dslNative.memNativeValueOne, null, i);
 					
 					cp.add(a.getComponent(), BorderLayout.CENTER);
 				}

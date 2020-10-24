@@ -56,9 +56,6 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		if ( createIfMissing && (null == e) ) {
 			e = new ArkDockEntity(this, globalId, itemId);
 			meta.initEntity(e, type);
-//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityId, itemId, null);
-//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityGlobalId, globalId, null);
-//			e.accessMember(DustDialogCmd.SET, meta.tokModel.eEntityPrimType, type, null);
 			entities.put(globalId, e);
 		}
 
@@ -337,7 +334,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		DustGenCounter counter = new DustGenCounter(true);
 		
 		for ( ArkDockEntity me : entities.values()) {
-			counter.add(me.data.get(meta.tokModel.eEntityPrimType).toString());
+			counter.add(me.data.get(meta.dslModel.memEntityPrimType).toString());
 		}
 		
 		return counter.toString();

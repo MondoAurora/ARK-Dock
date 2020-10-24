@@ -21,7 +21,7 @@ import dust.gen.DustGenFactory;
 import dust.gen.DustGenShutdown;
 
 public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
-	ArkDockDsl.Net tokNet;
+	ArkDockDsl.DslNet dslNet;
 	Server server;
 
 	class CtrlHandler extends AbstractHandler {
@@ -90,11 +90,11 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 
 	public void init() throws Exception {
 		ArkDockModel mod = getMind().modMain;
-		tokNet = new ArkDockDsl.Net(mod.getMeta());
+		dslNet = new ArkDockDsl.DslNet(mod.getMeta());
 
 		DustEntity def = getDef();
 		DustEntity eSvc;
-		DustEntity m = getDsl(ArkDockDsl.Generic.class).eCollMember;
+		DustEntity m = getDsl(ArkDockDsl.DslGeneric.class).memCollMember;
 		DustEntity e;
 
 		HandlerList handlers = null;
@@ -103,7 +103,7 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 		for (int i = 0; i < cnt; ++i) {
 			e = mod.getMember(def, m, null, i);
 
-			HandlerAgent<? extends AbstractHandler> ha = mod.getMember(e, getMind().tokNative.eNativeValueOne, null, i);
+			HandlerAgent<? extends AbstractHandler> ha = mod.getMember(e, getMind().dslNative.memNativeValueOne, null, i);
 			if ( null != ha ) {
 				if ( null == server ) {
 					server = new Server();
@@ -112,8 +112,8 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 				}
 				handlers.addHandler(ha.getWrapOb());
 
-				eSvc = mod.getMember(e, getDsl(ArkDockDsl.Generic.class).eLinkTarget, null, null);
-				Long port = mod.getMember(eSvc, tokNet.memServicePort, 8080L, null);
+				eSvc = mod.getMember(e, getDsl(ArkDockDsl.DslGeneric.class).memLinkTarget, null, null);
+				Long port = mod.getMember(eSvc, dslNet.memServicePort, 8080L, null);
 
 				factChannels.get(port.intValue());
 			}

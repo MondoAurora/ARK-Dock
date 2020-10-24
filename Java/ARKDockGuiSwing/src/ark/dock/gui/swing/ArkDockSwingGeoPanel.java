@@ -25,11 +25,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockModelSerializer.SerializeAgent;
-import ark.dock.ArkDockDsl;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonPolygon;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
@@ -45,7 +45,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 
 	private JPanel drawingPane;
 
-	private final ArkDockDsl.Native tokNative;
+	private final ArkDockDsl.DslNative dslNative;
 	private final ArkDockModel modMain;
 
 	DustGenTranslator<DustEntity, Shape> trContent = new DustGenTranslator<DustEntity, Shape>();
@@ -104,7 +104,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 		this.modMain = modMain_;
 
 		ArkDockModelMeta modMeta = modMain.getMeta();
-		tokNative = new ArkDockDsl.Native(modMeta);
+		dslNative = new ArkDockDsl.DslNative(modMeta);
 
 		JLabel instructionsLeft = new JLabel("Click left mouse button to select.");
 		JLabel instructionsRight = new JLabel("Click right mouse button to reload.");
@@ -139,7 +139,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 				if ( action == DustAgentAction.PROCESS ) {
 					DustEntityContext ctx = getActionCtx();
 
-					if ( (ctx.member == tokNative.eNativeValueOne) || (ctx.member == tokNative.eNativeValueArr) ) {
+					if ( (ctx.member == dslNative.memNativeValueOne) || (ctx.member == dslNative.memNativeValueArr) ) {
 						Shape shp = null;
 
 						if ( ctx.value instanceof GeojsonPolygon ) {

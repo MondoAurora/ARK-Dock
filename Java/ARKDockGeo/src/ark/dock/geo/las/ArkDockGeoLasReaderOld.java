@@ -72,41 +72,41 @@ public class ArkDockGeoLasReaderOld implements ArkDockGeoLasConsts {
 	}
 
 	ArkDockModelMeta meta;
-	LasHeader tokLasHdr;
+	DslLasHeader dslLasHdr;
 
 	public ArkDockGeoLasReaderOld(ArkDockModelMeta meta) {
 		this.meta = meta;
-		tokLasHdr = new LasHeader(meta);
+		dslLasHdr = new DslLasHeader(meta);
 	}
 	
 	public void loadHeader(InputStream in, Map<DustEntity, Object> target) throws Exception {
 		ReadContext ctx = new ReadContext(target, in, ByteOrder.LITTLE_ENDIAN);
 		
-		ctx.readString(tokLasHdr.memFileSignature, 4);
-		ctx.readNum(tokLasHdr.memFileSourceID, NumType.Short);
-		ctx.readNum(tokLasHdr.memGlobalEncoding, NumType.Short);
+		ctx.readString(dslLasHdr.memFileSignature, 4);
+		ctx.readNum(dslLasHdr.memFileSourceID, NumType.Short);
+		ctx.readNum(dslLasHdr.memGlobalEncoding, NumType.Short);
 
-		ctx.readNum(tokLasHdr.memProjIdGUID1, NumType.Int);
-		ctx.readNum(tokLasHdr.memProjIdGUID2, NumType.Short);
-		ctx.readNum(tokLasHdr.memProjIdGUID3, NumType.Short);
-		ctx.readString(tokLasHdr.memProjIdGUID4, 8);
+		ctx.readNum(dslLasHdr.memProjIdGUID1, NumType.Int);
+		ctx.readNum(dslLasHdr.memProjIdGUID2, NumType.Short);
+		ctx.readNum(dslLasHdr.memProjIdGUID3, NumType.Short);
+		ctx.readString(dslLasHdr.memProjIdGUID4, 8);
 
-		ctx.readNum(tokLasHdr.memVerMajor, NumType.Byte);
-		ctx.readNum(tokLasHdr.memVerMinor, NumType.Byte);
+		ctx.readNum(dslLasHdr.memVerMajor, NumType.Byte);
+		ctx.readNum(dslLasHdr.memVerMinor, NumType.Byte);
 
-		ctx.readString(tokLasHdr.memSysId, 32);
-		ctx.readString(tokLasHdr.memGenSw, 32);
+		ctx.readString(dslLasHdr.memSysId, 32);
+		ctx.readString(dslLasHdr.memGenSw, 32);
 		
-		ctx.readNum(tokLasHdr.memCreateDayOfYear, NumType.Short);
-		ctx.readNum(tokLasHdr.memCreateYear, NumType.Short);
+		ctx.readNum(dslLasHdr.memCreateDayOfYear, NumType.Short);
+		ctx.readNum(dslLasHdr.memCreateYear, NumType.Short);
 
-		ctx.readNum(tokLasHdr.memHdrSize, NumType.Short);
-		ctx.readNum(tokLasHdr.memPtDataOffset, NumType.Int);
-		ctx.readNum(tokLasHdr.memVLRNum, NumType.Int);
-		ctx.readNum(tokLasHdr.memPtDataRecFmt, NumType.Byte);
-		ctx.readNum(tokLasHdr.memPtDataRecLen, NumType.Short);
+		ctx.readNum(dslLasHdr.memHdrSize, NumType.Short);
+		ctx.readNum(dslLasHdr.memPtDataOffset, NumType.Int);
+		ctx.readNum(dslLasHdr.memVLRNum, NumType.Int);
+		ctx.readNum(dslLasHdr.memPtDataRecFmt, NumType.Byte);
+		ctx.readNum(dslLasHdr.memPtDataRecLen, NumType.Short);
 		
-		ctx.readNum(tokLasHdr.memPtRecNum, NumType.Int);
+		ctx.readNum(dslLasHdr.memPtRecNum, NumType.Int);
 //		DustGenLog.log("Legacy Number of Point Records", buf.getInt());
 //
 //		for (int i = 0; i < 5; ++i) {

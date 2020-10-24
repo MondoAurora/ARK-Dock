@@ -2,129 +2,133 @@ package ark.dock;
 
 public interface ArkDockDslMind extends ArkDockConsts {
 	
-	public class Model {
-		public final DustEntity eUnit;
+	public class DslModel {
+		public final DustEntity unit;
 
-		public final DustEntity eTypeUnit;
+		public final DustEntity typUnit;
 
-		public final DustEntity eTypeEntity;
-		public final DustEntity eEntityUnit;
-		public final DustEntity eEntityId;
-		public final DustEntity eEntityGlobalId;
-		public final DustEntity eEntityPrimType;
-		public final DustEntity eEntityOwner;
-		public final DustEntity eEntityTags;
+		public final DustEntity typEntity;
+		public final DustEntity memEntityUnit;
+		public final DustEntity memEntityId;
+		public final DustEntity memEntityGlobalId;
+		public final DustEntity memEntityPrimType;
+		public final DustEntity memEntityOwner;
+		public final DustEntity memEntityTags;
 
-		public Model(ArkDockModelMeta meta) {
-			eUnit = meta.getBootEntity("Model", "Unit", "Model");
+		public DslModel(ArkDockModelMeta meta) {
+			unit = meta.getBootEntity("Model", "Unit", "Model");
 			
-			eTypeUnit = meta.getBootEntity("Model", "Type", "Unit");
-			eTypeEntity = meta.getBootEntity("Model", "Type", "Entity");
+			typUnit = meta.getBootEntity("Model", "Type", "Unit");
+			typEntity = meta.getBootEntity("Model", "Type", "Entity");
 			
-			meta.factTypeDef.get(eTypeUnit, eUnit);
-			meta.factTypeDef.get(eTypeEntity, eUnit);
+			meta.factTypeDef.get(typUnit, unit);
+			meta.factTypeDef.get(typEntity, unit);
 
-			eEntityUnit = meta.getMember(eTypeEntity, "Unit");
-			eEntityId = meta.getMember(eTypeEntity, "Id");
-			eEntityGlobalId = meta.getMember(eTypeEntity, "GlobalId");
-			eEntityPrimType = meta.getMember(eTypeEntity, "PrimaryType");
-			eEntityOwner = meta.getMember(eTypeEntity, "Owner");
-			eEntityTags = meta.getMember(eTypeEntity, "Tags");
+			memEntityUnit = meta.getMember(typEntity, "Unit");
+			memEntityId = meta.getMember(typEntity, "Id");
+			memEntityGlobalId = meta.getMember(typEntity, "GlobalId");
+			memEntityPrimType = meta.getMember(typEntity, "PrimaryType");
+			memEntityOwner = meta.getMember(typEntity, "Owner");
+			memEntityTags = meta.getMember(typEntity, "Tags");
 		}
 	}
 	
-	public class Idea {
-		public final DustEntity eUnit;
+	public class DslIdea {
+		public final DustEntity unit;
 
-		public final DustEntity eTypeType;
+		public final DustEntity typType;
 		
-		public final DustEntity eTypeAgent;
+		public final DustEntity typAgent;
 		public final DustEntity eAgentUpdates;
 
-		public final DustEntity eTypeMember;
-		public final DustEntity eMemberOptions;
+		public final DustEntity typMember;
+		public final DustEntity memMemberOptions;
 		public final DustEntity eMemberCollType;
 		public final DustEntity eMemberValType;
 
-		public final DustEntity eTypeTag;
+		public final DustEntity typTag;
 
-		public final DustEntity eTypeConst;
+		public final DustEntity typConst;
 		
 		
-		public final DustEntity tagBoolean;
-		public final DustEntity eConstTrue;
-		public final DustEntity eConstFalse;
+		public final DustEntity tagBool;
+		public final DustEntity tagBoolTrue;
+		public final DustEntity tagBoolFalse;
 
-		public final DustEntity eConstValtypeInt;
-		public final DustEntity eConstValtypeReal;
-		public final DustEntity eConstValtypeRef;
-		public final DustEntity eConstValtypeRaw;
+		public final DustEntity tagValtype;
+		public final DustEntity tagValtypeInt;
+		public final DustEntity tagValtypeReal;
+		public final DustEntity tagValtypeRef;
+		public final DustEntity tagValtypeRaw;
 
-		public final DustEntity eConstColltypeOne;
-		public final DustEntity eConstColltypeArr;
-		public final DustEntity eConstColltypeSet;
-		public final DustEntity eConstColltypeMap;
+		public final DustEntity tagColltype;
+		public final DustEntity tagColltypeOne;
+		public final DustEntity tagColltypeArr;
+		public final DustEntity tagColltypeSet;
+		public final DustEntity tagColltypeMap;
 
-		public Idea(ArkDockModelMeta meta) {
-			eUnit = meta.getBootEntity("Idea", "Unit", "Idea");
+		public DslIdea(ArkDockModelMeta meta) {
+			unit = meta.getBootEntity("Idea", "Unit", "Idea");
 
-			eTypeType = meta.getBootEntity("Idea", "Type", "Type");
-			eTypeAgent = meta.getBootEntity("Idea", "Type", "Agent");
-			eTypeMember = meta.getBootEntity("Idea", "Type", "Member");
-			eTypeTag = meta.getBootEntity("Idea", "Type", "Tag");
+			typType = meta.getBootEntity("Idea", "Type", "Type");
+			typAgent = meta.getBootEntity("Idea", "Type", "Agent");
+			typMember = meta.getBootEntity("Idea", "Type", "Member");
+			typTag = meta.getBootEntity("Idea", "Type", "Tag");
 
-			meta.factTypeDef.get(eTypeType, eUnit);
-			meta.factTypeDef.get(eTypeAgent, eUnit);
-			meta.factTypeDef.get(eTypeMember, eUnit);
-			meta.factTypeDef.get(eTypeTag, eUnit);
+			meta.factTypeDef.get(typType, unit);
+			meta.factTypeDef.get(typAgent, unit);
+			meta.factTypeDef.get(typMember, unit);
+			meta.factTypeDef.get(typTag, unit);
 			
-			meta.eTypeType = eTypeType;
-			meta.eTypeMember = eTypeMember;
-			meta.eTypeTag = eTypeTag;
+			meta.typType = typType;
+			meta.typMember = typMember;
+			meta.typTag = typTag;
 			
-			eMemberOptions = meta.getMember(eTypeMember, "Options");
-			eMemberCollType = meta.getMember(eTypeMember, "CollType");
-			eMemberValType = meta.getMember(eTypeMember, "ValType");
+			memMemberOptions = meta.getMember(typMember, "Options");
+			eMemberCollType = meta.getMember(typMember, "CollType");
+			eMemberValType = meta.getMember(typMember, "ValType");
 
-			eAgentUpdates = meta.getMember(eTypeAgent, "Updates");
+			eAgentUpdates = meta.getMember(typAgent, "Updates");
 
-			eTypeConst = meta.getBootEntity("Idea", "Type", "Const");
+			typConst = meta.getBootEntity("Idea", "Type", "Const");
 			
-			tagBoolean = meta.defineTag(eUnit, "Boolean", null);
-			eConstFalse = meta.getEntity(eUnit, eTypeConst, "False", true);
-			eConstTrue = meta.getEntity(eUnit, eTypeConst, "True", true);
+			tagBool = meta.defineTag(unit, "Boolean", null);
+			tagBoolFalse = meta.getEntity(unit, typTag, "False", true);
+			tagBoolTrue = meta.getEntity(unit, typTag, "True", true);
 			
-			eConstValtypeInt = meta.getEntity(eUnit, eTypeConst, "Int", true);
-			eConstValtypeReal = meta.getEntity(eUnit, eTypeConst, "Real", true);
-			eConstValtypeRef = meta.getEntity(eUnit, eTypeConst, "Ref", true);
-			eConstValtypeRaw = meta.getEntity(eUnit, eTypeConst, "Raw", true);
+			tagValtype = meta.getEntity(unit, typTag, "ValType", true);
+			tagValtypeInt = meta.getEntity(unit, typTag, "Int", true);
+			tagValtypeReal = meta.getEntity(unit, typTag, "Real", true);
+			tagValtypeRef = meta.getEntity(unit, typTag, "Ref", true);
+			tagValtypeRaw = meta.getEntity(unit, typTag, "Raw", true);
 
-			eConstColltypeOne = meta.getEntity(eUnit, eTypeConst, "One", true);
-			eConstColltypeArr = meta.getEntity(eUnit, eTypeConst, "Arr", true);
-			eConstColltypeSet = meta.getEntity(eUnit, eTypeConst, "Set", true);
-			eConstColltypeMap = meta.getEntity(eUnit, eTypeConst, "Map", true);
+			tagColltype = meta.getEntity(unit, typTag, "CollType", true);
+			tagColltypeOne = meta.getEntity(unit, typTag, "One", true);
+			tagColltypeArr = meta.getEntity(unit, typTag, "Arr", true);
+			tagColltypeSet = meta.getEntity(unit, typTag, "Set", true);
+			tagColltypeMap = meta.getEntity(unit, typTag, "Map", true);
 		}
 	}
 	
-	public class Narrative {
-		public final DustEntity eUnit;
+	public class DslNarrative {
+		public final DustEntity unit;
 
-		public Narrative(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("Narrative");
+		public DslNarrative(ArkDockModelMeta meta) {
+			unit = meta.getUnit("Narrative");
 		}
 	}
 	
-	public class Dialog {
-		public final DustEntity eUnit;
+	public class DslDialog {
+		public final DustEntity unit;
 
 		public final DustEntity typAction;
 
 		public final DustEntity memActionResponse;
 
-		public Dialog(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("Dialog");
+		public DslDialog(ArkDockModelMeta meta) {
+			unit = meta.getUnit("Dialog");
 			
-			typAction = meta.getType(eUnit, "Action");
+			typAction = meta.getType(unit, "Action");
 
 			memActionResponse = meta.getMember(typAction, "Response");
 		}

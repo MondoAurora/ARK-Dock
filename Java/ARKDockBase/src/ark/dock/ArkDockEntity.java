@@ -28,7 +28,7 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 
 	@Override
 	public String toString() {
-		String ret = (String) data.get(model.meta.tokText.eTextName);
+		String ret = (String) data.get(model.meta.dslText.memTextName);
 		return (null == ret) ? globalId : ret;
 	}
 

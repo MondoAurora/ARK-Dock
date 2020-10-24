@@ -14,9 +14,9 @@ import ark.dock.ArkDockDsl;
 public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
 	ArkDockModel mod;
 	
-	ArkDockDsl.Net tokNet;
-	ArkDockDsl.Native tokNative;
-	ArkDockDsl.Dialog tokDialog;
+	ArkDockDsl.DslNet dslNet;
+	ArkDockDsl.DslNative dslNative;
+	ArkDockDsl.DslDialog dslDialog;
 	
 	URL url;
 	String method;
@@ -28,19 +28,19 @@ public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
 		switch ( action ) {
 		case INIT:
 			mod = getMind().modMain;
-			tokNet = mod.getDsl(ArkDockDsl.Net.class);
-			tokNative = mod.getDsl(ArkDockDsl.Native.class);
-			tokDialog = mod.getDsl(ArkDockDsl.Dialog.class);
+			dslNet = mod.getDsl(ArkDockDsl.DslNet.class);
+			dslNative = mod.getDsl(ArkDockDsl.DslNative.class);
+			dslDialog = mod.getDsl(ArkDockDsl.DslDialog.class);
 
 			DustEntity def = getDef();
-			DustEntity eSvc = mod.getMember(def, mod.getMeta().tokGeneric.eLinkSource, null, null);
+			DustEntity eSvc = mod.getMember(def, mod.getMeta().dslGeneric.memLinkSource, null, null);
 
-			Long port = mod.getMember(eSvc, tokNet.memServicePort, 8080L, null);
-			DustEntity eHost = mod.getMember(eSvc, tokNet.memServiceHost, null, null);
-			String hostName = mod.getMember(eHost, tokNet.memHostName, "", null);
+			Long port = mod.getMember(eSvc, dslNet.memServicePort, 8080L, null);
+			DustEntity eHost = mod.getMember(eSvc, dslNet.memServiceHost, null, null);
+			String hostName = mod.getMember(eHost, dslNet.memHostName, "", null);
 
-			String path = mod.getMember(def, tokNet.memClientPath, "", null);
-			method = mod.getId(mod.getMember(def, tokNet.memClientMethod, tokNet.tagHttpMethodGET, null));
+			String path = mod.getMember(def, dslNet.memClientPath, "", null);
+			method = mod.getId(mod.getMember(def, dslNet.memClientMethod, dslNet.tagHttpMethodGET, null));
 
 			url = new URL("http://" + hostName + ":" + port + "/" + path);
 
@@ -54,7 +54,7 @@ public class ArkDockClientAgent extends BaseAgent implements ArkDockSrvConsts {
 			} catch (Exception ex) {
 				// no problem, may get no response
 			}
-			mod.setMember(getDef(), tokDialog.memActionResponse, r, null);
+			mod.setMember(getDef(), dslDialog.memActionResponse, r, null);
 
 			break;
 		default:

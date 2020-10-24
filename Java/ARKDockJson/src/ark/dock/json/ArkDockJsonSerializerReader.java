@@ -9,9 +9,9 @@ import java.util.Map;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
@@ -42,7 +42,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	DustEntity eTarget;
 	Map<DustEntity, Object> newEntity = new HashMap<>();
 	
-	ArkDockDsl.Native tokNative;
+	ArkDockDsl.DslNative dslNative;
 
 	DustGenFactory<DustEntity, DustMemberDef> factMemberDef = new DustGenFactory<DustEntity, DustMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
@@ -86,7 +86,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		this.target = target;
 		this.meta = target.getMeta();
 		
-		tokNative = new ArkDockDsl.Native(meta);
+		dslNative = new ArkDockDsl.DslNative(meta);
 
 		JSONParser p = new JSONParser();
 		JsonContentVisitor h = new JsonContentVisitor(visitor);
@@ -186,9 +186,9 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				if ( null == eTarget ) {
 					String unit = globalId.split("_")[0];
 
-					DustEntity eT = (DustEntity) newEntity.get(meta.tokModel.eEntityPrimType);
+					DustEntity eT = (DustEntity) newEntity.get(meta.dslModel.memEntityPrimType);
 					DustEntity eU = meta.getUnit(unit);
-					String id = (String) newEntity.get(meta.tokModel.eEntityId);
+					String id = (String) newEntity.get(meta.dslModel.memEntityId);
 
 					eTarget = target.getEntity(eU, eT, id, true);
 					
@@ -198,7 +198,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					for (Map.Entry<DustEntity, Object> e : newEntity.entrySet()) {
 						DustEntity key = e.getKey();
 						
-						if ( (key == tokNative.eNativeValueOne) || (key == tokNative.eNativeValueArr)) {
+						if ( (key == dslNative.memNativeValueOne) || (key == dslNative.memNativeValueArr)) {
 							nativeKey = key;
 							nativeOb = e.getValue();
 						} else {
@@ -208,7 +208,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					}
 					
 					if ( null != nativeOb ) {
-						DustEntity nt = target.getMember(eTarget, tokNative.eNativeValType, null, null);
+						DustEntity nt = target.getMember(eTarget, dslNative.memNativeValType, null, null);
 						JsonFormatter fmt = formatters.get(nt);
 						if ( null != fmt ) {
 							nativeOb = fmt.fromParsedData(nativeOb);
