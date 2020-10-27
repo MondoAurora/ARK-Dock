@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.json.simple.parser.ContentHandler;
 
-import ark.dock.json.ArkDockJsonConsts;
+import ark.dock.stream.json.ArkDockJsonConsts;
 
 public interface ArkDockGeojsonConsts extends ArkDockJsonConsts {
     enum GeojsonKey {

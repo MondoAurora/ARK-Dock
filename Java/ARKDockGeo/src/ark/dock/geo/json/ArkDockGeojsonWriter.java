@@ -2,8 +2,8 @@ package ark.dock.geo.json;
 
 import java.util.Map;
 
-import ark.dock.json.ArkDockJsonConsts;
-import ark.dock.json.ArkDockJsonWriterAgent;
+import ark.dock.stream.json.ArkDockJsonConsts;
+import ark.dock.stream.json.ArkDockJsonWriterAgent;
 import dust.gen.DustGenDevUtils;
 
 public class ArkDockGeojsonWriter implements ArkDockJsonConsts, ArkDockGeojsonConsts, DustGenDevUtils {

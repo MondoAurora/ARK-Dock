@@ -1,4 +1,4 @@
-package ark.dock.json;
+package ark.dock.stream.json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ark.dock.ArkDockVisitor;
-import ark.dock.json.ArkDockJsonConsts.JsonBlock;
-import ark.dock.json.ArkDockJsonConsts.JsonContext;
+import ark.dock.stream.json.ArkDockJsonConsts.JsonBlock;
+import ark.dock.stream.json.ArkDockJsonConsts.JsonContext;
 import dust.gen.DustGenConsts.DustAgentAction;
 import dust.gen.DustGenConsts.DustAgent;
 import dust.gen.DustGenConsts.DustResultType;

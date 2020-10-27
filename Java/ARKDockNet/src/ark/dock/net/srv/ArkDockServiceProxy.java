@@ -15,7 +15,7 @@ import ark.dock.ArkDockModel;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockUtils;
 import ark.dock.geo.json.ArkDockGeojson2D;
-import ark.dock.json.ArkDockJsonSerializerWriter;
+import ark.dock.stream.json.ArkDockJsonSerializerWriter;
 
 public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvConsts {
 	

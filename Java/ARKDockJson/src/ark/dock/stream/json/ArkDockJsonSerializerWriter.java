@@ -1,4 +1,4 @@
-package ark.dock.json;
+package ark.dock.stream.json;
 
 import java.io.File;
 import java.io.PrintWriter;

@@ -12,8 +12,8 @@ import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
-import ark.dock.json.ArkDockJsonConsts;
-import ark.dock.json.ArkDockJsonReaderAgent;
+import ark.dock.stream.json.ArkDockJsonConsts;
+import ark.dock.stream.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenCounter;
 import dust.gen.DustGenDevUtils;
 import dust.gen.DustGenException;

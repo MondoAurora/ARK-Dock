@@ -23,13 +23,28 @@ public interface ArkDockConsts extends DustGenConsts {
     }
 
     public abstract class ArkDockAgentBase<ActionCtxType> implements ArkDockAgent<ActionCtxType> {
-    	ActionCtxType ctx;
+    	protected ActionCtxType ctx;
     	
     	public void setActionCtx(ActionCtxType ctx) {
     		this.ctx = ctx;
     	}
     	public ActionCtxType getActionCtx() {
     		return ctx;
+    	}
+    }
+
+    public abstract class ArkDockAgentWrapper<ActionCtxType, BinOjbType> implements ArkDockAgent<ActionCtxType> {
+    	protected BinOjbType obj;
+    	
+    	protected abstract BinOjbType createBinObj();
+    	
+    	public final BinOjbType getBinObj() {
+    		if ( null == obj ) {
+    			obj = createBinObj();
+    			// TODO register to entity
+    		}
+    		
+    		return obj;
     	}
     }
 
