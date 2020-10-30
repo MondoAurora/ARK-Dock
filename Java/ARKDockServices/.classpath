@@ -4,10 +4,10 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DustExtLib"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/antJarInJar/jar-in-jar-loader.zip"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockJson"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockGeo"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockNet"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockGuiSwing"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockText"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockStream"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

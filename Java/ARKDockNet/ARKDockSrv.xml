@@ -13,11 +13,11 @@
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
 				<attribute name="Rsrc-Main-Class" value="ark.dock.srv.ArkDockSrv" />
 				<attribute name="Class-Path" value="." />
-				<attribute name="Rsrc-Class-Path" value="./ ARKDockServices.jar servlet-api-3.1.jar jetty-server-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar json-simple-1.1.1.jar jsch-0.1.55.jar commons-net-3.7.1.jar" />
+				<attribute name="Rsrc-Class-Path" value="./ ARKDock.jar servlet-api-3.1.jar jetty-server-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar json-simple-1.1.1.jar jsch-0.1.55.jar commons-net-3.7.1.jar" />
 			</manifest>
 			<zipfileset src="${dir.extlib}/antJarInJar/jar-in-jar-loader.zip" />
 
-			<zipfileset dir="${dir.project}" includes="../ARKDockServices/ARKDockServices.jar" />
+			<zipfileset dir="${dir.project}" includes="../ARKDockServices/ARKDock.jar" />
 
 			<zipfileset dir="${dir.extlib}/servlet" includes="servlet-api-3.1.jar" />
 			<zipfileset dir="${dir.extlib}/jetty" includes="jetty-server-9.3.7.v20160115.jar" />

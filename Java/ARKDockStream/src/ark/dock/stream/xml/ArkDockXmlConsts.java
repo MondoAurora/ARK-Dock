@@ -1,4 +1,4 @@
-package ark.dock.stream.binary.xml;
+package ark.dock.stream.xml;
 
 import ark.dock.ArkDockConsts.ArkDockAgentBase;
 import dust.gen.DustGenConsts.DustAgentAction;

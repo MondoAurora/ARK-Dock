@@ -17,17 +17,44 @@ import dust.gen.DustGenLog;
 
 public class ArkDockSrvUtils implements ArkDockSrvConsts {
 	
-	public static void sendRespContentFrom(HttpServletResponse response, File srcFile, String contentType, boolean allowCache) {
+	public static void sendRespContentFrom(HttpServletResponse response, File srcFile, boolean allowCache) {
 		try (OutputStream out = response.getOutputStream()) {
-			Path path = srcFile.toPath();
-			Files.copy(path, out);
-			out.flush();
-			response.setContentType(contentType);
-			response.setStatus(HttpServletResponse.SC_OK);
+			String contentType = null;
+			String fn = srcFile.getName();
+			int extPos = fn.lastIndexOf(".");
 			
+			if ( -1 != extPos ) {
+				String ext = fn.substring(extPos);
+				
+				switch ( ext ) {
+				case ".js":
+					contentType = CONTENT_TYPE_JAVASCRIPT;
+					break;
+				case ".html":
+				case ".txt":
+					contentType = CONTENT_TYPE_TEXT_UTF8;
+					break;
+				case ".json":
+					contentType = CONTENT_TYPE_JSON;
+					break;
+				}
+			}
+			
+			if ( null != contentType ) {
+				response.setContentType(contentType);
+			}
 			if ( !allowCache ) {
 				setNoCache(response);
 			}
+			response.setContentLengthLong(srcFile.length());
+			
+			Path path = srcFile.toPath();
+			Files.copy(path, out);
+			out.flush();
+			response.setStatus(HttpServletResponse.SC_OK);
+			
+			DustGenLog.log(DustEventLevel.INFO, "Resp", srcFile.getName(), "content type", contentType);
+			
 		} catch (IOException e) {
 			DustGenLog.log(DustEventLevel.ERROR, e, "occured when sending file", srcFile.getAbsolutePath());
 		}

@@ -8,7 +8,7 @@ import ark.dock.ArkDockDslTools;
 
 // https://support.geocue.com/what-is-the-las-format/
 
-public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
+public interface ArkDockDslGeoLas extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
 	public class DslLasHeader implements ArkDockConsts{
 		public final DustEntity eUnit;
@@ -133,7 +133,7 @@ public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 		}		
 	}
 	
-	public class LasPoint implements ArkDockConsts {
+	public class DslLasPoint {
 		public final DustEntity eUnit;
 
 		public final DustEntity typLasPoint;
@@ -170,7 +170,7 @@ public interface ArkDockGeoLasTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 		public final DustEntity memParDy;
 		public final DustEntity memParDz;
 
-		public LasPoint(ArkDockModelMeta meta) {
+		public DslLasPoint(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Las");
 
 			typLasPoint = meta.getType(eUnit, "Point");

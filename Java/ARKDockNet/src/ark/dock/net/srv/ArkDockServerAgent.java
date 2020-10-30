@@ -20,6 +20,7 @@ import ark.dock.ArkDockUtils;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenShutdown;
 
+@SuppressWarnings("rawtypes")
 public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
 	ArkDockDsl.DslNet dslNet;
 	Server server;
@@ -35,9 +36,6 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 				String str = target.substring(prefix.length());
 				ArkDockSrvCmd cmd = ArkDockUtils.fromString(str, ArkDockSrvCmd.ping);
 				
-				response.setContentType("text/html; charset=utf-8");
-				response.setStatus(HttpServletResponse.SC_OK);
-
 				try {
 					switch ( cmd ) {
 					case stop:
@@ -46,6 +44,8 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 					default:
 						break;
 					}
+					response.setContentType("text/html; charset=utf-8");
+					response.setStatus(HttpServletResponse.SC_OK);
 					baseRequest.setHandled(true);
 				} catch (Throwable ex) {
 					throw new ServletException(ex);

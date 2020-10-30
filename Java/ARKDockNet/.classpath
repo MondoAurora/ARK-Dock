@@ -12,9 +12,9 @@
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/jetty/jetty-util-9.3.7.v20160115.jar"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/jetty/jetty-webapp-9.3.7.v20160115.jar"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/servlet/servlet-api-3.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockJson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockGeo"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/net/commons-net-3.7.1.jar" sourcepath="/DustExtLib/lib/net/commons-net-3.7.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/net/jsch-0.1.55.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockStream"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

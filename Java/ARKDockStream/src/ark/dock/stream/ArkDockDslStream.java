@@ -6,9 +6,9 @@ import ark.dock.ArkDockDslDust;
 import ark.dock.ArkDockDslMind;
 import ark.dock.ArkDockDslTools;
 
-public interface ArkDockStreamTokens extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
+public interface ArkDockDslStream extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
-	public class Stream implements ArkDockConsts{
+	public class DslStream implements ArkDockConsts{
 		public final DustEntity eUnit;
 
 		public final DustEntity typStream;
@@ -16,7 +16,7 @@ public interface ArkDockStreamTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 
 		public final DustEntity tagFileMissing;
 		
-		public Stream(ArkDockModelMeta meta) {
+		public DslStream(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("Stream");
 
 			typStream = meta.getType(eUnit, "Stream");
@@ -26,7 +26,7 @@ public interface ArkDockStreamTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 		}
 	}
 	
-	public class StreamBin implements ArkDockConsts{
+	public class DslStreamBin implements ArkDockConsts{
 		public final DustEntity eUnit;
 
 		public final DustEntity typStreamDef;
@@ -57,7 +57,7 @@ public interface ArkDockStreamTokens extends ArkDockDslMind, ArkDockDslTools, Ar
 		public final DustEntity tagBinItemTypeReal8;
 		public final DustEntity tagBinItemTypeBits;
 		
-		public StreamBin(ArkDockModelMeta meta) {
+		public DslStreamBin(ArkDockModelMeta meta) {
 			eUnit = meta.getUnit("StreamBin");
 
 			typStreamDef = meta.getType(eUnit, "StreamDef");

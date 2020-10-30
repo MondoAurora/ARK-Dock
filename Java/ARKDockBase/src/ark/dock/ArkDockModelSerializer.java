@@ -133,10 +133,12 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 
 	public static <SCType extends DustEntityContext> void modelToAgent(Iterable<DustEntity> eIt,
 			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
-		ArkDockEntity e = (ArkDockEntity) eIt.iterator().next();
-
-		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
-		e.model.visit(mv, eIt, null, null);
+		if ( (null != eIt) && eIt.iterator().hasNext() ) {
+			ArkDockEntity e = (ArkDockEntity) eIt.iterator().next();
+	
+			ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
+			e.model.visit(mv, eIt, null, null);
+		}
 	}
 
 }

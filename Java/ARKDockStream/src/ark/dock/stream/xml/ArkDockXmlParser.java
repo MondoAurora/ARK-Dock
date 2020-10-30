@@ -1,4 +1,4 @@
-package ark.dock.stream.binary.xml;
+package ark.dock.stream.xml;
 
 import java.io.File;
 
