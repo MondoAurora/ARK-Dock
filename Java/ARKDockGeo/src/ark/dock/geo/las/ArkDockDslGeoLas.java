@@ -1,7 +1,8 @@
 package ark.dock.geo.las;
 
+import ark.dock.ArkDock;
 import ark.dock.ArkDockConsts;
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDockDslBuilder;
 import ark.dock.ArkDockDslDust;
 import ark.dock.ArkDockDslMind;
 import ark.dock.ArkDockDslTools;
@@ -11,7 +12,7 @@ import ark.dock.ArkDockDslTools;
 public interface ArkDockDslGeoLas extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
 	
 	public class DslLasHeader implements ArkDockConsts{
-		public final DustEntity eUnit;
+		public final DustEntity unit;
 
 		public final DustEntity typLasHeader;
 		
@@ -70,10 +71,12 @@ public interface ArkDockDslGeoLas extends ArkDockDslMind, ArkDockDslTools, ArkDo
 		public final DustEntity tagHeaderVer14;
 		
 
-		public DslLasHeader(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("Las");
+		public DslLasHeader() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Las");
+			
+			unit = meta.getUnit();
 
-			typLasHeader = meta.getType(eUnit, "Header");
+			typLasHeader = meta.getType("Header");
 			memFileSignature = meta.defineMember(typLasHeader, "FileSignature", DustValType.RAW, DustCollType.ONE);
 			memFileSourceID = meta.defineMember(typLasHeader, "FileSourceID", DustValType.INT, DustCollType.ONE);
 			memGlobalEncoding = meta.defineMember(typLasHeader, "GlobalEncoding", DustValType.INT, DustCollType.ONE);
@@ -124,17 +127,17 @@ public interface ArkDockDslGeoLas extends ArkDockDslMind, ArkDockDslTools, ArkDo
 			memPtRecNum64 = meta.defineMember(typLasHeader, "PtRecNum64", DustValType.INT, DustCollType.ONE);
 			memPtByRetNum64 = meta.defineMember(typLasHeader, "PtByRetNum64", DustValType.INT, DustCollType.ONE);
 			
-			tagHeaderVer = meta.defineTag(eUnit, "HeaderVer", null);
-			tagHeaderVer10 = meta.defineTag(eUnit, "1.0", tagHeaderVer);
-			tagHeaderVer11 = meta.defineTag(eUnit, "1.1", tagHeaderVer);
-			tagHeaderVer12 = meta.defineTag(eUnit, "1.2", tagHeaderVer);
-			tagHeaderVer13 = meta.defineTag(eUnit, "1.3", tagHeaderVer);
-			tagHeaderVer14 = meta.defineTag(eUnit, "1.4", tagHeaderVer);
+			tagHeaderVer = meta.defineTag("HeaderVer", null);
+			tagHeaderVer10 = meta.defineTag("1.0", tagHeaderVer);
+			tagHeaderVer11 = meta.defineTag("1.1", tagHeaderVer);
+			tagHeaderVer12 = meta.defineTag("1.2", tagHeaderVer);
+			tagHeaderVer13 = meta.defineTag("1.3", tagHeaderVer);
+			tagHeaderVer14 = meta.defineTag("1.4", tagHeaderVer);
 		}		
 	}
 	
 	public class DslLasPoint {
-		public final DustEntity eUnit;
+		public final DustEntity unit;
 
 		public final DustEntity typLasPoint;
 		
@@ -170,10 +173,12 @@ public interface ArkDockDslGeoLas extends ArkDockDslMind, ArkDockDslTools, ArkDo
 		public final DustEntity memParDy;
 		public final DustEntity memParDz;
 
-		public DslLasPoint(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("Las");
+		public DslLasPoint() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Las");
+			
+			unit = meta.getUnit();
 
-			typLasPoint = meta.getType(eUnit, "Point");
+			typLasPoint = meta.getType("Point");
 			
 			memX = meta.defineMember(typLasPoint, "X", DustValType.INT, DustCollType.ONE);
 			memY = meta.defineMember(typLasPoint, "Y", DustValType.INT, DustCollType.ONE);

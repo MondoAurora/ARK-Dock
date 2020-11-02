@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import ark.dock.ArkDockConsts.ArkDockAgentBase;
+import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 
-public class ArkDockJsonWriterAgent extends ArkDockAgentBase<ArkDockJsonConsts.JsonContext>
+public class ArkDockJsonWriterAgent extends ArkDockAgentDefault<ArkDockJsonConsts.JsonContext>
 		implements ArkDockJsonConsts {
 
 	Writer target;

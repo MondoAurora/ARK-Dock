@@ -12,18 +12,14 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 
-import ark.dock.ArkDockDsl;
-import ark.dock.ArkDockMind.ArkDockMindContext;
-import ark.dock.ArkDockMind.BaseAgent;
-import ark.dock.ArkDockModel;
+import ark.dock.ArkDock;
+import ark.dock.ArkDockConsts.ArkDockAgentWrapper;
+import ark.dock.ArkDockUnit;
 import ark.dock.ArkDockUtils;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenShutdown;
 
-@SuppressWarnings("rawtypes")
-public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
-	ArkDockDsl.DslNet dslNet;
-	Server server;
+public class ArkDockServerAgent extends ArkDockAgentWrapper<Server> implements DustGenShutdown.ShutdownAware, ArkDockSrvConsts {
 
 	class CtrlHandler extends AbstractHandler {
 		@Override
@@ -67,6 +63,8 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 			return sc;
 		}
 	};
+	
+	Server server;
 
 	@Override
 	public DustResultType agentAction(DustAgentAction action) throws Exception {
@@ -74,9 +72,13 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 
 		switch ( action ) {
 		case INIT:
-			init();
-			break;
-		case BEGIN:
+			server = getBinObj();
+
+			if ( null != server ) {
+				server.start();
+				DustGenShutdown.register(this);
+			}
+			
 			break;
 		case END:
 			stopSrv();
@@ -88,47 +90,49 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 		return ret;
 	}
 
-	public void init() throws Exception {
-		ArkDockModel mod = getMind().modMain;
-		dslNet = new ArkDockDsl.DslNet(mod.getMeta());
+	@Override
+	protected Server createBinObj() throws Exception {
+		ArkDockUnit unit = ArkDock.getMind().getMainUnit();
+		
+		DslNet dslNet = ArkDock.getDsl(DslNet.class);
+		DslGeneric dslGen = ArkDock.getDsl(DslGeneric.class);
+		DslNative dslNative = ArkDock.getDsl(DslNative.class);
 
 		DustEntity def = getDef();
 		DustEntity eSvc;
-		DustEntity m = getDsl(ArkDockDsl.DslGeneric.class).memCollMember;
+		DustEntity m = dslGen.memCollMember;
 		DustEntity e;
 
 		HandlerList handlers = null;
 
-		int cnt = mod.getCount(def, m);
+		int cnt = unit.getCount(def, m);
 		for (int i = 0; i < cnt; ++i) {
-			e = mod.getMember(def, m, null, i);
+			e = unit.getMember(def, m, null, i);
 
-			HandlerAgent<? extends AbstractHandler> ha = mod.getMember(e, getMind().dslNative.memNativeValueOne, null, i);
+			HandlerAgent<? extends AbstractHandler> ha = unit.getMember(e, dslNative.memNativeValueOne, null, i);
 			if ( null != ha ) {
 				if ( null == server ) {
 					server = new Server();
 					handlers = new HandlerList();
 					handlers.addHandler(new CtrlHandler());
+					server.setHandler(handlers);
 				}
-				handlers.addHandler(ha.getWrapOb());
+				handlers.addHandler(ha.getBinObj());
 
-				eSvc = mod.getMember(e, getDsl(ArkDockDsl.DslGeneric.class).memLinkTarget, null, null);
-				Long port = mod.getMember(eSvc, dslNet.memServicePort, 8080L, null);
+				eSvc = unit.getMember(e, dslGen.memLinkTarget, null, null);
+				Long port = unit.getMember(eSvc, dslNet.memServicePort, 8080L, null);
 
 				factChannels.get(port.intValue());
 			}
 		}
-
-		if ( null != server ) {
-			server.setHandler(handlers);
-
-			server.start();
-			DustGenShutdown.register(this);
-		}
+		
+		return server;
 	}
 
 	@Override
 	public void shutdown() throws Exception {
+		Server server = getBinObj();
+		
 		if ( (null != server) && (!server.isStopping()) ) {
 			server.stop();
 			server = null;
@@ -139,4 +143,5 @@ public class ArkDockServerAgent extends BaseAgent<ArkDockMindContext> implements
 		DustGenShutdown.remove(this);
 		shutdown();
 	}
+
 }

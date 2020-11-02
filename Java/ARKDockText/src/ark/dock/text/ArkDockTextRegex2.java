@@ -5,8 +5,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ark.dock.ArkDockModel;
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDockUnit;
+import ark.dock.ArkDockDslBuilder;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
 
@@ -37,17 +37,17 @@ public class ArkDockTextRegex2 implements ArkDockTextConsts {
 		}
 	}
 
-	ArkDockModel model;
+	ArkDockUnit model;
 	Pattern pattern;
 
 	Map<String, GroupReader> reader = new TreeMap<String, GroupReader>();
 
-	public ArkDockTextRegex2(ArkDockModel model_, String regex, int regexFlags,
+	public ArkDockTextRegex2(ArkDockUnit model_, String regex, int regexFlags,
 			Map<DustEntity, StringConverter> converters) {
 		this.model = model_;
 		this.pattern = Pattern.compile(regex, regexFlags);
 
-		ArkDockModelMeta meta = model.getMeta();
+		ArkDockDslBuilder meta = model.getMeta();
 		Matcher m = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>").matcher(regex);
 		while (m.find()) {
 			String name = m.group(1);

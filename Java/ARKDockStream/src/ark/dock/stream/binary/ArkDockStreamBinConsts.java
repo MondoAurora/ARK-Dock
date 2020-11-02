@@ -1,6 +1,8 @@
 package ark.dock.stream.binary;
 
-public interface ArkDockStreamBinConsts {
+import ark.dock.stream.ArkDockStreamConsts;
+
+public interface ArkDockStreamBinConsts extends ArkDockStreamConsts {
 	enum BinNumType {
 		Byte, Short, Int, Double;
 

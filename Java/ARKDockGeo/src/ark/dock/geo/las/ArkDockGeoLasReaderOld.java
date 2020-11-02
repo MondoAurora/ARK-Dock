@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDockDslBuilder;
 import dust.gen.DustGenException;
 import dust.gen.DustGenLog;
 
@@ -71,10 +71,10 @@ public class ArkDockGeoLasReaderOld implements ArkDockGeoLasConsts {
 
 	}
 
-	ArkDockModelMeta meta;
+	ArkDockDslBuilder meta;
 	DslLasHeader dslLasHdr;
 
-	public ArkDockGeoLasReaderOld(ArkDockModelMeta meta) {
+	public ArkDockGeoLasReaderOld(ArkDockDslBuilder meta) {
 		this.meta = meta;
 		dslLasHdr = new DslLasHeader(meta);
 	}

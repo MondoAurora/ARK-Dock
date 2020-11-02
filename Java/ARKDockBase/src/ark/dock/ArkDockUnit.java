@@ -10,52 +10,53 @@ import dust.gen.DustGenCounter;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
-public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
+public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 
-	protected ArkDockModelMeta meta;
-	protected ArkDockModel parent;
-
+	protected final ArkDockMind mind;
+	private final ArkDockUnit parent;
 	protected final Map<String, ArkDockEntity> entities = new HashMap<>();
 
-	public ArkDockModel(ArkDockModel parent_) {		
-		if ( null == parent_ ) { 
-			parent = meta = new ArkDockModelMeta();
-		} else {
-			this.parent = parent_;
-			meta = parent.meta;
-		}
+	final String unitName;
+	ArkDockEntity eUnit;
+
+	ArkDockUnit(ArkDockUnit src) {
+		this.unitName = src.unitName;
+		this.parent = src.parent;
+		this.mind = ArkDock.getMind();
+		eUnit = src.eUnit;
 	}
 
-	protected ArkDockModel() {
+	public ArkDockUnit(String unitName_, ArkDockUnit parent_) {
+		this.unitName = unitName_;
+		this.parent = parent_;
+		this.mind = ArkDock.getMind();
+		eUnit = (null == mind.typUnit) ? null : getEntity(mind.typUnit, unitName, true);
 	}
 
-	public <DslType> DslType getDsl(Class<DslType> dslClass) {
-		return meta.getDsl(dslClass);
+	public DustEntity getUnit() {
+		return eUnit;
 	}
 
-	public ArkDockModelMeta getMeta() {
-		return meta;
-	}
-
-	public ArkDockModel getParent() {
+	public ArkDockUnit getParent() {
 		return parent;
 	}
 
-	public ArkDockEntity getNewEntity(DustEntity unit, DustEntity type) {
-		return getEntity(unit, type, null, true);
+	public ArkDockEntity getNewEntity(DustEntity type) {
+		return getEntity(type, null, true);
 	}
 
-	public ArkDockEntity getEntity(DustEntity unit, DustEntity type, String itemId, boolean createIfMissing) {
+	public ArkDockEntity getEntity(DustEntity type, String itemId, boolean createIfMissing) {
 		if ( null == itemId ) {
 			itemId = ArkDockEntity.getNextUniqueId();
-		}
-		String globalId = ArkDockUtils.buildGlobalId(((ArkDockEntity) unit).id, ((ArkDockEntity) type).id, itemId);
+		} 
+		
+		String globalId = ArkDockUtils.buildGlobalId(unitName, (String) ((ArkDockEntity) type).data.get(mind.memEntityId), itemId);
 
 		ArkDockEntity e = entities.get(globalId);
 
 		if ( createIfMissing && (null == e) ) {
-			e = new ArkDockEntity(this, globalId, itemId);
-			meta.initEntity(e, type);
+			e = new ArkDockEntity(this);
+			mind.initEntityBoot(e, globalId, type, itemId, null);
 			entities.put(globalId, e);
 		}
 
@@ -74,13 +75,13 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).getCount(member) : 0;
 	}
 
-	public String getId(DustEntity e) {
-		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).id : null;
-	}
-
-	public String getGlobalId(DustEntity e) {
-		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).globalId : null;
-	}
+//	public String getId(DustEntity e) {
+//		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).id : null;
+//	}
+//
+//	public String getGlobalId(DustEntity e) {
+//		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).globalId : null;
+//	}
 
 	@SuppressWarnings("unchecked")
 	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity e, DustEntity member, Object value,
@@ -95,7 +96,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 				case CHK:
 					break;
 				case DEL:
-					Object o = entities.remove(getGlobalId(e));
+					Object o = entities.remove(ArkDock.getGlobalId(e));
 					o.toString();
 					break;
 				case GET:
@@ -104,7 +105,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 					break;
 				default:
 					break;
-				
+
 				}
 			} else {
 				ret = ((ArkDockEntity) e).accessMember(cmd, member, value, hint);
@@ -145,7 +146,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		ArkDockEntity entity = (ArkDockEntity) ctx.entity;
 		ctx.member = member;
 
-		DustMemberDef md = meta.getMemberDef(member, ctx.value, ctx.key);
+		DustMemberDef md = mind.getMemberDef(member, ctx.value, ctx.key);
 		ctx.valType = md.getValType();
 		ctx.collType = md.getCollType();
 
@@ -240,7 +241,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 
 		return ret;
 	}
-	
+
 	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor) throws Exception {
 		return visit(visitor, null, null, null, null);
 	}
@@ -250,13 +251,13 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		return visit(visitor, e, null, member, key);
 	}
 
-	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, Iterable<DustEntity> eIt, DustEntity member,
-			Object key) throws Exception {
+	public DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, Iterable<DustEntity> eIt,
+			DustEntity member, Object key) throws Exception {
 		return visit(visitor, null, eIt, member, key);
 	}
 
-	private DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity e, Iterable<DustEntity> eIt, DustEntity member,
-			Object key) throws Exception {
+	private DustResultType visit(ArkDockAgent<? extends DustEntityContext> visitor, DustEntity e,
+			Iterable<DustEntity> eIt, DustEntity member, Object key) throws Exception {
 		DustResultType ret = null;
 
 		DustEntityContext ctx = visitor.getActionCtx();
@@ -269,7 +270,7 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 		try {
 			if ( null == e ) {
 				Iterable<? extends DustEntity> root = (null == eIt) ? entities.values() : eIt;
-				for ( DustEntity me : root) {
+				for (DustEntity me : root) {
 					ret = doVisitEntity(visitor, (ArkDockEntity) me);
 					if ( DustGenUtils.isReject(ret) ) {
 						break;
@@ -328,15 +329,15 @@ public class ArkDockModel implements ArkDockConsts, Iterable<DustEntity> {
 	public Iterator<DustEntity> iterator() {
 		return new ContentReader();
 	}
-	
+
 	@Override
 	public String toString() {
 		DustGenCounter counter = new DustGenCounter(true);
-		
-		for ( ArkDockEntity me : entities.values()) {
-			counter.add(me.data.get(meta.dslModel.memEntityPrimType).toString());
+
+		for (ArkDockEntity me : entities.values()) {
+			counter.add(me.data.get(mind.memEntityPrimType).toString());
 		}
-		
+
 		return counter.toString();
 	}
 }

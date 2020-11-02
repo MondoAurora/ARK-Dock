@@ -3,12 +3,10 @@ package ark.dock.stream.csv;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ark.dock.ArkDockConsts.ArkDockAgentBase;
-import dust.gen.DustGenConsts.DustAgentAction;
-import dust.gen.DustGenConsts.DustResultType;
+import ark.dock.stream.ArkDockStreamConsts;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockCsvConsts {
+public interface ArkDockCsvConsts extends ArkDockStreamConsts {
 
 	public class CsvContext {
 		public String key;
@@ -21,7 +19,7 @@ public interface ArkDockCsvConsts {
 		}
 	}
 
-	public abstract class CsvDataCollector extends ArkDockAgentBase<ArkDockCsvParser.CsvContext> {
+	public abstract class CsvDataCollector extends ArkDockAgentDefault<ArkDockCsvParser.CsvContext> {
 		private final Map<String, String> csvData = new TreeMap<>();
 
 		protected abstract void processRow(Map<String, String> csvData);

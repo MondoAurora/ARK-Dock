@@ -6,14 +6,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ark.dock.ArkDockVisitor;
-import ark.dock.stream.json.ArkDockJsonConsts.JsonBlock;
-import ark.dock.stream.json.ArkDockJsonConsts.JsonContext;
-import dust.gen.DustGenConsts.DustAgentAction;
 import dust.gen.DustGenConsts.DustAgent;
-import dust.gen.DustGenConsts.DustResultType;
 
 @SuppressWarnings("rawtypes")
-public class ArkDockJsonReaderAgent implements DustAgent {
+public class ArkDockJsonReaderAgent implements ArkDockJsonConsts, DustAgent {
 
 	private final ArkDockVisitor<JsonContext> visitor;
 

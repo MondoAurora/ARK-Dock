@@ -25,11 +25,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import ark.dock.ArkDock;
 import ark.dock.ArkDockDsl;
-import ark.dock.ArkDockModel;
-import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockModelSerializer.SerializeAgent;
+import ark.dock.ArkDockUnit;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonPolygon;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
@@ -46,7 +46,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 	private JPanel drawingPane;
 
 	private final ArkDockDsl.DslNative dslNative;
-	private final ArkDockModel modMain;
+	private final ArkDockUnit modMain;
 
 	DustGenTranslator<DustEntity, Shape> trContent = new DustGenTranslator<DustEntity, Shape>();
 	Shape shpSel;
@@ -98,13 +98,12 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 		}
 	};
 
-	public ArkDockSwingGeoPanel(ArkDockModel modMain_) {
+	public ArkDockSwingGeoPanel() {
 		super(new BorderLayout());
 
-		this.modMain = modMain_;
+		this.modMain = ArkDock.getMind().getMainUnit();
 
-		ArkDockModelMeta modMeta = modMain.getMeta();
-		dslNative = new ArkDockDsl.DslNative(modMeta);
+		dslNative = ArkDock.getDsl(DslNative.class);
 
 		JLabel instructionsLeft = new JLabel("Click left mouse button to select.");
 		JLabel instructionsRight = new JLabel("Click right mouse button to reload.");
@@ -260,7 +259,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 				} else {
 					g.setColor(Color.red);
 				}
-				g2d.drawString(modMain.getId(e), (int) pt.getX(), (int) pt.getY());
+				g2d.drawString(ArkDock.getId(e), (int) pt.getX(), (int) pt.getY());
 			}
 
 			if ( null != shpSel ) {
@@ -272,7 +271,7 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 
 				if ( null == shpSelDrawn ) {
 					DustEntity eSel = trContent.getLeft(shpSel);
-					DustGenLog.log(DustEventLevel.INFO, "Selected", modMain.getId(eSel), eSel);
+					DustGenLog.log(DustEventLevel.INFO, "Selected", ArkDock.getId(eSel), eSel);
 				}
 
 				for (PathIterator pi = shpSel.getPathIterator(null); !pi.isDone(); pi.next()) {
@@ -300,8 +299,8 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 
 	public static class Agent extends SwingAgent<ArkDockSwingGeoPanel> {
 		@Override
-		protected ArkDockSwingGeoPanel createComponent() {
-			return new ArkDockSwingGeoPanel(getActionCtx().mind.modMain);
+		protected ArkDockSwingGeoPanel createBinObj() throws Exception {
+			return new ArkDockSwingGeoPanel();
 		}
 	}
 	

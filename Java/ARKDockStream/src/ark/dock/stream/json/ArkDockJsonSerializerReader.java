@@ -9,9 +9,9 @@ import java.util.Map;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import ark.dock.ArkDockDsl;
-import ark.dock.ArkDockModel;
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDock;
+import ark.dock.ArkDockMindUtils;
+import ark.dock.ArkDockUnit;
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
 import dust.gen.DustGenConsts;
@@ -25,8 +25,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		Init, Header, HeaderContent, Entity, EntityContent, EntityContentValue, EntityContentCustom
 	}
 
-	private ArkDockModel target;
-	private ArkDockModelMeta meta;
+	private ArkDockUnit target;
+//	private ArkDockDslBuilder meta;
 
 	private final ArkDockVisitor<JsonContext> visitor;
 	private final JsonContext ctx = new JsonContext();
@@ -42,14 +42,15 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	DustEntity eTarget;
 	Map<DustEntity, Object> newEntity = new HashMap<>();
 	
-	ArkDockDsl.DslNative dslNative;
+	final DslNative dslNative;
+	final DslModel dslModel;
 
 	DustGenFactory<DustEntity, DustMemberDef> factMemberDef = new DustGenFactory<DustEntity, DustMemberDef>(null) {
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected DustMemberDef createItem(DustEntity key, Object hint) {
-			return target.getMeta().getMemberDef(key, hint, null);
+			return ArkDock.getMind().getMemberDef(key, hint, null);
 		}
 	};
 
@@ -70,6 +71,10 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 	public ArkDockJsonSerializerReader() {
 		this.visitor = new ArkDockVisitor<>(ctx, this);
 		jsonReader = new ArkDockJsonReaderAgent(visitor);
+		
+		dslNative = ArkDock.getDsl(DslNative.class);
+		dslModel = ArkDock.getDsl(DslModel.class);
+
 	}
 
 	public void addFormatter(DustEntity member, JsonFormatter fmt) {
@@ -80,14 +85,12 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 		formatters.put(member, fmt);
 	}
 
-	public void parse(Reader r, ArkDockModel target) throws IOException, ParseException {
+	public void parse(Reader r, ArkDockUnit target) throws IOException, ParseException {
 		DevTimer parseTimer = new DevTimer("Parse");
 
 		this.target = target;
-		this.meta = target.getMeta();
+//		this.meta = target.getMeta();
 		
-		dslNative = new ArkDockDsl.DslNative(meta);
-
 		JSONParser p = new JSONParser();
 		JsonContentVisitor h = new JsonContentVisitor(visitor);
 		p.parse(r, h);
@@ -132,7 +135,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				switch ( ctx.block ) {
 				case Entry:
 					memberId = (String) ctx.param;
-					setCurrMember(meta.getEntity(memberId));
+//					setCurrMember(meta.getEntity(memberId));
+					setCurrMember(ArkDock.getByGlobalId(memberId));
 					newState = ReadState.EntityContentValue;
 					break;
 				case Array:
@@ -184,13 +188,13 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				break;
 			case Entity:
 				if ( null == eTarget ) {
-					String unit = globalId.split("_")[0];
-
-					DustEntity eT = (DustEntity) newEntity.get(meta.dslModel.memEntityPrimType);
-					DustEntity eU = meta.getUnit(unit);
-					String id = (String) newEntity.get(meta.dslModel.memEntityId);
-
-					eTarget = target.getEntity(eU, eT, id, true);
+					String unit = ArkDockUtils.getSegment(globalId, TokenSegment.UNIT);
+					DustEntity eT = (DustEntity) newEntity.get(dslModel.memEntityPrimaryType);
+					String id = (String) newEntity.get(dslModel.memEntityId);
+					
+//					DustEntity eU = meta.getUnit(unit);
+//					eTarget = target.getEntity(eU, eT, id, true);
+					eTarget = ArkDock.getMind().getUnit(unit, null).getEntity(eT, id, true);
 					
 					DustEntity nativeKey = null;
 					Object nativeOb = null;
@@ -223,7 +227,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 						}
 					}
 				}
-				meta.optUpdateMeta(eTarget);
+				ArkDockMindUtils.optUpdateMeta(eTarget);
 				newState = ReadState.Init;
 				break;
 			case EntityContent:
@@ -323,6 +327,10 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				if ( val instanceof String ) {
 					String refId = (String) val;
 					DustEntity eRef = target.getEntity(refId);
+					
+					if ( null == eRef ) {
+						eRef = ArkDock.getByGlobalId(refId);
+					}
 
 					if ( null == eRef ) {
 						factPostponedDelta.get(refId)

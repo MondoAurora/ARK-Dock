@@ -29,18 +29,25 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
     	public String getSegment(TokenSegment sg) {
 			return strs.get(sg);
 		}
-    	
-    	public DustEntity resolvePrimaryType(ArkDockModel model, DustEntity unit) {
-    		if ( null == unit ) {
-    			unit = model.getMeta().getUnit(getSegment(TokenSegment.UNIT));
-    		}
-    		
-    		return model.getMeta().getType(unit, strs.get(TokenSegment.ID));
-    	}
     }
 	
 	public static String buildGlobalId(String unitId, String typeId, String itemId) {
 		return DustGenUtils.sbAppend(null, TOKEN_SEP, true, unitId, typeId, itemId).toString();
+	}
+
+	public static String getSegment(String globalId, TokenSegment sg) {
+		int loc1 = globalId.indexOf(TOKEN_SEP);
+		
+		if ( TokenSegment.UNIT == sg ) {
+			return globalId.substring(0, loc1);
+		} else {
+			int loc2 = globalId.indexOf(TOKEN_SEP, loc1 + 1);
+			if ( TokenSegment.TYPE == sg ) {
+				return globalId.substring(loc1+1, loc2);
+			} else {
+				return globalId.substring(loc2+1);
+			}
+		}
 	}
 
 	public static DustCollType getCollType(DustMemberDef md, DustCollType def) {
@@ -151,7 +158,7 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		DustCollType ct = (null == md) ? null : md.getCollType();
 
 		if ( (cmd == DustDialogCmd.ADD) && (null == ct) ) {
-			((ArkDockModelMeta.ArkMemberDef) md).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
+			((ArkDockDslBuilder.ArkMemberDef) md).ct = ct = ArkDockUtils.getCollTypeForHint(hint);
 		}
 
 		if ( (null == ct) || (ct == DustCollType.ONE) ) {

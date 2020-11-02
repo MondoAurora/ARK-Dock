@@ -1,33 +1,33 @@
 package ark.dock.stream;
 
+import ark.dock.ArkDock;
 import ark.dock.ArkDockConsts;
-import ark.dock.ArkDockModelMeta;
-import ark.dock.ArkDockDslDust;
-import ark.dock.ArkDockDslMind;
-import ark.dock.ArkDockDslTools;
+import ark.dock.ArkDockDsl;
+import ark.dock.ArkDockDslBuilder;
 
-public interface ArkDockDslStream extends ArkDockDslMind, ArkDockDslTools, ArkDockDslDust {
+public interface ArkDockDslStream extends ArkDockDsl {
 	
 	public class DslStream implements ArkDockConsts{
-		public final DustEntity eUnit;
+		public final DustEntity unit;
 
 		public final DustEntity typStream;
 		public final DustEntity memStreamUrl;
 
 		public final DustEntity tagFileMissing;
 		
-		public DslStream(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("Stream");
+		public DslStream() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Stream");
+			unit = meta.getUnit();
 
-			typStream = meta.getType(eUnit, "Stream");
+			typStream = meta.getType("Stream");
 			memStreamUrl = meta.defineMember(typStream, "Url", DustValType.RAW, DustCollType.ONE);
 			
-			tagFileMissing = meta.defineTag(eUnit, "FileMissing", null);
+			tagFileMissing = meta.defineTag("FileMissing", null);
 		}
 	}
 	
 	public class DslStreamBin implements ArkDockConsts{
-		public final DustEntity eUnit;
+		public final DustEntity unit;
 
 		public final DustEntity typStreamDef;
 		public final DustEntity memStreamStartBlock;
@@ -57,36 +57,37 @@ public interface ArkDockDslStream extends ArkDockDslMind, ArkDockDslTools, ArkDo
 		public final DustEntity tagBinItemTypeReal8;
 		public final DustEntity tagBinItemTypeBits;
 		
-		public DslStreamBin(ArkDockModelMeta meta) {
-			eUnit = meta.getUnit("StreamBin");
+		public DslStreamBin() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("StreamBin");
+			unit = meta.getUnit();
 
-			typStreamDef = meta.getType(eUnit, "StreamDef");
+			typStreamDef = meta.getType("StreamDef");
 			memStreamStartBlock = meta.defineMember(typStreamDef, "StartBlock", DustValType.REF, DustCollType.ONE);
 			memStreamSwitches = meta.defineMember(typStreamDef, "Switches", DustValType.REF, DustCollType.SET);
 			
-			typSwitchDef = meta.getType(eUnit, "SwitchDef");
+			typSwitchDef = meta.getType("SwitchDef");
 			memSwitchOffset = meta.defineMember(typSwitchDef, "Offset", DustValType.REF, DustCollType.ONE);
 			memSwitchCount = meta.defineMember(typSwitchDef, "Count", DustValType.REF, DustCollType.ONE);
 
-			typBinBlockDef = meta.getType(eUnit, "BlockDef");
-			typBinItemDef = meta.getType(eUnit, "Item");
-			typBinBitfield = meta.getType(eUnit, "Bitfield");
+			typBinBlockDef = meta.getType("BlockDef");
+			typBinItemDef = meta.getType("Item");
+			typBinBitfield = meta.getType("Bitfield");
 			
-			tagBinItemUnsigned = meta.defineTag(eUnit, "Unsigned", null);
+			tagBinItemUnsigned = meta.defineTag("Unsigned", null);
 			
-			tagBinEndian = meta.defineTag(eUnit, "Endian", null);
-			tagBinEndianLittle = meta.defineTag(eUnit, "Little", tagBinEndian);
-			tagBinEndianBig = meta.defineTag(eUnit, "Big", tagBinEndian);
+			tagBinEndian = meta.defineTag("Endian", null);
+			tagBinEndianLittle = meta.defineTag("Little", tagBinEndian);
+			tagBinEndianBig = meta.defineTag("Big", tagBinEndian);
 			
-			tagBinItemType = meta.defineTag(eUnit, "ItemType", null);
-			tagBinItemTypeRaw = meta.defineTag(eUnit, "Raw", tagBinItemType);
-			tagBinItemTypeInt1 = meta.defineTag(eUnit, "Int1", tagBinItemType);
-			tagBinItemTypeInt2 = meta.defineTag(eUnit, "Int2", tagBinItemType);
-			tagBinItemTypeInt4 = meta.defineTag(eUnit, "Int4", tagBinItemType);
-			tagBinItemTypeInt8 = meta.defineTag(eUnit, "Int8", tagBinItemType);
-			tagBinItemTypeReal4 = meta.defineTag(eUnit, "Real4", tagBinItemType);
-			tagBinItemTypeReal8 = meta.defineTag(eUnit, "Real8", tagBinItemType);
-			tagBinItemTypeBits = meta.defineTag(eUnit, "Bits", tagBinItemType);
+			tagBinItemType = meta.defineTag("ItemType", null);
+			tagBinItemTypeRaw = meta.defineTag("Raw", tagBinItemType);
+			tagBinItemTypeInt1 = meta.defineTag("Int1", tagBinItemType);
+			tagBinItemTypeInt2 = meta.defineTag("Int2", tagBinItemType);
+			tagBinItemTypeInt4 = meta.defineTag("Int4", tagBinItemType);
+			tagBinItemTypeInt8 = meta.defineTag("Int8", tagBinItemType);
+			tagBinItemTypeReal4 = meta.defineTag("Real4", tagBinItemType);
+			tagBinItemTypeReal8 = meta.defineTag("Real8", tagBinItemType);
+			tagBinItemTypeBits = meta.defineTag("Bits", tagBinItemType);
 		}
 	}
 }

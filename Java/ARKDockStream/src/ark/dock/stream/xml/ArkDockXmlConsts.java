@@ -1,12 +1,10 @@
 package ark.dock.stream.xml;
 
-import ark.dock.ArkDockConsts.ArkDockAgentBase;
-import dust.gen.DustGenConsts.DustAgentAction;
-import dust.gen.DustGenConsts.DustResultType;
+import ark.dock.stream.ArkDockStreamConsts;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockXmlConsts {
+public interface ArkDockXmlConsts extends ArkDockStreamConsts {
 	enum XmlItem {
 		Element, Attribute, Text
 	}
@@ -23,7 +21,7 @@ public interface ArkDockXmlConsts {
 		}
 	}
 
-	class XmlDump extends ArkDockAgentBase<XmlContext> {
+	class XmlDump extends ArkDockAgentDefault<XmlContext> {
 
 		@Override
 		public DustResultType agentAction(DustAgentAction action) throws Exception {

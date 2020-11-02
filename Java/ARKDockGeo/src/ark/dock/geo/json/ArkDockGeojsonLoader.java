@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import ark.dock.ArkDock;
 import ark.dock.ArkDockConsts;
-import ark.dock.ArkDockModel;
-import ark.dock.ArkDockModelMeta;
 import ark.dock.ArkDockDsl;
+import ark.dock.ArkDockDslBuilder;
+import ark.dock.ArkDockUnit;
 import ark.dock.ArkDockUtils;
 import ark.dock.geo.json.ArkDockGeojson2D.GeojsonBuilder2DDouble;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonKey;
@@ -25,10 +26,10 @@ public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 	DustGenTranslator<ArkDockGeojsonLoader.LoadSpecKey, String> specKeys = new DustGenTranslator<ArkDockGeojsonLoader.LoadSpecKey, String>();
 	ArkDockUtils.TokenSplitter ts = new ArkDockUtils.TokenSplitter();
 
-	private final ArkDockModelMeta modMeta;
-	private final ArkDockModel modMain;
+//	private final ArkDockDslBuilder modMeta;
+	private final ArkDockUnit unit;
 	
-	private final DustEntity eMainUnit;
+//	private final DustEntity eMainUnit;
 	
 	private final DslIdea dslIdea;
 	private final DslModel dslModel;
@@ -38,20 +39,22 @@ public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 	
 	private DustEntity eContainer;
 	
-	public ArkDockGeojsonLoader(DustEntity eMainUnit_, ArkDockModel modMain_) {
-		this.eMainUnit = eMainUnit_;
-		this.modMain = modMain_;
+	public ArkDockGeojsonLoader(ArkDockUnit unit_) {
+//	public ArkDockGeojsonLoader() {
+//		this.eMainUnit = eMainUnit_;
+//		this.modMain = modMain_;
+		this.unit = unit_;
 		
-		this.modMeta = modMain.getMeta();
+//		this.modMeta = modMain.getMeta();
 
-		dslIdea = modMeta.getDsl(DslIdea.class);
-		dslModel = modMeta.getDsl(DslModel.class);
-		dslGeo = modMeta.getDsl(DslGeometry.class);
-		dslGeneric = modMeta.getDsl(DslGeneric.class);
-		dslNative = modMeta.getDsl(DslNative.class);
+		dslIdea = ArkDock.getDsl(DslIdea.class);
+		dslModel = ArkDock.getDsl(DslModel.class);
+		dslGeo = ArkDock.getDsl(DslGeometry.class);
+		dslGeneric = ArkDock.getDsl(DslGeneric.class);
+		dslNative = ArkDock.getDsl(DslNative.class);
 		
-		specKeys.add(LoadSpecKey.PrimaryType, modMeta.getGlobalId(dslModel.memEntityPrimType));
-		specKeys.add(LoadSpecKey.EntityId, modMeta.getGlobalId(dslModel.memEntityId));
+		specKeys.add(LoadSpecKey.PrimaryType, ArkDock.getGlobalId(dslModel.memEntityPrimaryType));
+		specKeys.add(LoadSpecKey.EntityId, ArkDock.getGlobalId(dslModel.memEntityId));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -72,13 +75,13 @@ public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 			Map<String, Object> props = (Map<String, Object>) feature.get(GeojsonKey.properties);
 
 			String id = (String) props.get(specKeys.getRight(LoadSpecKey.EntityId));
-
+			
 			String strType = (String) props.get(specKeys.getRight(LoadSpecKey.PrimaryType));
-			ts.split(strType);
-			DustEntity eType = ts.resolvePrimaryType(modMeta, null);
-
-			DustEntity eFeature = modMain.getEntity(eMainUnit, eType, id, true);
-//			DustEntity eFeature = mind.getEntity(eType, id, true);
+			DustEntity eType = ArkDock.getByGlobalId(strType);
+//			ts.split(strType);
+//			DustEntity eType = ts.resolvePrimaryType(modMeta, null);
+//
+			DustEntity eFeature = unit.getEntity(eType, id, true);
 
 			DustEntity eMember;
 
@@ -93,12 +96,13 @@ public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 				if ( specKeys.contains(key) ) {
 					continue;
 				}
-
+				
 				ts.split(key);
-				eType = ts.resolvePrimaryType(modMeta, null);
-				eMember = modMeta.getMember(eType, ts.getSegment(TokenSegment.ID));
+				ArkDockDslBuilder dslBuilder = ArkDock.getDslBuilder(ts.getSegment(TokenSegment.UNIT));
+				eType = dslBuilder.getType(ts.getSegment(TokenSegment.TYPE));
+				eMember = dslBuilder.getMember(eType, ts.getSegment(TokenSegment.ID));
 
-				modMain.setMember(eFeature, eMember, val, null);
+				ArkDock.access(DustDialogCmd.SET, eFeature, eMember, val, null);
 			}
 
 			Object geometry = feature.get(GeojsonKey.coordinates);
@@ -128,20 +132,20 @@ public class ArkDockGeojsonLoader implements ArkDockConsts, ArkDockDsl {
 			}
 			
 			if ( null != eContainer ) {
-				modMain.setMember(eContainer, dslGeneric.memCollMember, eFeature, KEY_APPEND);
+				ArkDock.access(DustDialogCmd.SET, eContainer, dslGeneric.memCollMember, eFeature, KEY_APPEND);
 			}
 		}
 	}
 
 	private void setNative(DustEntity eFeature, boolean isSingle, DustEntity geoValType, Object geometry) {
-		modMain.setMember(eFeature, dslNative.memNativeValType, geoValType, null);
-		modMain.setMember(eFeature, dslNative.memNativeCollType,
+		ArkDock.access(DustDialogCmd.SET, eFeature, dslNative.memNativeValType, geoValType, null);
+		ArkDock.access(DustDialogCmd.SET, eFeature, dslNative.memNativeCollType,
 				isSingle ? dslIdea.tagColltypeOne : dslIdea.tagColltypeArr, null);
 		if ( isSingle ) {
-			modMain.setMember(eFeature, dslNative.memNativeValueOne, geometry, null);
+			ArkDock.access(DustDialogCmd.SET, eFeature, dslNative.memNativeValueOne, geometry, null);
 		} else {
 			for (Object p : (GeojsonObjectArray) geometry) {
-				modMain.accessMember(DustDialogCmd.ADD, eFeature, dslNative.memNativeValueArr, p, KEY_APPEND);
+				ArkDock.access(DustDialogCmd.ADD, eFeature, dslNative.memNativeValueArr, p, KEY_APPEND);
 			}
 		}
 	}

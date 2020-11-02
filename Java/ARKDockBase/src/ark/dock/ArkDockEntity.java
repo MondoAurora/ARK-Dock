@@ -15,21 +15,16 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 		return String.valueOf(++uniqueId);
 	}
 	
-	final ArkDockModel model;
-	final String id;
-	final String globalId;
+	final ArkDockUnit unit;
 	Map<DustEntity, Object> data = new HashMap<>();
 
-	public ArkDockEntity(ArkDockModel model, String globalId, String id) {
-		this.model = model;
-		this.globalId = globalId;
-		this.id = id;
+	public ArkDockEntity(ArkDockUnit unit_) {
+		this.unit = unit_;
 	}
 
 	@Override
 	public String toString() {
-		String ret = (String) data.get(model.meta.dslText.memTextName);
-		return (null == ret) ? globalId : ret;
+		return ArkDock.formatEntity(this);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -37,7 +32,7 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 		Object ret;
 
 		Object val = data.get(member);
-		DustMemberDef md = model.meta.getMemberDef(member, value, hint);
+		DustMemberDef md = ArkDock.getMind().getMemberDef(member, value, hint);
 		DustCollType ct = (null == md) ? null : md.getCollType();
 
 		Object rv;
@@ -120,7 +115,7 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 		Object val = data.get(member);
 
 		if ( null != val ) {
-			DustMemberDef md = model.meta.getMemberDef(member, null, null);
+			DustMemberDef md = ArkDock.getMind().getMemberDef(member, null, null);
 			DustCollType ct = (null == md) ? null : md.getCollType();
 
 			if ( (null != ct) ) {

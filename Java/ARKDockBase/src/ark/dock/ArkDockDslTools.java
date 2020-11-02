@@ -2,7 +2,7 @@ package ark.dock;
 
 public interface ArkDockDslTools extends ArkDockConsts {
 
-	public class DslGeometry implements ArkDockConsts {
+	public class DslGeometry {
 		public final DustEntity unit;
 
 		public final DustEntity typNative;
@@ -47,15 +47,17 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		
 		public final DustEntity tagAngleTheta;
 
-		public DslGeometry(ArkDockModelMeta meta) {
-			unit = meta.getUnit("Geometry");
+		public DslGeometry() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Geometry");
+			
+			unit = meta.getUnit();
 
-			typNative = meta.getType(unit, "Native");
+			typNative = meta.getType("Native");
 
-			tagNativeType = meta.defineTag(unit, "NativeType", null);
-			tagNativePoint = meta.defineTag(unit, "Point", tagNativeType);
-			tagNativePath = meta.defineTag(unit, "Path", tagNativeType);
-			tagNativePolygon = meta.defineTag(unit, "Polygon", tagNativeType);
+			tagNativeType = meta.defineTag("NativeType", null);
+			tagNativePoint = meta.defineTag("Point", tagNativeType);
+			tagNativePath = meta.defineTag("Path", tagNativeType);
+			tagNativePolygon = meta.defineTag("Polygon", tagNativeType);
 
 			memGeomPoint = meta.getMember(typNative, "Point");
 			memGeomPolygon = meta.getMember(typNative, "Polygon");
@@ -64,33 +66,33 @@ public interface ArkDockDslTools extends ArkDockConsts {
 			memGeomBBoxMembers = meta.getMember(typNative, "BBoxMembers");
 			
 			
-			typInfo = meta.getType(unit, "Info");
-			typPath = meta.getType(unit, "Path");
-			typArea = meta.getType(unit, "Area");
-			typImage = meta.getType(unit, "Image");
-			typComposite = meta.getType(unit, "Composite");
+			typInfo = meta.getType("Info");
+			typPath = meta.getType("Path");
+			typArea = meta.getType("Area");
+			typImage = meta.getType("Image");
+			typComposite = meta.getType("Composite");
 
-			typInclude = meta.getType(unit, "Include");
+			typInclude = meta.getType("Include");
 
 //			memInfoData = meta.getMember(typInfo, "Data");
 			memInfoData = meta.defineMember(typInfo, "Data", DustValType.REAL, DustCollType.MAP);
 
 			
-			tagRole = meta.defineTag(unit, "Role", null);
-			tagRolePlace = meta.defineTag(unit, "Place", tagRole);
-			tagRoleRotate = meta.defineTag(unit, "Rotate", tagRole);
-			tagRoleScale = meta.defineTag(unit, "Scale", tagRole);
+			tagRole = meta.defineTag("Role", null);
+			tagRolePlace = meta.defineTag("Place", tagRole);
+			tagRoleRotate = meta.defineTag("Rotate", tagRole);
+			tagRoleScale = meta.defineTag("Scale", tagRole);
 
-			tagMeasure = meta.defineTag(unit, "Measure", null);
-			tagCartesianX = meta.defineTag(unit, "CartesianX", tagMeasure);
-			tagCartesianY = meta.defineTag(unit, "CartesianY", tagMeasure);
-			tagCartesianZ = meta.defineTag(unit, "CartesianZ", tagMeasure);
+			tagMeasure = meta.defineTag("Measure", null);
+			tagCartesianX = meta.defineTag("CartesianX", tagMeasure);
+			tagCartesianY = meta.defineTag("CartesianY", tagMeasure);
+			tagCartesianZ = meta.defineTag("CartesianZ", tagMeasure);
 			
-			tagGcsLat = meta.defineTag(unit, "Latitude", tagMeasure);
-			tagGcsLong = meta.defineTag(unit, "Longitude", tagMeasure);
-			tagGcsElev = meta.defineTag(unit, "Elevation", tagMeasure);
+			tagGcsLat = meta.defineTag("Latitude", tagMeasure);
+			tagGcsLong = meta.defineTag("Longitude", tagMeasure);
+			tagGcsElev = meta.defineTag("Elevation", tagMeasure);
 			
-			tagAngleTheta = meta.defineTag(unit, "Theta", tagMeasure);			
+			tagAngleTheta = meta.defineTag("Theta", tagMeasure);			
 		}
 	}
 
@@ -102,10 +104,12 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		public final DustEntity memTextName;
 		public final DustEntity memTextDesc;
 
-		public DslText(ArkDockModelMeta meta) {
-			unit = meta.getUnit("Text");
+		public DslText() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Text");
 			
-			typText = meta.getType(unit, "Text");
+			unit = meta.getUnit();
+			
+			typText = meta.getType("Text");
 
 			memTextName = meta.getMember(typText, "Name");
 			memTextDesc = meta.getMember(typText, "Desc");
@@ -140,33 +144,34 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		public final DustEntity tagHttpMethodTRACE;
 		public final DustEntity tagHttpMethodPATCH;
 				
-		public DslNet(ArkDockModelMeta meta) {
-			unit = meta.getUnit("Net");
-			
-			typHost = meta.getType(unit, "Host");
+		public DslNet() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Net");
+			unit = meta.getUnit();
+
+			typHost = meta.getType("Host");
 			memHostName = meta.defineMember(typHost, "Name", DustValType.RAW, DustCollType.ONE);
 			memHostIPv4 = meta.defineMember(typHost, "IPv4", DustValType.RAW, DustCollType.ONE);
 			memHostIPv6 = meta.defineMember(typHost, "IPv6", DustValType.RAW, DustCollType.ONE);
 			
-			typService = meta.getType(unit, "Service");
+			typService = meta.getType("Service");
 			memServiceHost = meta.defineMember(typService, "Host", DustValType.REF, DustCollType.ONE);
 			memServicePath = meta.defineMember(typService, "Path", DustValType.RAW, DustCollType.ONE);
 			memServicePort = meta.defineMember(typService, "Port", DustValType.INT, DustCollType.ONE);
 			
-			typClient = meta.getType(unit, "Client");
+			typClient = meta.getType("Client");
 			memClientPath = meta.defineMember(typClient, "Path", DustValType.RAW, DustCollType.ONE);
 			memClientMethod = meta.defineMember(typClient, "Method", DustValType.REF, DustCollType.ONE);
 			
-			tagHttpMethod = meta.defineTag(unit, "Method", null);
-			tagHttpMethodGET = meta.defineTag(unit, "GET", tagHttpMethod);
-			tagHttpMethodHEAD = meta.defineTag(unit, "HEAD", tagHttpMethod);
-			tagHttpMethodPOST = meta.defineTag(unit, "POST", tagHttpMethod);
-			tagHttpMethodPUT = meta.defineTag(unit, "PUT", tagHttpMethod);
-			tagHttpMethodDELETE = meta.defineTag(unit, "DELETE", tagHttpMethod);
-			tagHttpMethodCONNECT = meta.defineTag(unit, "CONNECT", tagHttpMethod);
-			tagHttpMethodOPTIONS = meta.defineTag(unit, "OPTIONS", tagHttpMethod);
-			tagHttpMethodTRACE = meta.defineTag(unit, "TRACE", tagHttpMethod);
-			tagHttpMethodPATCH = meta.defineTag(unit, "PATCH", tagHttpMethod);
+			tagHttpMethod = meta.defineTag("Method", null);
+			tagHttpMethodGET = meta.defineTag("GET", tagHttpMethod);
+			tagHttpMethodHEAD = meta.defineTag("HEAD", tagHttpMethod);
+			tagHttpMethodPOST = meta.defineTag("POST", tagHttpMethod);
+			tagHttpMethodPUT = meta.defineTag("PUT", tagHttpMethod);
+			tagHttpMethodDELETE = meta.defineTag("DELETE", tagHttpMethod);
+			tagHttpMethodCONNECT = meta.defineTag("CONNECT", tagHttpMethod);
+			tagHttpMethodOPTIONS = meta.defineTag("OPTIONS", tagHttpMethod);
+			tagHttpMethodTRACE = meta.defineTag("TRACE", tagHttpMethod);
+			tagHttpMethodPATCH = meta.defineTag("PATCH", tagHttpMethod);
 		}
 	};
 
@@ -196,23 +201,24 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		public final DustEntity memMinRaw;
 		public final DustEntity memMaxRaw;
 
-		public DslGeneric(ArkDockModelMeta meta) {
-			unit = meta.getUnit("Generic");
+		public DslGeneric() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Generic");
+			unit = meta.getUnit();
 
-			typColl = meta.getType(unit, "Collection");
+			typColl = meta.getType("Collection");
 			memCollMember = meta.defineMember(typColl, "Members", DustValType.REF, DustCollType.ARR);
 			memCollSize = meta.defineMember(typColl, "Size", DustValType.INT, DustCollType.ONE);
 			memCollCount = meta.defineMember(typColl, "Count", DustValType.INT, DustCollType.ONE);
 			
-			typLink = meta.getType(unit, "Link");
+			typLink = meta.getType("Link");
 			memLinkSource = meta.defineMember(typLink, "Source", DustValType.REF, DustCollType.ONE);
 			memLinkTarget = meta.defineMember(typLink, "Target", DustValType.REF, DustCollType.ONE);
 			
-			typConnected = meta.getType(unit, "Connected");
+			typConnected = meta.getType("Connected");
 			memConnectedRequires = meta.defineMember(typConnected, "Requires", DustValType.REF, DustCollType.SET);
 			memConnectedExtends = meta.defineMember(typConnected, "Extends", DustValType.REF, DustCollType.SET);
 
-			typRange = meta.getType(unit, "Range");
+			typRange = meta.getType("Range");
 			memMinInt = meta.defineMember(typRange, "MinInt", DustValType.INT, DustCollType.ONE);
 			memMaxInt = meta.defineMember(typRange, "MaxInt", DustValType.REF, DustCollType.ONE);
 			memMinReal = meta.defineMember(typRange, "MinReal", DustValType.REAL, DustCollType.ONE);

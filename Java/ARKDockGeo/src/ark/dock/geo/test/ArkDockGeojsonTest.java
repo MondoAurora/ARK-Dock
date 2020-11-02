@@ -12,8 +12,8 @@ import org.json.simple.JSONValue;
 import ark.dock.geo.json.ArkDockGeojson2D.GeojsonBuilder2DDouble;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonKey;
 import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonObjectSource;
-import dust.gen.DustGenLog;
 import ark.dock.geo.json.ArkDockGeojsonParser;
+import dust.gen.DustGenLog;
 
 public class ArkDockGeojsonTest {
     public static void importGeojson(File f, GeojsonObjectSource obSrc) throws Exception {

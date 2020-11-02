@@ -9,9 +9,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ark.dock.ArkDockConsts.ArkDockAgent;
-import dust.gen.DustGenConsts.DustAgentAction;
-
 public class ArkDockXmlParser implements ArkDockXmlConsts {
 
 	static SAXParserFactory factory = SAXParserFactory.newInstance();

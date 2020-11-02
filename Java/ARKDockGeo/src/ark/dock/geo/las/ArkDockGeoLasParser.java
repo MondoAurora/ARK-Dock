@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDock;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockModelSerializer.SerializeAgent;
 import dust.gen.DustGenException;
@@ -120,12 +120,16 @@ public class ArkDockGeoLasParser implements ArkDockGeoLasConsts {
 		}
 	}
 
-	ArkDockModelMeta meta;
+//	ArkDockDslBuilder meta;
 	DslLasHeader dslLasHdr;
 
-	public ArkDockGeoLasParser(ArkDockModelMeta meta) {
-		this.meta = meta;
-		dslLasHdr = new DslLasHeader(meta);
+//	public ArkDockGeoLasParser(ArkDockDslBuilder meta) {
+//		this.meta = meta;
+//		dslLasHdr = new DslLasHeader(meta);
+//	}
+	
+	public ArkDockGeoLasParser() {
+		dslLasHdr = ArkDock.getDsl(DslLasHeader.class);
 	}
 
 	public void loadHeader(InputStream in, SerializeAgent<DustEntityContext> receiver) throws Exception {
@@ -185,9 +189,10 @@ public class ArkDockGeoLasParser implements ArkDockGeoLasConsts {
 		DustGenLog.log("Reading", fName);
 
 		try (FileInputStream in = new FileInputStream(fName)) {
-			ArkDockModelMeta meta = new ArkDockModelMeta();
-
-			ArkDockGeoLasParser reader = new ArkDockGeoLasParser(meta);
+//			ArkDockDslBuilder meta = new ArkDockDslBuilder();
+//
+//			ArkDockGeoLasParser reader = new ArkDockGeoLasParser(meta);
+			ArkDockGeoLasParser reader = new ArkDockGeoLasParser();
 			ArkDockModelSerializer.Dump receiver = new ArkDockModelSerializer.Dump();
 
 			reader.loadHeader(in, receiver);

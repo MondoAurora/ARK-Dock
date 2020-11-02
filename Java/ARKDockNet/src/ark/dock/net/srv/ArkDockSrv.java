@@ -26,16 +26,16 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import ark.dock.ArkDockModelMeta;
+import ark.dock.ArkDock;
+import ark.dock.ArkDockDslBuilder;
 import ark.dock.ArkDockUtils;
 import dust.gen.DustGenInitParams;
 import dust.gen.DustGenLog;
 
 public class ArkDockSrv implements ArkDockSrvConsts {
 
-    ArkDockModelMeta model = new ArkDockModelMeta();
-    DustEntity eTestUnit = model.getUnit("Test");
-    DustEntity eTestType = model.getType(eTestUnit, "Test");
+    ArkDockDslBuilder model = ArkDock.getDslBuilder("Test");
+    DustEntity eTestType = model.getType("Test");
     DustEntity eTestMember = model.getMember(eTestType, "TestValue");
     
 	Server server;
@@ -98,13 +98,13 @@ public class ArkDockSrv implements ArkDockSrvConsts {
                 clientData = (JSONObject) data.get("data");
                 
                 id = (String) clientData.get("id");
-                e = model.getEntity(eTestUnit, eTestType, id, true);
+                e = model.getEntity(eTestType, id, true);
                 model.accessMember(DustDialogCmd.SET, e, eTestMember, clientData, null);
                 
                 break;
             case get:
                 id = request.getParameter("id");
-                e = model.getEntity(eTestUnit, eTestType, id, false);
+                e = model.getEntity(eTestType, id, false);
                 respData = (JSONObject) model.accessMember(DustDialogCmd.GET, e, eTestMember, null, null);
 
                 break;

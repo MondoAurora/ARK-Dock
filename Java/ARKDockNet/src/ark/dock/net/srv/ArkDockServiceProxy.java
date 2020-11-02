@@ -11,19 +11,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
-import ark.dock.ArkDockModel;
+import ark.dock.ArkDock;
 import ark.dock.ArkDockModelSerializer;
+import ark.dock.ArkDockUnit;
 import ark.dock.ArkDockUtils;
 import ark.dock.geo.json.ArkDockGeojson2D;
 import ark.dock.stream.json.ArkDockJsonSerializerWriter;
 
 public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvConsts {
 	
-	private final ArkDockModel modMain;
+	private final ArkDockUnit modMain;
 	
-	public ArkDockServiceProxy(ArkDockModel modMain) {
+	public ArkDockServiceProxy() {
 		super();
-		this.modMain = modMain;
+		this.modMain = ArkDock.getMind().mainUnit;
 	}
 
 	@Override
@@ -77,8 +78,8 @@ public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvCo
 
 	public static class Agent extends HandlerAgent<ArkDockServiceProxy> {
 		@Override
-		protected ArkDockServiceProxy createWrapOb() {
-			return new ArkDockServiceProxy(getMind().modMain);
+		protected ArkDockServiceProxy createBinObj() {
+			return new ArkDockServiceProxy();
 		}
 	}
 }

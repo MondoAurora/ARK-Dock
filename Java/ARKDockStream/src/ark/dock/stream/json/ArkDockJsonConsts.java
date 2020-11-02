@@ -6,11 +6,11 @@ import java.io.Writer;
 import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
-import ark.dock.ArkDockConsts;
+import ark.dock.stream.ArkDockStreamConsts;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockJsonConsts extends ArkDockConsts {
+public interface ArkDockJsonConsts extends ArkDockStreamConsts {
 
     enum JsonBlock {
         Entry, Object, Array

@@ -1,8 +1,8 @@
 package ark.dock;
 
-public interface ArkDockDslDust extends ArkDockConsts {
+public interface ArkDockDslDust extends ArkDockConsts, ArkDockBootConsts {
 
-	public class DslNative implements ArkDockConsts {
+	public class DslNative {
 		public final DustEntity unit;
 
 		public final DustEntity typNative;
@@ -16,24 +16,26 @@ public interface ArkDockDslDust extends ArkDockConsts {
 
 		public final DustEntity memBinaryId;
 
-		public DslNative(ArkDockModelMeta meta) {
-			unit = meta.getUnit("Native");
-
-			typNative = meta.getType(unit, "Native");
-
-			memNativeValType = meta.getMember(typNative, "ValType");
-			memNativeCollType = meta.getMember(typNative, "CollType");
-			memNativeValueOne = meta.getMember(typNative, "ValueOne");
-			memNativeValueArr = meta.getMember(typNative, "ValueArr");
+		public DslNative() {
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder(UNITNAME_NATIVE);
 			
-			typBinary = meta.getType(unit, "Binary");
-			memBinaryId = meta.getMember(typBinary, "Id");
+			unit = meta.getUnit();
+
+			typNative = meta.getType(TYPENAME_NATIVE);
+
+			memNativeValType = meta.defineMember(typNative, "ValType", DustValType.REF, DustCollType.ONE);
+			memNativeCollType = meta.defineMember(typNative, MEMBERNAME_NATIVE_COLLTYPE, DustValType.REF, DustCollType.ONE);
+			memNativeValueOne = meta.defineMember(typNative, MEMBERNAME_NATIVE_VALUEONE, DustValType.RAW, DustCollType.ONE);
+			memNativeValueArr = meta.defineMember(typNative, "ValueArr", DustValType.RAW, DustCollType.ARR);
 			
-			meta.initMember(memNativeValType, DustValType.REF, DustCollType.ONE);
-			meta.initMember(memNativeCollType, DustValType.REF, DustCollType.ONE);
-			meta.initMember(memNativeValueOne, DustValType.RAW, DustCollType.ONE);
-			meta.initMember(memNativeValueArr, DustValType.RAW, DustCollType.ARR);
-			meta.initMember(memBinaryId, DustValType.RAW, DustCollType.ONE);
+			typBinary = meta.getType(TYPENAME_BINARY);
+			memBinaryId = meta.defineMember(typBinary, MEMBERNAME_BINARY_NAME, DustValType.RAW, DustCollType.ONE);
+			
+//			meta.initMember(memNativeValType, DustValType.REF, DustCollType.ONE);
+//			meta.initMember(memNativeCollType, DustValType.REF, DustCollType.ONE);
+//			meta.initMember(memNativeValueOne, DustValType.RAW, DustCollType.ONE);
+//			meta.initMember(memNativeValueArr, DustValType.RAW, DustCollType.ARR);
+//			meta.initMember(memBinaryId, DustValType.RAW, DustCollType.ONE);
 		}
 	}
 }

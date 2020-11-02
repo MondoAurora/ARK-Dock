@@ -3,10 +3,10 @@ package ark.dock.net.srv;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import ark.dock.ArkDockConsts;
-import ark.dock.ArkDockMind.WrapAgent;
+import ark.dock.ArkDockDsl;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockSrvConsts extends ArkDockConsts {
+public interface ArkDockSrvConsts extends ArkDockConsts, ArkDockDsl {
 	
 	String CONTENT_TYPE_TEXT_UTF8 = "text/html; charset=utf-8";
 	String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
@@ -39,7 +39,7 @@ public interface ArkDockSrvConsts extends ArkDockConsts {
 		}
 	}
 
-	public abstract class HandlerAgent<HandlerType extends AbstractHandler> extends WrapAgent<HandlerType> {
+	public abstract class HandlerAgent<HandlerType extends AbstractHandler> extends ArkDockAgentWrapper<HandlerType> {
 
 	}
 

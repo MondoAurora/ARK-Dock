@@ -37,14 +37,14 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 	}
 
 	public static class ModelVisitor<SCType extends DustEntityContext> extends SerializeAgent<SCType> {
-		final ArkDockModel model;
+		final ArkDockUnit model;
 		final ArkDockAgent<SCType> target;
 		final ArkDockAgent<SCType> filter;
 
 		final Map<DustEntity, Object> serIDs = new HashMap<>();
 		final Set<DustEntity> todo = new HashSet<>();
 
-		public ModelVisitor(ArkDockModel model, ArkDockAgent<SCType> target,
+		public ModelVisitor(ArkDockUnit model, ArkDockAgent<SCType> target,
 				ArkDockAgent<SCType> filter) {
 			setActionCtx(target.getActionCtx());
 
@@ -61,7 +61,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			Object ret = serIDs.get(entity);
 
 			if ( null == ret ) {
-				ret = ((ArkDockEntity)entity).globalId;
+				ret = ArkDock.getGlobalId(entity);
 				serIDs.put(entity, ret);
 				if ( addTodo ) {
 					todo.add(entity);
@@ -116,7 +116,7 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 		}
 	}
 
-	public static <SCType extends DustEntityContext> void modelToAgent(ArkDockModel model,
+	public static <SCType extends DustEntityContext> void modelToAgent(ArkDockUnit model,
 			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
 
 		ModelVisitor<SCType> mv = new ModelVisitor<>(model, target, filter);
@@ -127,8 +127,8 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 			ArkDockAgent<SCType> target, ArkDockAgent<SCType> filter) throws Exception {
 		ArkDockEntity e = (ArkDockEntity) entity;
 
-		ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
-		e.model.visit(mv, entity, null, null);
+		ModelVisitor<SCType> mv = new ModelVisitor<>(e.unit, target, filter);
+		e.unit.visit(mv, entity, null, null);
 	}
 
 	public static <SCType extends DustEntityContext> void modelToAgent(Iterable<DustEntity> eIt,
@@ -136,8 +136,8 @@ public abstract class ArkDockModelSerializer implements ArkDockConsts {
 		if ( (null != eIt) && eIt.iterator().hasNext() ) {
 			ArkDockEntity e = (ArkDockEntity) eIt.iterator().next();
 	
-			ModelVisitor<SCType> mv = new ModelVisitor<>(e.model, target, filter);
-			e.model.visit(mv, eIt, null, null);
+			ModelVisitor<SCType> mv = new ModelVisitor<>(e.unit, target, filter);
+			e.unit.visit(mv, eIt, null, null);
 		}
 	}
 

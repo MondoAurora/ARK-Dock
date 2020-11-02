@@ -1,24 +1,15 @@
 package ark.dock;
 
-import ark.dock.ArkDockConsts.MetaProvider;
+import ark.dock.ArkDockDslMind.DslIdea;
+import ark.dock.ArkDockDslMind.DslModel;
 import dust.gen.DustGenException;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
 
-public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
+public class ArkDockModelMetaOld implements ArkDockConsts, ArkDockDsl {
 
-	public final ArkDockDslMind.DslModel dslModel;
-	public final ArkDockDslMind.DslIdea dslIdea;
-	public final ArkDockDslTools.DslText dslText;
-	public final ArkDockDslTools.DslGeneric dslGeneric;
-
-	DustEntity typType;
-	DustEntity typMember;
-	DustEntity typTag;
-
-	DustGenTranslator<DustCollType, DustEntity> trCollType;
-	DustGenTranslator<DustValType, DustEntity> trValType;
+	ArkDockUnit model = new ArkDockUnit(null, null);
 	
 	class ArkMemberDef implements DustMemberDef {
 		final DustEntity member;
@@ -87,28 +78,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 		}
 	};
 
-	final DustGenFactory<Class<?>, Object> factTokens = new DustGenFactory<Class<?>, Object>(null) {
-		private static final long serialVersionUID = 1L;
-
-		protected Object createItem(Class<?> key, Object hint) {
-			try {
-				return key.getConstructor(ArkDockModelMeta.class).newInstance(ArkDockModelMeta.this);
-			} catch (Throwable e) {
-				return DustGenException.throwException(e, "Failed to instantiate token container for class", key);
-			}
-		};
-	};
-
-	public ArkDockModelMeta() {
-		parent = null;
-		meta = this;
-
-		dslIdea = getDsl(ArkDockDslMind.DslIdea.class);
-		dslModel = getDsl(ArkDockDslMind.DslModel.class);
-		
-		dslText = getDsl(ArkDockDslTools.DslText.class);
-		dslGeneric = getDsl(ArkDockDslTools.DslGeneric.class);
-
+	public ArkDockModelMetaOld() {
 		initEntity(dslModel.unit, dslModel.typUnit);
 		initEntity(dslIdea.unit, dslModel.typUnit);
 
@@ -157,7 +127,7 @@ public class ArkDockModelMeta extends ArkDockModel implements MetaProvider {
 	
 	@SuppressWarnings("unchecked")
 	public <DslType> DslType getDsl(Class<DslType> dslClass) {
-		return (DslType) factTokens.get(dslClass);
+		return (DslType) factDsl.get(dslClass);
 	}
 
 	@Override

@@ -6,9 +6,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 
-import ark.dock.ArkDockConsts.ArkDockAgent;
-import dust.gen.DustGenConsts.DustAgentAction;
-import dust.gen.DustGenConsts.DustEventLevel;
 import dust.gen.DustGenLog;
 
 public class ArkDockCsvParser implements ArkDockCsvConsts {
