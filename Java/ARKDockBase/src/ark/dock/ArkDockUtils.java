@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ark.dock.ArkDockDslConsts.ArkTagDef;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
@@ -218,6 +219,13 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 				}
 				set = (Set) createContainer(ct, data, member);
 				set.add(currVal);
+			}
+			
+			if ( (member == ArkDock.getMind().memEntityTags) && !set.isEmpty() ) {
+				Set<ArkTagDef> siblings = ArkDock.getMind().factTagDef.get(newVal).getSiblings(true);
+				if ( null != siblings ) {
+					set.removeAll(siblings);
+				}
 			}
 
 			return set.add(newVal);

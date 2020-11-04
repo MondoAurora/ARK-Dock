@@ -1,5 +1,8 @@
 package ark.dock;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
@@ -12,6 +15,30 @@ public interface ArkDockDslConsts extends ArkDockConsts {
 		public ArkTypeDef(ArkDockEntity type, ArkDockEntity unit) {
 			this.type = type;
 			this.unit = unit;
+		}
+	}
+
+	class ArkTagDef {
+		final ArkDockEntity tag;
+		boolean single;
+		private ArkTagDef root;
+		private Set<ArkTagDef> children;
+
+		public ArkTagDef(ArkDockEntity tag) {
+			this.tag = tag;
+		}
+		
+		public void setRoot(ArkTagDef root) {
+			this.root = root;
+			
+			if ( null == root.children) {
+				root.children = new HashSet<>();
+			}
+			root.children.add(this);
+		}
+		
+		Set<ArkTagDef> getSiblings(boolean onlyForSingle) {
+			return ((null != root) && (root.single || !onlyForSingle) && (null != root.children)) ? root.children : null;
 		}
 	}
 

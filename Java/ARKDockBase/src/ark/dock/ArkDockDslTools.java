@@ -201,8 +201,11 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		public final DustEntity memMinRaw;
 		public final DustEntity memMaxRaw;
 
+		public final DustEntity tagSingle;
+		public final DustEntity tagAbstract;
+
 		public DslGeneric() {
-			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Generic");
+			ArkDockDslBuilder meta = ArkDock.getDslBuilder(ArkDockBootConsts.UNITNAME_GENERIC);
 			unit = meta.getUnit();
 
 			typColl = meta.getType("Collection");
@@ -227,6 +230,10 @@ public interface ArkDockDslTools extends ArkDockConsts {
 			memMaxRef = meta.defineMember(typRange, "MaxRef", DustValType.REF, DustCollType.ONE);
 			memMinRaw = meta.defineMember(typRange, "MinRaw", DustValType.RAW, DustCollType.ONE);
 			memMaxRaw = meta.defineMember(typRange, "MaxRaw", DustValType.RAW, DustCollType.ONE);
+			
+			tagAbstract = meta.defineTag(ArkDockBootConsts.TAGNAME_ABSTRACT, null);
+			tagSingle = meta.defineTag(ArkDockBootConsts.TAGNAME_SINGLE, null);
+
 		}
 	}
 

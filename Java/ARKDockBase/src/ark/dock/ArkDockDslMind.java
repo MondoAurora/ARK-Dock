@@ -82,14 +82,14 @@ public interface ArkDockDslMind extends ArkDockConsts, ArkDockBootConsts {
 			tagBoolFalse = meta.defineTag("False", tagBool);
 			tagBoolTrue = meta.defineTag("True", tagBool);
 
-			tagValtype = meta.defineTag("ValType", null);
+			tagValtype = meta.defineTag(TAGNAME_VALTYPE, null);
 			tagValtypeInt = meta.defineTag("Int", tagValtype);
 			tagValtypeReal = meta.defineTag("Real", tagValtype);
 			tagValtypeRef = meta.defineTag("Ref", tagValtype);
 			tagValtypeRaw = meta.defineTag("Raw", tagValtype);
 
-			tagColltype = meta.defineTag("CollType", null);
-			tagColltypeOne = meta.defineTag("One", tagColltype);
+			tagColltype = meta.defineTag(TAGNAME_COLLTYPE, null);
+			tagColltypeOne = meta.defineTag(TAGNAME_COLLTYPE_ONE, tagColltype);
 			tagColltypeArr = meta.defineTag("Arr", tagColltype);
 			tagColltypeSet = meta.defineTag("Set", tagColltype);
 			tagColltypeMap = meta.defineTag("Map", tagColltype);

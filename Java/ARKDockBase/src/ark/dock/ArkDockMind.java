@@ -1,6 +1,7 @@
 package ark.dock;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import dust.gen.DustGenException;
@@ -41,7 +42,7 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 			} else {
 				ret = new ArkDockDslBuilder(u);
 			}
-			
+
 			factUnit.put(key, ret);
 
 			return ret;
@@ -77,21 +78,48 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		}
 	};
 
+	DustGenFactory<DustEntity, ArkTagDef> factTagDef = new DustGenFactory<DustEntity, ArkTagDef>(null) {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ArkTagDef createItem(DustEntity key, Object hint) {
+			ArkDockEntity e = (ArkDockEntity) key;
+			ArkTagDef ret = new ArkTagDef(e);
+
+			ret.single = e.accessMember(DustDialogCmd.CHK, memEntityTags, tagTagSingle, null);
+
+			ArkDockEntity r = ArkDockMindUtils.getRoot(key);
+			if ( null != r ) {
+				ret.setRoot(get(r));
+			}
+
+			return ret;
+		}
+	};
+
 	final ArkDockEntity typUnit;
 	final ArkDockEntity memEntityId;
 	final ArkDockEntity memEntityGlobalId;
-	final ArkDockEntity memEntityPrimType;
+	final ArkDockEntity memEntityPrimaryType;
+	final ArkDockEntity memEntityTags;
 	final ArkDockEntity memEntityOwner;
 
 	final ArkDockEntity typType;
 	final ArkDockEntity typMember;
 	final ArkDockEntity typTag;
 	final ArkDockEntity typAgent;
+	
+	final ArkDockEntity tagColltype;
 	final ArkDockEntity tagColltypeOne;
+	final ArkDockEntity tagValtype;
 
 	final ArkDockEntity memBinaryName;
 	final ArkDockEntity memNativeCollType;
 	final ArkDockEntity memNativeValueOne;
+
+	final ArkDockEntity memCollMember;
+
+	final ArkDockEntity tagTagSingle;
 
 	DustGenTranslator<DustCollType, DustEntity> trCollType = new DustGenTranslator<DustCollType, DustEntity>();
 	DustGenTranslator<DustValType, DustEntity> trValType = new DustGenTranslator<DustValType, DustEntity>();
@@ -163,8 +191,10 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		bl.createBootEntity(dbModel, TYPENAME_TYPE, TYPENAME_ENTITY);
 		memEntityId = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_ID, TYPENAME_ENTITY);
 		memEntityGlobalId = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_GLOBALID, TYPENAME_ENTITY);
-		memEntityPrimType = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_PRIMARYTYPE, TYPENAME_ENTITY);
+		memEntityPrimaryType = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_PRIMARYTYPE,
+				TYPENAME_ENTITY);
 		memEntityOwner = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_OWNER, TYPENAME_ENTITY);
+		memEntityTags = bl.createBootEntity(dbModel, TYPENAME_MEMBER, MEMBERNAME_ENTITY_TAGS, TYPENAME_ENTITY);
 
 		typUnit.data.put(memEntityId, TYPENAME_UNIT);
 		dbModel.eUnit = bl.createBootEntity(dbModel, TYPENAME_UNIT, UNITNAME_MODEL);
@@ -174,8 +204,10 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		typAgent = bl.createBootEntity(dbIdea, TYPENAME_TYPE, TYPENAME_AGENT);
 		typMember = bl.createBootEntity(dbIdea, TYPENAME_TYPE, TYPENAME_MEMBER);
 		typTag = bl.createBootEntity(dbIdea, TYPENAME_TYPE, TYPENAME_TAG);
-
+		
+		tagColltype = bl.createBootEntity(dbIdea, TYPENAME_TAG, TAGNAME_COLLTYPE);
 		tagColltypeOne = bl.createBootEntity(dbIdea, TYPENAME_TAG, TAGNAME_COLLTYPE_ONE, TAGNAME_COLLTYPE);
+		tagValtype = bl.createBootEntity(dbIdea, TYPENAME_TAG, TAGNAME_VALTYPE);
 
 		ArkDockDslBuilder dbNative = factDslBuilder.get(UNITNAME_NATIVE);
 		bl.createBootEntity(dbNative, TYPENAME_TYPE, TYPENAME_NATIVE);
@@ -183,6 +215,9 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		memNativeValueOne = bl.createBootEntity(dbNative, TYPENAME_MEMBER, MEMBERNAME_NATIVE_VALUEONE, TYPENAME_NATIVE);
 		bl.createBootEntity(dbNative, TYPENAME_TYPE, TYPENAME_BINARY);
 		memBinaryName = bl.createBootEntity(dbNative, TYPENAME_MEMBER, MEMBERNAME_BINARY_NAME, TYPENAME_BINARY);
+
+		ArkDockDslBuilder dbGeneric = factDslBuilder.get(UNITNAME_NATIVE);
+		tagTagSingle = bl.createBootEntity(dbGeneric, TYPENAME_TAG, TAGNAME_SINGLE);
 
 		bl.updateEntities();
 
@@ -203,7 +238,9 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 		getDsl(DslNarrative.class);
 		getDsl(DslDialog.class);
-		getDsl(DslGeneric.class);
+		DslGeneric dslGen = getDsl(DslGeneric.class);
+		memCollMember = (ArkDockEntity) dslGen.memCollMember;
+
 		getDsl(DslText.class);
 
 		mainUnit = factUnit.get(mainUnitName);
@@ -213,7 +250,7 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 	public <DslType> DslType getDsl(Class<DslType> dslClass) {
 		return (DslType) factDslWrap.get(dslClass);
 	}
-	
+
 	protected ArkDockDslBuilder getDslBuilder(String unitName) {
 		return factDslBuilder.get(unitName);
 	}
@@ -242,7 +279,7 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 		e.data.put(memEntityId, itemId);
 		e.data.put(memEntityGlobalId, globalId);
-		e.data.put(memEntityPrimType, type);
+		e.data.put(memEntityPrimaryType, type);
 		if ( null != owner ) {
 			e.data.put(memEntityOwner, owner);
 		}
@@ -262,6 +299,33 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 	public final DustEntity getEntity(String unitName, DustEntity eType, String id, boolean createIfMissing) {
 		return factUnit.get(unitName).getEntity(eType, id, createIfMissing);
+	}
+
+	public final DustEntity getTagByOwner(DustEntity e, DustEntity tagRoot) {
+		Object tags = ((ArkDockEntity) e).data.get(memEntityTags);
+
+		if ( null != tags ) {
+			Set<ArkTagDef> opts = factTagDef.get(tagRoot).getSiblings(false);
+			if ( null != opts ) {
+				if ( tags instanceof DustEntity ) {
+					for ( ArkTagDef atd : opts ) {
+						if ( e == atd.tag ) {
+							return e;
+						}
+					}
+				} else {
+					@SuppressWarnings("unchecked")
+					Set<DustEntity> ts = (Set<DustEntity>) tags;
+					for ( ArkTagDef atd : opts ) {
+						if ( ts.contains(atd.tag)) {
+							return atd.tag;
+						}
+					}
+				}
+			}
+		}
+		
+		return null;
 	}
 
 	public final DustEntity getAgent(String agentName) {

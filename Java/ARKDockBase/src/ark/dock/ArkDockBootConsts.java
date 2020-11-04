@@ -20,6 +20,7 @@ public interface ArkDockBootConsts {
 	String MEMBERNAME_ENTITY_GLOBALID = "GlobalId";
 	String MEMBERNAME_ENTITY_PRIMARYTYPE = "PrimaryType";
 	String MEMBERNAME_ENTITY_OWNER = "Owner";
+	String MEMBERNAME_ENTITY_TAGS = "Tags";
 
 	String TYPENAME_NATIVE = "Native";
 	String MEMBERNAME_NATIVE_COLLTYPE = "CollType";
@@ -27,7 +28,14 @@ public interface ArkDockBootConsts {
 	String TYPENAME_BINARY = "Binary";
 	String MEMBERNAME_BINARY_NAME = "Name";
 
-	String TAGNAME_COLLTYPE = "CollType";
+	String TAGNAME_COLLTYPE = "Colltype";
 	String TAGNAME_COLLTYPE_ONE = "One";
+	
+	String TAGNAME_VALTYPE = "Valtype";
+
+	String UNITNAME_GENERIC = "Generic";
+
+	String TAGNAME_SINGLE = "Single";
+	String TAGNAME_ABSTRACT = "Abstract";
 
 }

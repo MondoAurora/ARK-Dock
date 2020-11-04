@@ -335,7 +335,7 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		DustGenCounter counter = new DustGenCounter(true);
 
 		for (ArkDockEntity me : entities.values()) {
-			counter.add(me.data.get(mind.memEntityPrimType).toString());
+			counter.add(me.data.get(mind.memEntityPrimaryType).toString());
 		}
 
 		return counter.toString();
