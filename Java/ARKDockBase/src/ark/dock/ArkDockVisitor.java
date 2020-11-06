@@ -7,6 +7,11 @@ import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
 public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConsts.ArkDockAgent<EventCtxType> {
+	
+	public interface VisitorAware<EventCtxType> {
+		void setVisitor(ArkDockVisitor<EventCtxType> visitor);
+	}
+	
     class RelayInfo {
         int start;
         DustAgent parent;

@@ -3,6 +3,6 @@
 	<classpathentry excluding="ark/dock/geo/garbage/|ark/dock/geo/las/ArkDockGeoLasReaderOld.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockBase"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockStream"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockIO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,16 +1,23 @@
-package ark.dock.stream.csv;
+package ark.dock.io.csv;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ark.dock.stream.ArkDockStreamConsts;
+import ark.dock.io.ArkDockIOConsts;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockCsvConsts extends ArkDockStreamConsts {
+public interface ArkDockCsvConsts extends ArkDockIOConsts {
 
 	public class CsvContext {
+		public ArrayList<String> colNames;
+		
 		public String key;
 		public String value;
+		
+		public void reset() {
+			colNames = null;
+		}
 
 		@Override
 		public String toString() {
@@ -19,14 +26,14 @@ public interface ArkDockCsvConsts extends ArkDockStreamConsts {
 		}
 	}
 
-	public abstract class CsvDataCollector extends ArkDockAgentDefault<ArkDockCsvParser.CsvContext> {
+	public abstract class CsvDataCollector extends ArkDockAgentDefault<ArkDockIOConnCsv.CsvContext> {
 		private final Map<String, String> csvData = new TreeMap<>();
 
 		protected abstract void processRow(Map<String, String> csvData);
 
 		@Override
 		public DustResultType agentAction(DustAgentAction action) throws Exception {
-			ArkDockCsvParser.CsvContext ctx;
+			ArkDockIOConnCsv.CsvContext ctx;
 
 			switch ( action ) {
 			case BEGIN:

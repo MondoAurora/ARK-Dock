@@ -1,4 +1,4 @@
-package ark.dock.stream.json;
+package ark.dock.io.json;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -92,7 +92,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 //		this.meta = target.getMeta();
 		
 		JSONParser p = new JSONParser();
-		JsonContentVisitor h = new JsonContentVisitor(visitor);
+		JsonContentDispatcher h = new JsonContentDispatcher(visitor);
 		p.parse(r, h);
 
 		parseTimer.log();

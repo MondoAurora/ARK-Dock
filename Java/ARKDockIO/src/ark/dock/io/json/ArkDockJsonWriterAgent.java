@@ -1,4 +1,4 @@
-package ark.dock.stream.json;
+package ark.dock.io.json;
 
 import java.io.Writer;
 import java.util.HashMap;

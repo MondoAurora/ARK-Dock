@@ -1,31 +1,39 @@
-package ark.dock.stream.json;
+package ark.dock.io.json;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 import ark.dock.ArkDockVisitor;
-import dust.gen.DustGenConsts.DustAgent;
+import ark.dock.ArkDockVisitor.VisitorAware;
+import ark.dock.io.json.ArkDockJsonConsts.JsonContext;
 
 @SuppressWarnings("rawtypes")
-public class ArkDockJsonReaderAgent implements ArkDockJsonConsts, DustAgent {
+public class ArkDockJsonReaderAgent extends ArkDockAgentDefault<JsonContext> implements ArkDockJsonConsts, VisitorAware<JsonContext> {
 
-	private final ArkDockVisitor<JsonContext> visitor;
-
-	private final JsonContext ctx;
+	private ArkDockVisitor<JsonContext> visitor;
 
 	private Object root;
 
 	private String key;
 	private JsonBlock blockType;
 	private Object blockOb;
+	
+	public ArkDockJsonReaderAgent() {
+	}
 
 	public ArkDockJsonReaderAgent(ArkDockVisitor<JsonContext> visitor) {
 		this.visitor = visitor;
 		this.ctx = visitor.getActionCtx();
 	}
 
+	@Override
+	public void setVisitor(ArkDockVisitor<JsonContext> visitor) {
+		this.visitor = visitor;
+	}
+	
 	public Object getRoot() {
 		return root;
 	}
@@ -63,7 +71,7 @@ public class ArkDockJsonReaderAgent implements ArkDockJsonConsts, DustAgent {
 //				((Map) blockOb).put(key, ob);
 				blockType = JsonBlock.Object;
 			} else if ( blockOb instanceof List ) {
-				((List) blockOb).add(ob);
+//				((List) blockOb).add(ob);
 				blockType = JsonBlock.Array;
 			} else {
 				blockType = null;
@@ -87,13 +95,22 @@ public class ArkDockJsonReaderAgent implements ArkDockJsonConsts, DustAgent {
 		return DustResultType.ACCEPT_READ;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void startBlock(JsonBlock b, Object ob) {
+		Object currBlock = blockOb;
+		
 		blockType = b;
 		blockOb = ob;
 		visitor.setProcCtx(ob);
 
 		if ( null == root ) {
 			root = ob;
+		}
+		
+		if ( currBlock instanceof Map ) {
+			((Map) currBlock).put(key, ob);
+		} else if ( currBlock instanceof List ) {
+			((List) currBlock).add(ob);
 		}
 	}
 

@@ -15,6 +15,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockGeo"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/net/commons-net-3.7.1.jar" sourcepath="/DustExtLib/lib/net/commons-net-3.7.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/DustExtLib/lib/net/jsch-0.1.55.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockStream"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ARKDockIO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

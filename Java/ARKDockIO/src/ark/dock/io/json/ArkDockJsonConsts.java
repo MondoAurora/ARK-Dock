@@ -1,4 +1,4 @@
-package ark.dock.stream.json;
+package ark.dock.io.json;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -6,11 +6,11 @@ import java.io.Writer;
 import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
-import ark.dock.stream.ArkDockStreamConsts;
+import ark.dock.io.ArkDockIOConsts;
 import dust.gen.DustGenException;
 import dust.gen.DustGenUtils;
 
-public interface ArkDockJsonConsts extends ArkDockStreamConsts {
+public interface ArkDockJsonConsts extends ArkDockIOConsts {
 
     enum JsonBlock {
         Entry, Object, Array
@@ -36,17 +36,15 @@ public interface ArkDockJsonConsts extends ArkDockStreamConsts {
 			StringBuilder sb = DustGenUtils.sbAppend(null, " ", true, block, param);
 			return sb.toString();
 		}
-
     }
 
-    public class JsonContentVisitor implements ContentHandler {
+    public class JsonContentDispatcher implements ContentHandler {
         JsonContext ctx;
-        ArkDockAgent<JsonContext> visitor;
+        ArkDockAgent<JsonContext> processor;
 
-        public JsonContentVisitor(ArkDockAgent<JsonContext> visitor) {
-            super();
-            this.visitor = visitor;
-            this.ctx = visitor.getActionCtx();
+        public JsonContentDispatcher(ArkDockAgent<JsonContext> processor) {
+            this.processor = processor;
+            this.ctx = processor.getActionCtx();
         }
 
         boolean processJsonEvent(DustAgentAction action, JsonBlock block, Object param) {
@@ -54,7 +52,7 @@ public interface ArkDockJsonConsts extends ArkDockStreamConsts {
             ctx.param = param;
 
             try {
-                DustResultType ret = visitor.agentAction(action);
+                DustResultType ret = processor.agentAction(action);
 
                 switch (ret) {
                 case NOTIMPLEMENTED:

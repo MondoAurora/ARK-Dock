@@ -12,8 +12,8 @@ import org.json.simple.parser.ParseException;
 
 import ark.dock.ArkDockUtils;
 import ark.dock.ArkDockVisitor;
-import ark.dock.stream.json.ArkDockJsonConsts;
-import ark.dock.stream.json.ArkDockJsonReaderAgent;
+import ark.dock.io.json.ArkDockJsonConsts;
+import ark.dock.io.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenCounter;
 import dust.gen.DustGenDevUtils;
 import dust.gen.DustGenException;
@@ -113,7 +113,7 @@ public class ArkDockGeojsonParser implements ArkDockJsonConsts, ArkDockGeojsonCo
             DevTimer parseTimer = new DevTimer("Parse");
 
             JSONParser p = new JSONParser();
-            JsonContentVisitor h = new JsonContentVisitor(jsonVisitor);
+            JsonContentDispatcher h = new JsonContentDispatcher(jsonVisitor);
             p.parse(r, h);
             
             parseTimer.log();

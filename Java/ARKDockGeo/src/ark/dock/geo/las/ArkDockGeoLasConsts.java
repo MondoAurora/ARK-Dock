@@ -1,6 +1,6 @@
 package ark.dock.geo.las;
 
-import ark.dock.stream.binary.ArkDockStreamBinConsts;
+import ark.dock.io.binary.ArkDockIOBinConsts;
 
-public interface ArkDockGeoLasConsts extends ArkDockDslGeoLas, ArkDockStreamBinConsts {
+public interface ArkDockGeoLasConsts extends ArkDockDslGeoLas, ArkDockIOBinConsts {
 }

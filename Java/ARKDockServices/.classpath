@@ -8,6 +8,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockNet"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockGuiSwing"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockText"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockStream"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ARKDockIO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

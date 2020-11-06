@@ -14,9 +14,10 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
+import ark.dock.io.json.ArkDockJsonConsts;
 import dust.gen.DustGenException;
 
-public interface ArkDockGeojson2D extends ArkDockGeojsonConsts {
+public interface ArkDockGeojson2D extends ArkDockGeojsonConsts, ArkDockJsonConsts {
 	enum FormatParam {
 		FakeZCoord
 	}

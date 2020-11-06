@@ -1,11 +1,11 @@
-package ark.dock.stream;
+package ark.dock.io;
 
 import ark.dock.ArkDock;
 import ark.dock.ArkDockConsts;
 import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockDslBuilder;
 
-public interface ArkDockDslStream extends ArkDockDsl {
+public interface ArkDockDslIO extends ArkDockDsl {
 	
 	public class DslStream implements ArkDockConsts{
 		public final DustEntity unit;

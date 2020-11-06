@@ -2,6 +2,7 @@ package ark.dock;
 
 import dust.gen.DustGenConsts;
 import dust.gen.DustGenException;
+import dust.gen.DustGenLog;
 
 public interface ArkDockConsts extends DustGenConsts {
 
@@ -74,4 +75,13 @@ public interface ArkDockConsts extends DustGenConsts {
     		return obj;
     	}
     }
+    
+	class DumpAgent<ActionCtxType> extends ArkDockAgentDefault<ActionCtxType> {
+		@Override
+		public DustResultType agentAction(DustAgentAction action) throws Exception {
+			DustGenLog.log(action, getActionCtx());
+			return DustResultType.ACCEPT_READ;
+		}
+	}
+
 }

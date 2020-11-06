@@ -12,7 +12,7 @@
 			<fileset dir="${ARK_API}/DustApiGen/bin" />
 			<fileset dir="${dir.project}/../ARKDockBase/bin" />
 			<fileset dir="${dir.project}/../ARKDockGeo/bin" />
-			<fileset dir="${dir.project}/../ARKDockStream/bin" />
+			<fileset dir="${dir.project}/../ARKDockIO/bin" />
 			<fileset dir="${dir.project}/../ARKDockText/bin" />
 			<fileset dir="${dir.project}/../ARKDockGuiSwing/bin" />
 			<fileset dir="${dir.project}/../ARKDockNet/bin" />
@@ -24,7 +24,7 @@
 			<fileset dir="${ARK_JAVA_ROOT}/api/gen/src" />
 			<fileset dir="${dir.project}/../ARKDockBase/src" />
 			<fileset dir="${dir.project}/../ARKDockGeo/src" />
-			<fileset dir="${dir.project}/../ARKDockStream/src" />
+			<fileset dir="${dir.project}/../ARKDockIO/src" />
 			<fileset dir="${dir.project}/../ARKDockText/src" />
 			<fileset dir="${dir.project}/../ARKDockGuiSwing/src" />
 			<fileset dir="${dir.project}/../ARKDockNet/src" />
