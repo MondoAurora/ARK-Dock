@@ -3,6 +3,7 @@ package ark.dock.geo.geojson;
 import java.util.Map;
 
 import ark.dock.ArkDockConsts;
+import dust.gen.DustGenUtils;
 
 public interface ArkDockGeojsonConsts extends ArkDockConsts {
     enum GeojsonKey {
@@ -37,15 +38,32 @@ public interface ArkDockGeojsonConsts extends ArkDockConsts {
         Feature, FeatureCollection
     }
     
-    public class GeojsonProcessor {
-    	public void startFeatureCollection(Map<String, Object> data) {
-    		
-    	}
-    	public void processFeature(Map<String, Object> data) {
-    		
-    	}
-    	public void endFeatureCollection(Map<String, Object> data) {
-    		
+    class GeojsonContext {
+    	GeojsonObjectType typeObj;
+    	Map<String, Object> data;
+
+    	ArkDockGeojsonGeometry<?> geometry;
+    	
+    	public GeojsonObjectType getTypeObj() {
+			return typeObj;
+		}
+    	
+    	public ArkDockGeojsonGeometry<?> getGeometry() {
+			return geometry;
+		}
+    	
+    	public Iterable<String> getDataKeys() {
+			return data.keySet();
+		}
+    	
+    	public Object getData(String key) {
+			return data.get(key);
+		}
+    	
+    	@Override
+    	public String toString() {
+    		return DustGenUtils.sbAppend(null, ",", true, typeObj, geometry, data).toString();
     	}
     }
+    
 }

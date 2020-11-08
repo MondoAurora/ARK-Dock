@@ -10,6 +10,7 @@ import ark.dock.ArkDockConsts.ArkDockAgent;
 import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 import ark.dock.ArkDockVisitor;
 import ark.dock.ArkDockVisitor.VisitorAware;
+import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
 
 public class ArkDockIOUtils extends DustGenUtils {
@@ -100,6 +101,7 @@ public class ArkDockIOUtils extends DustGenUtils {
 		DustResultType ret = DustResultType.REJECT;
 
 		if ( f.isFile() ) {
+			DustGenLog.log("Reading file", f.getAbsolutePath());
 			try (FileInputStream fin = new FileInputStream(f)) {
 				ret = connector.isText()
 						? read(connector, processor, new InputStreamReader(fin, connector.getEncoding()))

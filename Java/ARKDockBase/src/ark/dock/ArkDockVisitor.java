@@ -19,7 +19,9 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
         
         RelayInfo(boolean shareCtx) {
             this.shareCtx = shareCtx;
-            this.start = depth;
+// WARNING: this change breaks ArkDockJsonSerializerReader (going obsolete)
+//            this.start = depth;
+            this.start = shareCtx ? depth : (depth + 1);
             this.parent = current;
         }
     }
@@ -97,7 +99,7 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
         current = agent;
         
         if ( shareCtx ) {
-            return null;
+            return DustResultType.READ;
         } else {
             move(true);
             return agent.agentAction(DustAgentAction.BEGIN);

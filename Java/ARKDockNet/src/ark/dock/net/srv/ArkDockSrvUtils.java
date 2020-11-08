@@ -35,6 +35,7 @@ public class ArkDockSrvUtils implements ArkDockSrvConsts {
 					contentType = CONTENT_TYPE_TEXT_UTF8;
 					break;
 				case ".json":
+				case ".geojson":
 					contentType = CONTENT_TYPE_JSON;
 					break;
 				}

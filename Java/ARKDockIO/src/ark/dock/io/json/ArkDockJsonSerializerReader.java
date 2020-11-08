@@ -22,7 +22,7 @@ import dust.gen.DustGenLog;
 
 public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, ArkDockJsonConsts {
 	enum ReadState {
-		Init, Header, HeaderContent, Entity, EntityContent, EntityContentValue, EntityContentCustom
+		Init, Header, /*HeaderContent,*/ Entity, EntityContent, EntityContentValue, EntityContentCustom
 	}
 
 	private ArkDockUnit target;
@@ -149,7 +149,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 				break;
 			case Header:
 				visitor.setRelay(jsonReader, false);
-				newState = ReadState.HeaderContent;
+				newState = ReadState.Header;
+//				newState = ReadState.HeaderContent;
 				break;
 			case Init:
 				switch ( ctx.block ) {
@@ -182,7 +183,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					break;
 				}
 				break;
-			case HeaderContent:
+//			case HeaderContent:
+			case Header:
 				header = jsonReader.getRoot();
 				newState = ReadState.Init;
 				break;
@@ -228,7 +230,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 					}
 				}
 				ArkDockMindUtils.optUpdateMeta(eTarget);
-				newState = ReadState.Init;
+//				newState = ReadState.Init;
+				newState = readState;
 				break;
 			case EntityContent:
 				newState = ReadState.Entity;
@@ -248,7 +251,8 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 			switch ( readState ) {
 			case Header:
 				header = ctx.param;
-				newState = ReadState.Init;
+				newState = readState;
+//				newState = ReadState.Init;
 				break;
 			case EntityContentValue:
 				setValue(ctx.param);
