@@ -61,4 +61,8 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 		return (String) ((ArkDockEntity) e).data.get(THE_MIND.memEntityId);
 	}
 
+	public static DustEntity getPrimaryType(DustEntity e) {
+		return (DustEntity) ((ArkDockEntity) e).data.get(THE_MIND.memEntityPrimaryType);
+	}
+
 }

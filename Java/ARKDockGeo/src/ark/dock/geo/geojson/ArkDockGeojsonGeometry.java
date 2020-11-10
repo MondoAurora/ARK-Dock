@@ -6,38 +6,35 @@ import java.util.ArrayList;
 
 import dust.gen.DustGenException;
 
-public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
+public interface ArkDockGeojsonGeometry extends ArkDockGeojsonConsts {
 	public GeojsonGeometryType getType();
 
-	public void addInfo(DataType o);
-
-	static <DataType> ArkDockGeojsonGeometry<DataType> forName(String name) {
+	static ArkDockGeojsonGeometry forName(String name) {
 		return forType(GeojsonGeometryType.valueOf(name));
 	}
 
-	@SuppressWarnings("unchecked")
-	static <DataType> ArkDockGeojsonGeometry<DataType> forType(GeojsonGeometryType type) {
+	static ArkDockGeojsonGeometry forType(GeojsonGeometryType type) {
 		switch ( type ) {
 		case Point:
-			return (ArkDockGeojsonGeometry<DataType>) new Point();
+			return new Point();
 		case MultiPoint:
-			return (ArkDockGeojsonGeometry<DataType>) new MultiPoint();
+			return new MultiPoint();
 		case LineString:
-			return (ArkDockGeojsonGeometry<DataType>) new LineString();
+			return new LineString();
 		case MultiLineString:
-			return (ArkDockGeojsonGeometry<DataType>) new MultiLineString();
+			return new MultiLineString();
 		case Polygon:
-			return (ArkDockGeojsonGeometry<DataType>) new Polygon();
+			return new Polygon();
 		case MultiPolygon:
-			return (ArkDockGeojsonGeometry<DataType>) new MultiPolygon();
+			return new MultiPolygon();
 		case GeometryCollection:
-			return (ArkDockGeojsonGeometry<DataType>) new GeometryCollection();
+			return new GeometryCollection();
 		}
 
 		return DustGenException.throwException(null, "Should never get here");
 	}
 
-	public static class Point extends Point2D.Double implements ArkDockGeojsonGeometry<Double> {
+	public static class Point extends Point2D.Double implements ArkDockGeojsonGeometry {
 		private static final long serialVersionUID = 1L;
 		double z;
 
@@ -54,11 +51,6 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 			this.z = z;
 		}
 		
-		@Override
-		public void addInfo(java.lang.Double o) {
-			DustGenException.throwException(null, "addInfo not supported in Point");
-		}
-
 		public void addCoord(int idx, java.lang.Double o) {
 			switch ( idx ) {
 			case 0:
@@ -75,9 +67,13 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 			}
 		}
 	}
+	
+	interface GeoColl<DataType> extends ArkDockGeojsonGeometry {
+		public void addInfo(DataType o);
+	}
 
 	public static class MultiPoint extends ArrayList<ArkDockGeojsonGeometry.Point>
-			implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry.Point> {
+			implements GeoColl<ArkDockGeojsonGeometry.Point> {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -92,7 +88,7 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 	}
 
 	public static class LineString extends Path2D.Double
-			implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry.Point> {
+			implements GeoColl<ArkDockGeojsonGeometry.Point> {
 		private static final long serialVersionUID = 1L;
 		ArrayList<java.lang.Double> z;
 
@@ -114,7 +110,7 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 	}
 
 	public static class MultiLineString extends ArrayList<ArkDockGeojsonGeometry.LineString>
-			implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry.LineString> {
+			implements GeoColl<ArkDockGeojsonGeometry.LineString> {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -128,7 +124,7 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 		}
 	}
 
-	public static class Polygon implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry.LineString> {
+	public static class Polygon implements GeoColl<ArkDockGeojsonGeometry.LineString> {
 		LineString main;
 		ArrayList<LineString> exclusions;
 
@@ -159,7 +155,7 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 	}
 
 	public static class MultiPolygon extends ArrayList<ArkDockGeojsonGeometry.Polygon>
-			implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry.Polygon> {
+			implements GeoColl<ArkDockGeojsonGeometry.Polygon> {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -173,8 +169,8 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 		}
 	}
 
-	public static class GeometryCollection extends ArrayList<ArkDockGeojsonGeometry<?>>
-			implements ArkDockGeojsonGeometry<ArkDockGeojsonGeometry<?>> {
+	public static class GeometryCollection extends ArrayList<ArkDockGeojsonGeometry>
+			implements GeoColl<ArkDockGeojsonGeometry> {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -183,7 +179,7 @@ public interface ArkDockGeojsonGeometry<DataType> extends ArkDockGeojsonConsts {
 		}
 
 		@Override
-		public void addInfo(ArkDockGeojsonGeometry<?> o) {
+		public void addInfo(ArkDockGeojsonGeometry o) {
 			add(o);
 		}
 	}

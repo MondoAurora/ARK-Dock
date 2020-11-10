@@ -340,4 +340,8 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 
 		return counter.toString();
 	}
+
+	public <RetType> RetType setTag(DustEntity entity, DustEntity tag, DustDialogCmd cmd) {
+		return accessMember(cmd, entity, mind.memEntityTags, tag, null);
+	}
 }

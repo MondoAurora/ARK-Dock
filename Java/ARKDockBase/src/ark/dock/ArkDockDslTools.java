@@ -18,6 +18,7 @@ public interface ArkDockDslTools extends ArkDockConsts {
 		public final DustEntity memGeomBBox;
 		public final DustEntity memGeomBBoxMembers;
 		
+		public final DustEntity memGeomBBox2D;
 		
 
 		public final DustEntity typInfo;
@@ -64,6 +65,8 @@ public interface ArkDockDslTools extends ArkDockConsts {
 			memGeomPolygons = meta.getMember(typNative, "Polygons");
 			memGeomBBox = meta.getMember(typNative, "BBox");
 			memGeomBBoxMembers = meta.getMember(typNative, "BBoxMembers");
+			
+			memGeomBBox2D = meta.getMember(typNative, "BBox2D");
 			
 			
 			typInfo = meta.getType("Info");

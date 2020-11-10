@@ -11,9 +11,15 @@ import dust.gen.DustGenLog;
 public class ArkDockIOConnCsv  extends ArkDockIOUtils.IoConnector<CsvContext> implements ArkDockCsvConsts {
 
 	String separator;
+	int skipHead;
 
 	public ArkDockIOConnCsv(String separator_) {
 		this.separator = separator_;
+	}
+	
+	public ArkDockIOConnCsv(String separator_, int skipHead_) {
+		this.separator = separator_;
+		this.skipHead = skipHead_;
 	}
 	
 	@Override
@@ -39,7 +45,13 @@ public class ArkDockIOConnCsv  extends ArkDockIOUtils.IoConnector<CsvContext> im
 		boolean resetColNames = 0 == cc;
 
 		try (BufferedReader br = new BufferedReader(source)) {
+			int dropLines = skipHead;
 		    for(String line; (line = br.readLine()) != null; ) {
+		    	if ( 0 < dropLines ) {
+		    		--dropLines;
+		    		continue;
+		    	}
+		    	
 				String[] sl = line.split(separator);
 
 				if ( null == ctx.colNames ) {

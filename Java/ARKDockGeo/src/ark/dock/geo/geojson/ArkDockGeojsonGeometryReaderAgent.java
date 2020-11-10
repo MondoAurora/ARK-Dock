@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import ark.dock.geo.geojson.ArkDockGeojsonConsts.GeojsonGeometryType;
 import ark.dock.geo.geojson.ArkDockGeojsonConsts.GeojsonKey;
+import ark.dock.geo.geojson.ArkDockGeojsonGeometry.GeoColl;
 import ark.dock.io.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenUtils;
 
@@ -64,7 +65,7 @@ public class ArkDockGeojsonGeometryReaderAgent extends ArkDockJsonReaderAgent {
 		case END:
 			if (( ctx.block == JsonBlock.Array ) && ( readingKey == GeojsonKey.coordinates ) ) {
 				if ( (null != readStack) && !readStack.isEmpty() ) {
-					ArkDockGeojsonGeometry g = readStack.pop();
+					GeoColl g = (GeoColl) readStack.pop();
 					g.addInfo(geo);
 					geo = g;
 					typeGeom = geo.getType().childType;

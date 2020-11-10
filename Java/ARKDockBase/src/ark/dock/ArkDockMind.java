@@ -9,12 +9,6 @@ import dust.gen.DustGenFactory;
 import dust.gen.DustGenTranslator;
 
 public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootConsts {
-//	public final DslModel dslModel;
-//	public final DslIdea dslIdea;
-//	public final DslNative dslNative;
-//	
-//	public final DslText dslText;
-//	public final DslGeneric dslGeneric;
 
 	final DustGenFactory<Class<?>, Object> factDslWrap = new DustGenFactory<Class<?>, Object>(null) {
 		private static final long serialVersionUID = 1L;
@@ -156,16 +150,10 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 	class Bootloader {
 		Map<String, BootItem> boot = new TreeMap<String, BootItem>();
-//		Map<ArkDockDslBuilder> dsls = new TreeSet<ArkDockDslBuilder>();
 
 		ArkDockEntity createBootEntity(ArkDockDslBuilder db, String typeId, String itemId, String parentId) {
 			BootItem be = new BootItem(db, typeId, itemId, parentId);
 			boot.put(itemId, be);
-
-//			if ( dsls.add(db) ) {
-//				BootItem b = new BootItem(db, TYPENAME_UNIT,  db.unitName,  null);
-//				boot.put("", b);
-//			}
 
 			return be.entity;
 		}
@@ -287,6 +275,10 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 	public ArkDockUnit getMainUnit() {
 		return mainUnit;
+	}
+
+	public final ArkDockUnit peekUnit(String unitName) {
+		return factUnit.peek(unitName);
 	}
 
 	public final ArkDockUnit getUnit(String unitName, ArkDockUnit parent) {
