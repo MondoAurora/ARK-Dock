@@ -101,7 +101,7 @@ public class ArkDockIOUtils extends DustGenUtils {
 		DustResultType ret = DustResultType.REJECT;
 
 		if ( f.isFile() ) {
-			DustGenLog.log("Reading file", f.getAbsolutePath());
+//			DustGenLog.log("Reading file", f.getAbsolutePath());
 			try (FileInputStream fin = new FileInputStream(f)) {
 				ret = connector.isText()
 						? read(connector, processor, new InputStreamReader(fin, connector.getEncoding()))
