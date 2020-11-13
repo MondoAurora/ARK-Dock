@@ -10,7 +10,6 @@ import ark.dock.ArkDockConsts.ArkDockAgent;
 import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 import ark.dock.ArkDockVisitor;
 import ark.dock.ArkDockVisitor.VisitorAware;
-import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
 
 public class ArkDockIOUtils extends DustGenUtils {

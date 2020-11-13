@@ -111,6 +111,22 @@ public interface ArkDockDslMind extends ArkDockConsts, ArkDockBootConsts {
 		public final DustEntity typAction;
 
 		public final DustEntity memActionRespRaw;
+		
+		public final DustEntity typCommit;
+		
+		public final DustEntity typAccess;
+		public final DustEntity memAccessEntity;
+		public final DustEntity memAccessMember;
+		public final DustEntity memAccessValue;
+		public final DustEntity memAccessKey;
+		
+		public final DustEntity tagCommand;
+		public final DustEntity tagCommandCHK;
+		public final DustEntity tagCommandGET;
+		public final DustEntity tagCommandSET;
+		public final DustEntity tagCommandADD;
+		public final DustEntity tagCommandDEL;
+		
 
 		public DslDialog() {
 			ArkDockDslBuilder meta = ArkDock.getDslBuilder("Dialog");
@@ -119,6 +135,21 @@ public interface ArkDockDslMind extends ArkDockConsts, ArkDockBootConsts {
 			typAction = meta.getType("Action");
 
 			memActionRespRaw = meta.defineMember(typAction, "RespRaw", DustValType.RAW, DustCollType.ONE);
+
+			typCommit = meta.getType("Commit");
+			
+			typAccess = meta.getType("Access");
+			memAccessEntity = meta.defineMember(typAccess, "Entity", DustValType.REF, DustCollType.ONE);
+			memAccessMember = meta.defineMember(typAccess, "Member", DustValType.REF, DustCollType.ONE);
+			memAccessValue = meta.defineMember(typAccess, "Value", DustValType.RAW, DustCollType.ONE);
+			memAccessKey = meta.defineMember(typAccess, "Key", DustValType.RAW, DustCollType.ONE);
+
+			tagCommand = meta.defineTag("Command", null);
+			tagCommandCHK = meta.defineTag("CHK", tagCommand);
+			tagCommandGET = meta.defineTag("GET", tagCommand);
+			tagCommandSET = meta.defineTag("SET", tagCommand);
+			tagCommandADD = meta.defineTag("ADD", tagCommand);
+			tagCommandDEL = meta.defineTag("DEL", tagCommand);
 		}
 	}
 

@@ -115,8 +115,11 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 	final ArkDockEntity tagTagSingle;
 
+	final DslDialog dslDialog;
+
 	DustGenTranslator<DustCollType, DustEntity> trCollType = new DustGenTranslator<DustCollType, DustEntity>();
 	DustGenTranslator<DustValType, DustEntity> trValType = new DustGenTranslator<DustValType, DustEntity>();
+	DustGenTranslator<DustDialogCmd, DustEntity> trAccCmd = new DustGenTranslator<DustDialogCmd, DustEntity>();
 
 	public final ArkDockUnit mainUnit;
 
@@ -225,7 +228,14 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		trValType.add(DustValType.RAW, dslIdea.tagValtypeRaw);
 
 		getDsl(DslNarrative.class);
-		getDsl(DslDialog.class);
+		
+		dslDialog = getDsl(DslDialog.class);
+		trAccCmd.add(DustDialogCmd.CHK, dslDialog.tagCommandCHK);
+		trAccCmd.add(DustDialogCmd.GET, dslDialog.tagCommandGET);
+		trAccCmd.add(DustDialogCmd.SET, dslDialog.tagCommandSET);
+		trAccCmd.add(DustDialogCmd.ADD, dslDialog.tagCommandADD);
+		trAccCmd.add(DustDialogCmd.DEL, dslDialog.tagCommandDEL);
+		
 		DslGeneric dslGen = getDsl(DslGeneric.class);
 		memCollMember = (ArkDockEntity) dslGen.memCollMember;
 
@@ -336,6 +346,7 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 	}
 
 	public final DustResultType initAgent(String agentName) throws Exception {
+		@SuppressWarnings("unchecked")
 		ArkDockAgent<DustEntityContext> agent = (ArkDockAgent<DustEntityContext>) createAgent(agentName);
 
 		DustEntity eAgent = getAgent(agentName);
@@ -356,6 +367,7 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 
 	public final DustResultType sendAgent(String agentName, DustAgentAction cmd, DustEntity e, DustEntity m, Object val,
 			Object key) throws Exception {
+		@SuppressWarnings("unchecked")
 		ArkDockAgent<DustEntityContext> agent = (ArkDockAgent<DustEntityContext>) agents.get(agentName);
 		return sendAgent(agent, cmd, e, m, val, key);
 	}

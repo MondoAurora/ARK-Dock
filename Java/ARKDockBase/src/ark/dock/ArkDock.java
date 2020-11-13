@@ -65,4 +65,8 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 		return (DustEntity) ((ArkDockEntity) e).data.get(THE_MIND.memEntityPrimaryType);
 	}
 
+	public static final DustEntity getTagByOwner(DustEntity e, DustEntity tagRoot) {
+		return THE_MIND.getTagByOwner(e, tagRoot);
+	}
+
 }

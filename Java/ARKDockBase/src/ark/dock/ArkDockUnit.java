@@ -119,6 +119,18 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		return accessMember(delta.cmd, entity, delta.member, delta.value, delta.key);
 	}
 
+	public <RetType> RetType accessMember(DustEntity eAction) {
+		ArkDockEntity ae = (ArkDockEntity) eAction;
+		
+		DustDialogCmd cmd = mind.trAccCmd.getLeft(mind.getTagByOwner(eAction, mind.dslDialog.tagCommand));
+		DustEntity entity = (DustEntity) ae.data.get(mind.dslDialog.memAccessEntity);
+		DustEntity member = (DustEntity) ae.data.get(mind.dslDialog.memAccessMember);
+		Object value = ae.data.get(mind.dslDialog.memAccessValue);
+		Object key = ae.data.get(mind.dslDialog.memAccessKey);
+		
+		return accessMember(cmd, entity, member, value, key);
+	}
+
 	private DustResultType doProcess(ArkDockAgent<? extends DustEntityContext> visitor, Object val, Object key)
 			throws Exception {
 		DustEntityContext ctx = visitor.getActionCtx();
