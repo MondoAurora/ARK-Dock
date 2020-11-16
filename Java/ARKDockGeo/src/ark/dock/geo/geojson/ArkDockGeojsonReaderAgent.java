@@ -1,13 +1,92 @@
 package ark.dock.geo.geojson;
 
 import java.util.Map;
+import java.util.Stack;
 
 import ark.dock.ArkDockVisitor;
+import ark.dock.geo.geojson.ArkDockGeojsonGeometry.GeoColl;
 import ark.dock.io.json.ArkDockJsonReaderAgent;
 import dust.gen.DustGenUtils;
 
 @SuppressWarnings("unchecked")
-public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent implements ArkDockGeojsonConsts {
+public class ArkDockGeojsonReaderAgent extends ArkDockJsonReaderAgent implements ArkDockGeojsonConsts {
+
+	@SuppressWarnings({ "rawtypes" })
+	public class GeometryReader extends ArkDockJsonReaderAgent {
+
+		GeojsonKey readingKey;
+
+		GeojsonGeometryType typeGeom;
+
+		ArkDockGeojsonGeometry geo;
+		Stack<ArkDockGeojsonGeometry> readStack;
+
+		int coordIdx;
+
+		@Override
+		public DustResultType agentAction(DustAgentAction action) throws Exception {
+			DustResultType ret = DustResultType.READ;
+			boolean callSuper = true;
+
+			switch ( action ) {
+			case INIT:
+				geo = null;
+				break;
+			case BEGIN:
+				switch ( ctx.block ) {
+				case Entry:
+					readingKey = DustGenUtils.fromString((String) ctx.param, GeojsonKey.class);
+					break;
+				case Array:
+					if ( readingKey == GeojsonKey.coordinates ) {
+						if ( null != geo ) {
+							if ( null == readStack ) {
+								readStack = new Stack();
+							}
+							readStack.push(geo);
+						}
+						geo = ArkDockGeojsonGeometry.forType(typeGeom);
+						coordIdx = 0;
+						typeGeom = typeGeom.childType;
+						callSuper = false;
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+			case PROCESS:
+				if ( GeojsonKey.type == readingKey ) {
+					typeGeom = DustGenUtils.fromString((String) ctx.param, GeojsonGeometryType.class);
+				} else if ( readingKey == GeojsonKey.coordinates ) {
+					((ArkDockGeojsonGeometry.Point) geo).addCoord(coordIdx++, (Double) ctx.param);
+					callSuper = false;
+				}
+				break;
+			case END:
+				if (( ctx.block == JsonBlock.Array ) && ( readingKey == GeojsonKey.coordinates ) ) {
+					if ( (null != readStack) && !readStack.isEmpty() ) {
+						GeoColl g = (GeoColl) readStack.pop();
+						g.addInfo(geo);
+						geo = g;
+						typeGeom = geo.getType().childType;
+					}
+					callSuper = false;
+				}
+				break;
+			case RELEASE:
+				break;
+			default:
+				break;
+			}
+
+			if ( callSuper ) {
+				super.agentAction(action);
+			}
+			
+			return ret;
+		}
+	}
 
 	ArkDockAgent<GeojsonContext> processor;
 	ArkDockVisitor<JsonContext> visitor;
@@ -15,14 +94,12 @@ public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent impl
 	GeojsonKey readingKey;
 	boolean startingFeature;
 
-	ArkDockGeojsonObjectReaderAgent featureReader;
-	ArkDockGeojsonGeometryReaderAgent geometryReader;
+	ArkDockGeojsonReaderAgent featureReader;
+	GeometryReader geometryReader;
 
 	GeojsonContext procCtx = new GeojsonContext();
 
-//	String name = "top";
-
-	public ArkDockGeojsonObjectReaderAgent(ArkDockAgent<GeojsonContext> processor) {
+	public ArkDockGeojsonReaderAgent(ArkDockAgent<GeojsonContext> processor) {
 		this.processor = processor;
 	}
 
@@ -37,8 +114,6 @@ public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent impl
 		ArkDockJsonReaderAgent relay = null;
 		boolean callSuper = true;
 
-//		DustGenLog.log("object", action, ctx);
-
 		switch ( action ) {
 		case INIT:
 			break;
@@ -50,21 +125,18 @@ public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent impl
 			case Object:
 				if ( GeojsonKey.geometry == readingKey ) {
 					if ( null == geometryReader ) {
-						geometryReader = new ArkDockGeojsonGeometryReaderAgent();
+						geometryReader = new GeometryReader();
 					}
 					relay = geometryReader;
-//					DustGenLog.log(name, "reading geometry");
 				} else if ( GeojsonKey.features == readingKey ) {
 					if ( null == featureReader ) {
 						processor.setActionCtx(procCtx);
 						sendFeatColl(DustAgentAction.BEGIN);
-						featureReader = new ArkDockGeojsonObjectReaderAgent(processor);
+						featureReader = new ArkDockGeojsonReaderAgent(processor);
 						featureReader.procCtx = procCtx;
-//						featureReader.name = "child";
 					}
 					relay = featureReader;
 					startingFeature = true;
-//					DustGenLog.log(name, "Ob reading feature");
 				}
 
 				break;
@@ -87,7 +159,6 @@ public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent impl
 					procCtx.typeObj = GeojsonObjectType.Feature;
 					procCtx.data = (Map<String, Object>) featureReader.getRoot();
 					processor.agentAction(DustAgentAction.PROCESS);
-//					DustGenLog.log(name, "end reading feature");
 					callSuper = false;
 				} else {
 					readingKey = null;
@@ -96,7 +167,6 @@ public class ArkDockGeojsonObjectReaderAgent extends ArkDockJsonReaderAgent impl
 				procCtx.geometry = geometryReader.geo;
 				readingKey = null;
 				callSuper = false;
-//				DustGenLog.log(name, "end reading geometry");
 			}
 			break;
 		case RELEASE:

@@ -101,14 +101,17 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
         if ( shareCtx ) {
             return DustResultType.READ;
         } else {
-            move(true);
-            return agent.agentAction(DustAgentAction.BEGIN);
+            return move(true);
+//            return current.agentAction(DustAgentAction.BEGIN);
         }
     }
     
-    private void move(boolean down) throws Exception {
+    private DustResultType move(boolean down) throws Exception {
+    	DustResultType ret = DustResultType.NOTIMPLEMENTED;
+    	
         if ( down ) {
             ++ depth;
+            ret = current.agentAction(DustAgentAction.BEGIN);
         } else {
             if ( null != relayStack ) {
                 Exception e = null;
@@ -117,7 +120,7 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
                     RelayInfo ri = relayStack.pop();
                     if ( !ri.shareCtx ) {
                         try {
-                            current.agentAction(DustAgentAction.END);
+                            ret = current.agentAction(DustAgentAction.END);
                         } catch ( Exception ex ) {
                             if ( null == e ) {
                                 e = ex;
@@ -129,7 +132,7 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
                     current = ri.parent;
                     
                     try {
-                        current.agentAction(DustAgentAction.END);
+                        ret = current.agentAction(DustAgentAction.END);
                     } catch ( Exception ex ) {
                         if ( null == e ) {
                             e = ex;
@@ -144,7 +147,13 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
             }
             
             --depth;
+            
+            if ( ret == DustResultType.NOTIMPLEMENTED ) {
+            	ret = current.agentAction(DustAgentAction.END);
+            }
         }
+        
+        return ret;
     }
 
     @Override
@@ -165,15 +174,23 @@ public class ArkDockVisitor<EventCtxType> implements ArkDockConsts, ArkDockConst
             break;
         }
         
-        try {
-            if ( action == DustAgentAction.BEGIN ) {
-                move(true);
-            }
-            return current.agentAction(action);
-        } finally {
-            if ( action == DustAgentAction.END ) {
-                move(false);
-            }
+        switch (action) {
+        case BEGIN:
+            return move(true);
+        case END:
+            return move(false);
+        default:
+        	return current.agentAction(action);
         }
+//        try {
+//            if ( action == DustAgentAction.BEGIN ) {
+//                move(true);
+//            }
+//            return current.agentAction(action);
+//        } finally {
+//            if ( action == DustAgentAction.END ) {
+//                move(false);
+//            }
+//        }
     }
 }

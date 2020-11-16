@@ -66,6 +66,11 @@ public interface ArkDockGeojsonGeometry extends ArkDockGeojsonConsts {
 				DustGenException.throwException(null, "Invalid info index in GeojsonPoint", idx);
 			}
 		}
+		
+		@Override
+		public String toString() {
+			return "GeojsonPoint [" + x + ", " + y + ", " + z + "]";
+		}
 	}
 	
 	interface GeoColl<DataType> extends ArkDockGeojsonGeometry {
