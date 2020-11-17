@@ -20,9 +20,12 @@ public interface ArkDockConsts extends DustGenConsts {
         DustMemberDef getMemberDef(DustEntity member, Object value, Object hint);
     }
 
-    public interface ArkDockAgent<ActionCtxType> extends DustAgent {
+    public interface ArkDockContextAware<ActionCtxType> {
     	void setActionCtx(ActionCtxType ctx);
     	ActionCtxType getActionCtx();
+    }
+
+    public interface ArkDockAgent<ActionCtxType> extends DustAgent, ArkDockContextAware<ActionCtxType> {
     }
 
     public abstract class ArkDockAgentDefault<ActionCtxType> implements ArkDockAgent<ActionCtxType> {

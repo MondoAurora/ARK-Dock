@@ -12,7 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import ark.dock.io.ArkDockIOUtils;
 import ark.dock.io.xml.ArkDockXmlConsts.XmlContext;
 
-public class ArkDockIOConnXml extends ArkDockIOUtils.IoConnector<XmlContext> implements ArkDockXmlConsts {
+public class ArkDockIOConnXml extends ArkDockIOUtils.ArkDockIOConnector<XmlContext> implements ArkDockXmlConsts {
 
 	static SAXParserFactory factory = SAXParserFactory.newInstance();
 	
@@ -90,11 +90,6 @@ public class ArkDockIOConnXml extends ArkDockIOUtils.IoConnector<XmlContext> imp
 		return new XmlContext();
 	}
 
-	@Override
-	public DustResultType agentAction(DustAgentAction action) throws Exception {
-		return DustResultType.REJECT;
-	}
-	
 	public ArkDockIOConnXml() {
 		// TODO Auto-generated constructor stub
 	}

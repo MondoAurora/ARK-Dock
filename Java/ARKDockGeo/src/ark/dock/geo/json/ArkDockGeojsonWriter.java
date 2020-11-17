@@ -3,6 +3,7 @@ package ark.dock.geo.json;
 import java.util.Map;
 
 import ark.dock.io.json.ArkDockJsonConsts;
+import ark.dock.io.json.ArkDockJsonUtils;
 import ark.dock.io.json.ArkDockJsonWriterAgent;
 import dust.gen.DustGenDevUtils;
 
@@ -30,8 +31,8 @@ public class ArkDockGeojsonWriter implements ArkDockJsonConsts, ArkDockGeojsonCo
 		jsonAgent.agentAction(DustAgentAction.BEGIN);
 
 		if ( listType == GeojsonType.FeatureCollection ) {
-			ArkDockJsonWriterAgent.sendSimpleEntry(jsonAgent, GeojsonKey.type, GeojsonType.Feature.name());
-			ArkDockJsonWriterAgent.sendMultiEntry(jsonAgent, src, GeojsonKey.id, GeojsonKey.bbox,
+			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.type, GeojsonType.Feature.name());
+			ArkDockJsonUtils.sendMultiEntry(jsonAgent, src, GeojsonKey.id, GeojsonKey.bbox,
 					GeojsonKey.properties);
 
 			ctx.block = JsonBlock.Entry;
@@ -42,15 +43,15 @@ public class ArkDockGeojsonWriter implements ArkDockJsonConsts, ArkDockGeojsonCo
 			ctx.param = type;
 			jsonAgent.agentAction(DustAgentAction.BEGIN);
 
-			ArkDockJsonWriterAgent.sendSimpleEntry(jsonAgent, GeojsonKey.type, type.name());
+			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.type, type.name());
 		} else {
-			ArkDockJsonWriterAgent.sendSimpleEntry(jsonAgent, GeojsonKey.type, type.name());
-			ArkDockJsonWriterAgent.sendMultiEntry(jsonAgent, src, GeojsonKey.bbox);
+			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.type, type.name());
+			ArkDockJsonUtils.sendMultiEntry(jsonAgent, src, GeojsonKey.bbox);
 		}
 
 		switch ( type ) {
 		case FeatureCollection:
-//			ArkDockJsonWriterAgent.sendMultiEntry(jsonAgent, src, GeojsonKey.id, GeojsonKey.properties);
+//			ArkDockJsonUtils.sendMultiEntry(jsonAgent, src, GeojsonKey.id, GeojsonKey.properties);
 
 			ctx.block = JsonBlock.Entry;
 			ctx.param = GeojsonKey.features;
@@ -75,7 +76,7 @@ public class ArkDockGeojsonWriter implements ArkDockJsonConsts, ArkDockGeojsonCo
 			Object coordinates = src.get(GeojsonKey.coordinates);
 			GeojsonType extType = type;
 
-			ArkDockJsonWriterAgent.sendSimpleEntry(jsonAgent, GeojsonKey.coordinates, coordinates);
+			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.coordinates, coordinates);
 
 			ctx.block = JsonBlock.Entry;
 			jsonAgent.agentAction(DustAgentAction.END);

@@ -8,7 +8,7 @@ import ark.dock.io.ArkDockIOUtils;
 import ark.dock.io.csv.ArkDockCsvConsts.CsvContext;
 import dust.gen.DustGenLog;
 
-public class ArkDockIOConnCsv  extends ArkDockIOUtils.IoConnector<CsvContext> implements ArkDockCsvConsts {
+public class ArkDockIOConnCsv  extends ArkDockIOUtils.ArkDockIOConnector<CsvContext> implements ArkDockCsvConsts {
 
 	String separator;
 	int skipHead;
@@ -22,11 +22,6 @@ public class ArkDockIOConnCsv  extends ArkDockIOUtils.IoConnector<CsvContext> im
 		this.skipHead = skipHead_;
 	}
 	
-	@Override
-	public DustResultType agentAction(DustAgentAction action) throws Exception {
-		return DustResultType.REJECT;
-	}
-
 	@Override
 	public boolean isText() {
 		return true;

@@ -132,27 +132,26 @@ public class ArkDockJsonWriterAgent extends ArkDockAgentDefault<ArkDockJsonConst
 
 		return DustResultType.ACCEPT_READ;
 	}
-
+	
 	@SuppressWarnings("rawtypes")
-	public static void sendMultiEntry(ArkDockJsonWriterAgent jsonAgent, Map src, Object... keys) throws Exception {
+	public void sendMultiEntry(Map src, Object... keys) throws Exception {
 		for (Object k : keys) {
 			Object v = src.get(k);
 			if ( null != v ) {
-				sendSimpleEntry(jsonAgent, k, v);
+				sendSimpleEntry(k, v);
 			}
 		}
 	}
 
-	public static void sendSimpleEntry(ArkDockJsonWriterAgent jsonAgent, Object name, Object value) throws Exception {
-		JsonContext ctx = jsonAgent.getActionCtx();
+	public void sendSimpleEntry(Object name, Object value) throws Exception {
+//		JsonContext ctx = jsonAgent.getActionCtx();
 
 		ctx.block = JsonBlock.Entry;
 		ctx.param = name;
-		jsonAgent.agentAction(DustAgentAction.BEGIN);
+		agentAction(DustAgentAction.BEGIN);
 
 		ctx.param = value;
-		jsonAgent.agentAction(DustAgentAction.PROCESS);
-		jsonAgent.agentAction(DustAgentAction.END);
+		agentAction(DustAgentAction.PROCESS);
+		agentAction(DustAgentAction.END);
 	}
-
 }

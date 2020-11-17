@@ -92,7 +92,7 @@ public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, Ark
 //		this.meta = target.getMeta();
 		
 		JSONParser p = new JSONParser();
-		JsonContentDispatcher h = new JsonContentDispatcher(visitor);
+		ArkDockIOConnJson.JsonContentDispatcher h = new ArkDockIOConnJson.JsonContentDispatcher(visitor);
 		p.parse(r, h);
 
 		parseTimer.log();

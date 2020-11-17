@@ -1,6 +1,7 @@
 package ark.dock.geo.geojson;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import ark.dock.ArkDock;
 import ark.dock.ArkDockConsts;
@@ -44,22 +45,10 @@ public interface ArkDockGeojsonConsts extends ArkDockConsts, ArkDockJsonConsts, 
 	}
 
 	class GeojsonContext {
-		GeojsonObjectType typeObj;
-		Map<String, Object> data;
+		public GeojsonObjectType typeObj;
+		public Map<String, Object> data = new TreeMap<>();
 
-		ArkDockGeojsonGeometry geometry;
-
-		public GeojsonObjectType getTypeObj() {
-			return typeObj;
-		}
-
-		public ArkDockGeojsonGeometry getGeometry() {
-			return geometry;
-		}
-
-		public Iterable<String> getDataKeys() {
-			return data.keySet();
-		}
+		public ArkDockGeojsonGeometry geometry;
 
 		@SuppressWarnings("unchecked")
 		public <RetType> RetType getData(String key) {

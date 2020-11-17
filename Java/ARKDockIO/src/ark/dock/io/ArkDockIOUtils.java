@@ -2,47 +2,29 @@ package ark.dock.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 
-import ark.dock.ArkDockConsts.ArkDockAgent;
-import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 import ark.dock.ArkDockVisitor;
 import ark.dock.ArkDockVisitor.VisitorAware;
 import dust.gen.DustGenUtils;
 
-public class ArkDockIOUtils extends DustGenUtils {
-
-	public static abstract class IoConnector<ActionCtxType> extends ArkDockAgentDefault<ActionCtxType> {
-		public abstract boolean isText();
-
-		public abstract ActionCtxType createContext();
-
-		public String getEncoding() {
-			return ENCODING_UTF8;
-		}
-
-		public DustResultType read(Reader source, ArkDockAgent<ActionCtxType> processor) throws Exception {
-			return DustResultType.REJECT;
-		}
-
-		public DustResultType read(InputStream source, ArkDockAgent<ActionCtxType> processor) throws Exception {
-			return DustResultType.REJECT;
-		}
-	}
+public class ArkDockIOUtils extends DustGenUtils implements ArkDockIOConsts {
 
 	static class ReadContext<ActionCtxType> {
-		IoConnector<ActionCtxType> connector;
+		ArkDockIOConnector<ActionCtxType> connector;
 		ArkDockAgent<ActionCtxType> processor;
 
 		ArkDockVisitor<ActionCtxType> localVisitor;
 		ActionCtxType localCtx;
 		
-		
-
 		@SuppressWarnings("unchecked")
-		public ReadContext(IoConnector<ActionCtxType> connector, ArkDockAgent<ActionCtxType> processor) {
+		public ReadContext(ArkDockIOConnector<ActionCtxType> connector, ArkDockAgent<ActionCtxType> processor) {
 			this.connector = connector;
 			this.processor = processor;
 
@@ -87,15 +69,14 @@ public class ArkDockIOUtils extends DustGenUtils {
 				close();
 			}
 		}
-
 	}
 
-	public static <ActionCtxType> DustResultType read(IoConnector<ActionCtxType> connector,
+	public static <ActionCtxType> DustResultType read(ArkDockIOConnector<ActionCtxType> connector,
 			ArkDockAgent<ActionCtxType> processor, String fileName) throws Exception {
 		return read(connector, processor, new File(fileName));
 	}
 
-	public static <ActionCtxType> DustResultType read(IoConnector<ActionCtxType> connector,
+	public static <ActionCtxType> DustResultType read(ArkDockIOConnector<ActionCtxType> connector,
 			ArkDockAgent<ActionCtxType> processor, File f) throws Exception {
 		DustResultType ret = DustResultType.REJECT;
 
@@ -111,13 +92,90 @@ public class ArkDockIOUtils extends DustGenUtils {
 		return ret;
 	}
 
-	public static <ActionCtxType> DustResultType read(IoConnector<ActionCtxType> connector,
+	public static <ActionCtxType> DustResultType read(ArkDockIOConnector<ActionCtxType> connector,
 			ArkDockAgent<ActionCtxType> processor, InputStream source) throws Exception {
 		return new ReadContext<ActionCtxType>(connector, processor).read(source);
 	}
 
-	public static <ActionCtxType> DustResultType read(IoConnector<ActionCtxType> connector,
+	public static <ActionCtxType> DustResultType read(ArkDockIOConnector<ActionCtxType> connector,
 			ArkDockAgent<ActionCtxType> processor, Reader source) throws Exception {
 		return new ReadContext<ActionCtxType>(connector, processor).read(source);
+	}
+	
+	
+	
+	
+	
+	static class WriteContext<ActionCtxType> {
+		ArkDockIOConnector<ActionCtxType> connector;
+		ArkDockIOSource<ActionCtxType> source;
+
+		ActionCtxType localCtx;
+		
+		public WriteContext(ArkDockIOConnector<ActionCtxType> connector, ArkDockIOSource<ActionCtxType> source) {
+			this.connector = connector;
+			this.source = source;
+
+			ActionCtxType ctx = source.getActionCtx();
+
+			if ( null == ctx ) {
+				ctx = localCtx = connector.createContext();
+				source.setActionCtx(ctx);
+			}
+		}
+
+		public void close() {
+			if ( null != localCtx ) {
+				source.setActionCtx(null);
+			}
+		}
+		
+		public DustResultType write(Writer target) throws Exception {
+			try {
+				return connector.write(source, target);
+			} finally {
+				close();
+			}
+		}
+
+		public DustResultType write(OutputStream target) throws Exception {
+			try {
+				return connector.write(source, target);
+			} finally {
+				close();
+			}
+		}
+	}
+
+	public static <ActionCtxType> DustResultType write(ArkDockIOConnector<ActionCtxType> connector,
+			ArkDockIOSource<ActionCtxType> source, String fileName) throws Exception {
+		return write(connector, source, new File(fileName));
+	}
+
+	public static <ActionCtxType> DustResultType write(ArkDockIOConnector<ActionCtxType> connector,
+			ArkDockIOSource<ActionCtxType> source, File f) throws Exception {
+		DustResultType ret = DustResultType.REJECT;
+		
+		DustGenUtils.ensureParents(f);
+
+			try (FileOutputStream fout = new FileOutputStream(f)) {
+				ret = connector.isText()
+						? write(connector, source, new OutputStreamWriter(fout, connector.getEncoding()))
+						: write(connector, source, fout);
+				fout.flush();
+				fout.close();
+			}
+
+		return ret;
+	}
+
+	public static <ActionCtxType> DustResultType write(ArkDockIOConnector<ActionCtxType> connector,
+			ArkDockIOSource<ActionCtxType> source, OutputStream target) throws Exception {
+		return new WriteContext<ActionCtxType>(connector, source).write(target);
+	}
+
+	public static <ActionCtxType> DustResultType write(ArkDockIOConnector<ActionCtxType> connector,
+			ArkDockIOSource<ActionCtxType> source, Writer target) throws Exception {
+		return new WriteContext<ActionCtxType>(connector, source).write(target);
 	}
 }
