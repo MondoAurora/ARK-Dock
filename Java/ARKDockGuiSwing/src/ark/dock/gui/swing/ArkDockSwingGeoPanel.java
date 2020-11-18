@@ -15,7 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -30,7 +29,7 @@ import ark.dock.ArkDockDsl;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockModelSerializer.SerializeAgent;
 import ark.dock.ArkDockUnit;
-import ark.dock.geo.json.ArkDockGeojsonConsts.GeojsonPolygon;
+import ark.dock.geo.geojson.ArkDockGeojsonGeometry;
 import dust.gen.DustGenLog;
 import dust.gen.DustGenTranslator;
 
@@ -132,7 +131,6 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 		shpSel = null;
 
 		SerializeAgent<DustEntityContext> target = new ArkDockModelSerializer.Dump() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public DustResultType agentAction(DustAgentAction action) throws Exception {
 				if ( action == DustAgentAction.PROCESS ) {
@@ -141,8 +139,8 @@ public class ArkDockSwingGeoPanel extends JPanel implements ArkDockSwingConsts {
 					if ( (ctx.member == dslNative.memNativeValueOne) || (ctx.member == dslNative.memNativeValueArr) ) {
 						Shape shp = null;
 
-						if ( ctx.value instanceof GeojsonPolygon ) {
-							shp = ((GeojsonPolygon<Path2D.Double>) ctx.value).getExterior();
+						if ( ctx.value instanceof ArkDockGeojsonGeometry.Polygon ) {
+							shp = ((ArkDockGeojsonGeometry.Polygon) ctx.value).getMain();
 						} else if ( ctx.value instanceof Shape ) {
 							shp = (Shape) ctx.value;
 						} else {

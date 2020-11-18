@@ -20,6 +20,7 @@ import dust.gen.DustGenException;
 import dust.gen.DustGenFactory;
 import dust.gen.DustGenLog;
 
+@Deprecated
 public class ArkDockJsonSerializerReader implements DustGenConsts.DustAgent, ArkDockJsonConsts {
 	enum ReadState {
 		Init, Header, /*HeaderContent,*/ Entity, EntityContent, EntityContentValue, EntityContentCustom

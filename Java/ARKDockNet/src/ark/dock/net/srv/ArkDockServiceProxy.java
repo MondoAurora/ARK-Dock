@@ -2,7 +2,6 @@ package ark.dock.net.srv;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.EnumSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +14,6 @@ import ark.dock.ArkDock;
 import ark.dock.ArkDockModelSerializer;
 import ark.dock.ArkDockUnit;
 import ark.dock.ArkDockUtils;
-import ark.dock.geo.json.ArkDockGeojson2D;
 import ark.dock.io.json.ArkDockJsonSerializerWriter;
 
 public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvConsts {
@@ -56,11 +54,11 @@ public class ArkDockServiceProxy extends AbstractHandler implements ArkDockSrvCo
                     	
     		ArkDockJsonSerializerWriter sw = new ArkDockJsonSerializerWriter(out, null);
     		
-    		EnumSet<ArkDockGeojson2D.FormatParam> params = EnumSet.of(ArkDockGeojson2D.FormatParam.FakeZCoord);
-    		sw.addFormatter(new ArkDockGeojson2D.PointFormatter(params));
-    		sw.addFormatter(new ArkDockGeojson2D.PathFormatter(params));
-    		sw.addFormatter(new ArkDockGeojson2D.PolygonFormatter(params));
-    		sw.addFormatter(new ArkDockGeojson2D.BBoxFormatter());
+//    		EnumSet<ArkDockGeojson2D.FormatParam> params = EnumSet.of(ArkDockGeojson2D.FormatParam.FakeZCoord);
+//    		sw.addFormatter(new ArkDockGeojson2D.PointFormatter(params));
+//    		sw.addFormatter(new ArkDockGeojson2D.PathFormatter(params));
+//    		sw.addFormatter(new ArkDockGeojson2D.PolygonFormatter(params));
+//    		sw.addFormatter(new ArkDockGeojson2D.BBoxFormatter());
 
     		try {
 				ArkDockModelSerializer.modelToAgent(e, sw, null);

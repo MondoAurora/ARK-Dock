@@ -8,9 +8,8 @@ import dust.gen.DustGenDevUtils;
 
 public class ArkDockGeojsonWriterAgent extends ArkDockAgentDefault<GeojsonContext> implements ArkDockJsonConsts, ArkDockGeojsonConsts, DustGenDevUtils {
 	ArkDockAgent<JsonContext> jsonAgent;
-//	ArrayList<String> dummy = new ArrayList<>();
 
-	public ArkDockGeojsonWriterAgent(ArkDockAgent<JsonContext> jsonAgent_) throws Exception {
+	public void setTarget(ArkDockAgent<JsonContext> jsonAgent_) {
 		this.jsonAgent = jsonAgent_;
 	}
 	

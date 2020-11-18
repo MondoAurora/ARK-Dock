@@ -8,6 +8,7 @@ import org.json.simple.JSONValue;
 
 import ark.dock.ArkDockConsts.ArkDockAgentDefault;
 
+@Deprecated
 public class ArkDockJsonWriterAgent extends ArkDockAgentDefault<ArkDockJsonConsts.JsonContext>
 		implements ArkDockJsonConsts {
 
