@@ -3,6 +3,7 @@ package ark.dock.geo.geojson;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import ark.dock.io.json.ArkDockJsonConsts;
@@ -13,6 +14,26 @@ public interface ArkDockGeojsonGeometry extends ArkDockGeojsonConsts, ArkDockJso
 
 	static ArkDockGeojsonGeometry forName(String name) {
 		return forType(GeojsonGeometryType.valueOf(name));
+	}
+
+	static Polygon forRect(Rectangle2D rect) {
+		LineString ls = new LineString();
+		
+		double minX = rect.getMinX();
+		double minY = rect.getMinY();
+		double maxX = rect.getMaxX();
+		double maxY = rect.getMaxY();
+
+		ls.moveTo(minX, minY);
+		ls.lineTo(maxX, minY);
+		ls.lineTo(maxX, maxY);
+		ls.lineTo(minX, maxY);
+		ls.lineTo(minX, minY);
+		
+		Polygon ret = new Polygon();
+		ret.addInfo(ls);
+		
+		return ret;
 	}
 
 	static ArkDockGeojsonGeometry forType(GeojsonGeometryType type) {
@@ -162,7 +183,7 @@ public interface ArkDockGeojsonGeometry extends ArkDockGeojsonConsts, ArkDockJso
 
 			for (PathIterator pi = getPathIterator(null); !pi.isDone(); pi.next()) {
 				pi.currentSegment(d);
-				d[2] = z.get(zIdx++);
+				d[2] = (null == z) ? 0.0 : z.get(zIdx++);
 				
 				target.agentAction(DustAgentAction.BEGIN);
 				for ( int i = 0; i < 3; ++i ) {

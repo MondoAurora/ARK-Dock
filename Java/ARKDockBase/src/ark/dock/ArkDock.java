@@ -1,7 +1,6 @@
 package ark.dock;
 
 import dust.gen.DustGenException;
-import dust.gen.DustGenLog;
 
 public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 	private static ArkDockMind THE_MIND = null;
@@ -50,9 +49,9 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 	public static DustEntity getByGlobalId(String globalId) {
 		DustEntity ret = THE_MIND.factUnit.get(ArkDockUtils.getSegment(globalId, TokenSegment.UNIT)).getEntity(globalId);
 		
-		if ( null == ret ) {
-			DustGenLog.log(DustEventLevel.WARNING, "Unresolved global ID ", globalId);
-		}
+//		if ( null == ret ) {
+//			DustGenLog.log(DustEventLevel.WARNING, "Unresolved global ID ", globalId);
+//		}
 		
 		return ret;
 	}
