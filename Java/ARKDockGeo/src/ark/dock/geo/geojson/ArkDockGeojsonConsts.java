@@ -63,8 +63,8 @@ public interface ArkDockGeojsonConsts extends ArkDockConsts, ArkDockJsonConsts, 
 		}
 
 		@SuppressWarnings("unchecked")
-		public <RetType> RetType getData(String key) {
-			return (RetType) data.get(key);
+		public <RetType> RetType getData(Object key) {
+			return (RetType) data.get(key.toString());
 		}
 
 		@Override

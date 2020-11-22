@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
+import ark.dock.ArkDockUnit;
 import ark.dock.io.json.ArkDockJsonConsts;
 import dust.gen.DustGenException;
 
@@ -14,6 +15,18 @@ public interface ArkDockGeojsonGeometry extends ArkDockGeojsonConsts, ArkDockJso
 
 	static ArkDockGeojsonGeometry forName(String name) {
 		return forType(GeojsonGeometryType.valueOf(name));
+	}
+
+	static Point forCoordArr(ArkDockUnit u, DustEntity e, DustEntity m) {
+		ArkDockGeojsonGeometry.Point pt = null;
+		
+		for (int ci = 0; ci < 3; ++ci) {
+			if ( null == pt ) {
+				pt = new ArkDockGeojsonGeometry.Point();
+			}
+			pt.addCoord(ci, u.getMember(e, m, 0.0, ci));
+		}
+		return pt;
 	}
 
 	static Polygon forRect(Rectangle2D rect) {

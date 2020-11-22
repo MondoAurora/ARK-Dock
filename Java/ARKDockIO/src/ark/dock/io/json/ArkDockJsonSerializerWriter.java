@@ -12,7 +12,7 @@ import ark.dock.ArkDockModelSerializer.SerializeAgent;
 import dust.gen.DustGenConsts.DustEntityContext;
 import dust.gen.DustGenUtils;
 
-@Deprecated
+//@Deprecated
 public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContext> implements ArkDockJsonConsts {
 	enum JsonHeader {
 		ArkJsonInfo, VersionInfo
