@@ -291,6 +291,10 @@ public class ArkDockMind implements ArkDockDslConsts, ArkDockDsl, ArkDockBootCon
 		return factUnit.peek(unitName);
 	}
 
+	public final ArkDockUnit getUnit(String unitName) {
+		return getUnit(unitName, mainUnit);
+	}
+
 	public final ArkDockUnit getUnit(String unitName, ArkDockUnit parent) {
 		return factUnit.get(unitName, parent);
 	}
