@@ -5,12 +5,22 @@ import ark.dock.geo.geojson.ArkDockGeojsonConsts.GeojsonContext;
 import ark.dock.io.json.ArkDockJsonConsts;
 import ark.dock.io.json.ArkDockJsonUtils;
 import dust.gen.DustGenDevUtils;
+import dust.gen.DustGenUtils;
 
 public class ArkDockGeojsonWriterAgent extends ArkDockAgentDefault<GeojsonContext> implements ArkDockJsonConsts, ArkDockGeojsonConsts, DustGenDevUtils {
 	ArkDockAgent<JsonContext> jsonAgent;
+	
+	public static String defCoordSys;
+	
+	private String coordSys;
+	private boolean writeCS;
 
 	public void setTarget(ArkDockAgent<JsonContext> jsonAgent_) {
 		this.jsonAgent = jsonAgent_;
+	}
+	
+	public void setCoordSys(String coordSys) {
+		this.coordSys = coordSys;
 	}
 	
 	@Override
@@ -21,11 +31,19 @@ public class ArkDockGeojsonWriterAgent extends ArkDockAgentDefault<GeojsonContex
 		switch ( action ) {
 		case INIT:
 			jsonAgent.agentAction(DustAgentAction.INIT);
+			if ( DustGenUtils.isEmpty(coordSys)) {
+				coordSys = defCoordSys;
+			}
+			writeCS = !DustGenUtils.isEmpty(coordSys);
 			break;
 		case BEGIN:
 			ctxJson.block = JsonBlock.Object;
 			jsonAgent.agentAction(DustAgentAction.BEGIN);
 			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.type, GeojsonObjectType.FeatureCollection);
+			if ( writeCS ) {
+				ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.coordSys, coordSys);				
+				writeCS = false;
+			}
 			ctxJson.block = JsonBlock.Entry;
 			ctxJson.param = GeojsonKey.features;
 			jsonAgent.agentAction(DustAgentAction.BEGIN);
@@ -40,6 +58,9 @@ public class ArkDockGeojsonWriterAgent extends ArkDockAgentDefault<GeojsonContex
 
 			ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.type, GeojsonObjectType.Feature);
 			ArkDockJsonUtils.sendMultiEntry(jsonAgent, ctx.data, GeojsonKey.id, GeojsonKey.bbox, GeojsonKey.properties);
+			if ( writeCS ) {
+				ArkDockJsonUtils.sendSimpleEntry(jsonAgent, GeojsonKey.coordSys, coordSys);				
+			}
 
 			ctxJson.block = JsonBlock.Entry;
 			ctxJson.param = GeojsonKey.geometry;

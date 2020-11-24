@@ -14,7 +14,7 @@ import dust.gen.DustGenUtils;
 
 public interface ArkDockGeojsonConsts extends ArkDockConsts, ArkDockJsonConsts, ArkDockDslGeojson {
 	enum GeojsonKey {
-		type, id, features, geometry, geometries, coordinates, properties, bbox;
+		type, id, features, geometry, geometries, coordinates, properties, bbox, coordSys;
 	}
 
 	enum GeojsonGeometryType {
