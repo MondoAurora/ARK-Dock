@@ -2,12 +2,15 @@ package ark.dock;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import dust.gen.DustGenConsts.DustEntity;
 import dust.gen.DustGenCounter;
 import dust.gen.DustGenException;
+import dust.gen.DustGenLog;
 import dust.gen.DustGenUtils;
 
 public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
@@ -18,6 +21,9 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 
 	final String unitName;
 	ArkDockEntity eUnit;
+	
+	DustEntityDelta notifDelta = null;
+	Set<DustDeltaListener> notifListeners;
 
 	ArkDockUnit(ArkDockUnit src) {
 		this.unitName = src.unitName;
@@ -31,6 +37,30 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		this.parent = parent_;
 		this.mind = ArkDock.getMind();
 		eUnit = (null == mind.typUnit) ? null : getEntity(mind.typUnit, unitName, true);
+	}
+
+	public boolean setDeltaListener(DustDeltaListener l, boolean add) {
+		boolean ret = false;
+		
+		if ( null == l ) {
+			if ( (null != notifListeners) && !add ) {
+				ret = !notifListeners.isEmpty();
+				notifListeners.clear();
+			}
+		} else {
+			if ( add ) {
+				if ( null == notifListeners ) {
+					notifListeners = new HashSet<>();
+				}
+				ret = notifListeners.add(l);
+			} else {
+				if (null != notifListeners) {
+					ret = notifListeners.remove(l);
+				}
+			}
+		}
+		
+		return ret;
 	}
 
 	public DustEntity getUnit() {
@@ -75,18 +105,26 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).getCount(member) : 0;
 	}
 
-//	public String getId(DustEntity e) {
-//		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).id : null;
-//	}
-//
-//	public String getGlobalId(DustEntity e) {
-//		return (e instanceof ArkDockEntity) ? ((ArkDockEntity) e).globalId : null;
-//	}
-
 	@SuppressWarnings("unchecked")
 	public <RetType> RetType accessMember(DustDialogCmd cmd, DustEntity e, DustEntity member, Object value,
 			Object hint) {
 		Object ret = (cmd == DustDialogCmd.GET) ? value : false;
+		
+		if ( null != notifListeners ) {
+			if ( null == notifDelta ) {
+				notifDelta = new DustEntityDelta(cmd, e, null, member, value, hint);
+			} else {
+				notifDelta.set(cmd, e, null, member, value, hint);
+			}
+			
+			for ( DustDeltaListener dl : notifListeners ) {
+				try {
+					dl.processDelta(notifDelta);
+				} catch (Throwable thr) {
+					DustGenLog.log(DustEventLevel.ERROR, "Delta listener failure", notifDelta, thr);
+				}
+			}
+		}
 
 		if ( null != e ) {
 			if ( null == member ) {

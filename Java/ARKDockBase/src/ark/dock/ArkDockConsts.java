@@ -6,7 +6,8 @@ import dust.gen.DustGenLog;
 
 public interface ArkDockConsts extends DustGenConsts {
 
-    String TOKEN_SEP = "_";
+  String TOKEN_SEP = "_";
+//  String TOKEN_SEP = ":";
     
     enum TokenSegment {
     	UNIT, TYPE, ID;

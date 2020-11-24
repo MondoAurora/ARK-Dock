@@ -3,8 +3,9 @@ package ark.dock.io.json;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -21,12 +22,14 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 	Writer target;
 	Map<JsonHeader, Object> header;
 
-	Map<Class<?>, JsonFormatter> formatters;
 	boolean pretty = true;
 
 	boolean contEntity;
 	boolean contMember;
 	String valueClose;
+	boolean skipMember;
+
+	Set<DustEntity> skippedMembers;
 
 	public ArkDockJsonSerializerWriter(Writer target, Map<JsonHeader, Object> header) {
 		this.target = target;
@@ -42,22 +45,21 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 		this(new File(fileName), header);
 	}
 
-	public void addFormatter(JsonFormatter fmt) {
-		if ( null == formatters ) {
-			formatters = new HashMap<>();
-		}
-
-		formatters.put(fmt.getDataClass(), fmt);
-	}
-	
 	public void setPretty(boolean pretty) {
 		this.pretty = pretty;
 	}
 
+	public void skipMember(DustEntity m) {
+		if ( null == skippedMembers ) {
+			skippedMembers = new HashSet<>();
+		}
+		skippedMembers.add(m);
+	}
+
 	private Writer endLine(String close) throws Exception {
-		target.append(close);	
+		target.append(close);
 		if ( pretty ) {
-			target.append("\n");	
+			target.append("\n");
 			target.append((getActionCtx().block == EntityBlock.Member) ? "    " : "  ");
 		} else {
 			target.append(" ");
@@ -91,13 +93,16 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 
 				break;
 			case Member:
-				if ( contMember ) {
-					closeLine = ",";
-				} else {
-					contMember = true;
+				skipMember = (null != skippedMembers) && skippedMembers.contains(ctx.member);
+				if ( !skipMember ) {
+					if ( contMember ) {
+						closeLine = ",";
+					} else {
+						contMember = true;
+					}
+					endLine(closeLine).write(JSONValue.toJSONString(ctx.member.toString()) + " : ");
+					valueClose = null;
 				}
-				endLine(closeLine).write(JSONValue.toJSONString(ctx.member.toString()) + " : ");
-				valueClose = null;
 				break;
 			}
 			break;
@@ -112,52 +117,47 @@ public class ArkDockJsonSerializerWriter extends SerializeAgent<DustEntityContex
 				endLine("").write("}");
 				break;
 			case Member:
+				skipMember = false;
 				break;
 			}
 			break;
 		case PROCESS:
-			Object val = ctx.value;
-			if ( null != val ) {
-				if ( null == valueClose ) {
-					DustCollType ct = (null == ctx.collType) ? DustCollType.ONE : ctx.collType;
-					switch ( ct ) {
-					case ARR:
-					case SET:
-						target.write("[ ");
-						valueClose = " ]";
-						break;
-					case MAP:
-						target.write("{ ");
-						valueClose = " }";
-						break;
-					default:
-						valueClose = "";
-						break;
+			if ( !skipMember ) {
+				Object val = ctx.value;
+				if ( null != val ) {
+					if ( null == valueClose ) {
+						DustCollType ct = (null == ctx.collType) ? DustCollType.ONE : ctx.collType;
+						switch ( ct ) {
+						case ARR:
+						case SET:
+							target.write("[ ");
+							valueClose = " ]";
+							break;
+						case MAP:
+							target.write("{ ");
+							valueClose = " }";
+							break;
+						default:
+							valueClose = "";
+							break;
+						}
+					} else {
+						target.write(", ");
 					}
-				} else {
-					target.write(", ");
-				}
 
-				if ( ctx.collType == DustCollType.MAP ) {
-					JSONValue.writeJSONString(ctx.key.toString(), target);
-					target.write(": ");
-				}
-
-				if ( null != formatters ) {
-					JsonFormatter fmt = formatters.get(val.getClass());
-					if ( null != fmt ) {
-						fmt.toJson(val, target);
-						return DustResultType.ACCEPT_READ;
+					if ( ctx.collType == DustCollType.MAP ) {
+						JSONValue.writeJSONString(ctx.key.toString(), target);
+						target.write(": ");
 					}
-				}
 
-				JSONValue.writeJSONString(val, target);
+					JSONValue.writeJSONString(val, target);
+				}
 			}
 			break;
 		case RELEASE:
 			endLine("").write("}");
 			endLine("").write("]");
-			
+
 			target.flush();
 			target.close();
 
