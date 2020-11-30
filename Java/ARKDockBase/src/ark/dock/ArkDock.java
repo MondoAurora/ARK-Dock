@@ -35,6 +35,11 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 		return ae.unit.accessMember(cmd, e, member, value, hint);
 	}
 
+	public static <RetType> RetType accessMember(DustEntity entity, DustEntityDelta delta) {
+		ArkDockEntity ae = (ArkDockEntity) entity;
+		return ae.unit.accessMember(entity, delta);
+	}
+
 	public static String formatEntity(DustEntity e) {
 		return getGlobalId(e);
 //		ArkDockEntity de = (ArkDockEntity) e;

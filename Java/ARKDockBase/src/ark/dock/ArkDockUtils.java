@@ -51,6 +51,16 @@ public class ArkDockUtils extends DustGenUtils implements ArkDockConsts {
 		}
 	}
 
+	public static void addMember(ArkDockUnit unit, DustEntity e, DustEntity member, boolean reset, Object... values) {
+		if ( reset ) {
+			unit.accessMember(DustDialogCmd.DEL, e, member, null, null);
+		}
+		
+		for ( Object v : values ) {
+			unit.accessMember(DustDialogCmd.ADD, e, member, v, KEY_APPEND);
+		}
+	}
+
 	public static DustCollType getCollType(DustMemberDef md, DustCollType def) {
 		DustCollType ret = (null == md) ? null : md.getCollType();
 		return (null == ret) ? def : ret;

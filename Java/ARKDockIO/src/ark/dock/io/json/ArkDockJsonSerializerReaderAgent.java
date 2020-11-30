@@ -53,6 +53,16 @@ public class ArkDockJsonSerializerReaderAgent extends ArkDockAgentDefault<JsonCo
 		}
 	};
 
+	DustGenFactory<String, ArrayList<DustEntityDelta>> factPostponedDelta = new DustGenFactory<String, ArrayList<DustEntityDelta>>(
+			null) {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ArrayList<DustEntityDelta> createItem(String key, Object hint) {
+			return new ArrayList<>();
+		}
+	};
+
 	enum SerReadState {
 		ReadSerialObject, ReadEntityId, ReadEntityObject, ReadMemberId// , ReadMemberValue
 	}
@@ -67,35 +77,35 @@ public class ArkDockJsonSerializerReaderAgent extends ArkDockAgentDefault<JsonCo
 		void selectEntity(Object id) {
 			globalId = (String) id;
 			eTarget = ArkDock.getByGlobalId(globalId);
-			
+
 			if ( null == eTarget ) {
 				newEntity.clear();
 			}
-			
+
 //			DustGenLog.log("Serial read - Reading entity", globalId, "found:", null != eTarget);
 		}
 
 		private void selectMember(Object id) {
 			memberId = (String) id;
 			eMember = ArkDock.getByGlobalId(memberId);
-			
+
 			if ( null == eMember ) {
 				String unit = ArkDockUtils.getSegment(memberId, TokenSegment.UNIT);
 				String iid = ArkDockUtils.getSegment(memberId, TokenSegment.ID);
-				
+
 				int sep = iid.indexOf(TOKEN_SEP);
 				String ti = iid.substring(0, sep);
-				String mi = iid.substring(sep+1);
-				
+				String mi = iid.substring(sep + 1);
+
 				ArkDockDslBuilder dslb = ArkDock.getDslBuilder(unit);
 				DustEntity eT = dslb.getType(ti);
 				eMember = dslb.getMember(eT, mi);
-				
+
 				DustGenLog.log("Serial read - new member created", eMember);
 			}
-			
+
 			md = null;
-			
+
 //			DustGenLog.log("Serial read - Select member", memberId, "found:", eMember);
 		}
 
@@ -127,12 +137,19 @@ public class ArkDockJsonSerializerReaderAgent extends ArkDockAgentDefault<JsonCo
 				if ( null == md ) {
 					md = ArkDock.getMind().getMemberDef(eMember, val, key);
 				}
+				DustDialogCmd cmd = (null == key) ? DustDialogCmd.SET : DustDialogCmd.ADD;
 				if ( md.getValType() == DustValType.REF ) {
-					val = ArkDock.getByGlobalId((String) val);
+					Object ref = ArkDock.getByGlobalId((String) val);
+
+					if ( null == ref ) {
+						factPostponedDelta.get((String) val).add(new DustEntityDelta(cmd, eTarget, globalId, eMember, val, key));
+						return;
+					}
+					val = ref;
 				}
-				ArkDock.access((null == key) ? DustDialogCmd.SET : DustDialogCmd.ADD, eTarget, eMember, val, key);
+				ArkDock.access(cmd, eTarget, eMember, val, key);
 			}
-			
+
 			if ( null == key ) {
 //				DustGenLog.log("Serial read - Set Single value", val);
 			} else {
@@ -145,28 +162,37 @@ public class ArkDockJsonSerializerReaderAgent extends ArkDockAgentDefault<JsonCo
 				String strType = (String) newEntity.remove(dslModel.memEntityPrimaryType);
 				String strId = (String) newEntity.remove(dslModel.memEntityId);
 				String strGlobalId = (String) newEntity.remove(dslModel.memEntityGlobalId);
-				
+
 				String unit = ArkDockUtils.getSegment(strGlobalId, TokenSegment.UNIT);
 				DustEntity eType = ArkDock.getByGlobalId(strType);
-				
+
 				if ( null == eType ) {
 					String uu = ArkDockUtils.getSegment(strType, TokenSegment.UNIT);
 					String ti = ArkDockUtils.getSegment(strType, TokenSegment.ID);
-					
+
 					ArkDockDslBuilder dslb = ArkDock.getDslBuilder(uu);
 					eType = dslb.getType(ti);
-					
+
 					DustGenLog.log("Serial read - new type created", eType);
 				}
-				
+
 				eTarget = ArkDock.getMind().getEntity(unit, eType, strId, true);
-				
-				for ( Map.Entry<DustEntity, Object> e : newEntity.entrySet() ) {
+
+				for (Map.Entry<DustEntity, Object> e : newEntity.entrySet()) {
 					eMember = e.getKey();
+					md = null;
 					setValue(e.getValue());
 				}
+
+				ArrayList<DustEntityDelta> pl = factPostponedDelta.peek(strGlobalId);
+				if ( null != pl ) {
+					for (DustEntityDelta d : pl) {
+						d.value = eTarget;
+						ArkDock.accessMember(d.target, d);
+					}
+				}
 			}
-			
+
 //			DustGenLog.log("Serial read - End Entity");
 		}
 
@@ -258,19 +284,9 @@ public class ArkDockJsonSerializerReaderAgent extends ArkDockAgentDefault<JsonCo
 
 	SerialReader serReader;
 
-	DustGenFactory<String, ArrayList<DustEntityDelta>> factPostponedDelta = new DustGenFactory<String, ArrayList<DustEntityDelta>>(
-			null) {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected ArrayList<DustEntityDelta> createItem(String key, Object hint) {
-			return new ArrayList<>();
-		}
-	};
-
 	public ArkDockJsonSerializerReaderAgent(ArkDockUnit uTarget) {
 		dslModel = ArkDock.getDsl(DslModel.class);
-		dslIdea = ArkDock.getDsl(DslIdea.class);		
+		dslIdea = ArkDock.getDsl(DslIdea.class);
 	}
 
 	@Override

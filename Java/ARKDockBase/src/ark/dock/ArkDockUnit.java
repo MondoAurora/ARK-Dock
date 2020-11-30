@@ -71,6 +71,10 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		return parent;
 	}
 
+	public int getSize() {
+		return entities.size();
+	}
+
 	public ArkDockEntity getNewEntity(DustEntity type) {
 		return getEntity(type, null, true);
 	}
