@@ -29,6 +29,11 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 		return (MindType) THE_MIND;
 	}
 
+	public static DustEntity getByGlobalId(String globalId) {
+		DustEntity ret = THE_MIND.factUnit.get(ArkDockUtils.getSegment(globalId, TokenSegment.UNIT)).getEntity(globalId);
+		return ret;
+	}
+
 	public static <RetType> RetType access(DustDialogCmd cmd, DustEntity e, DustEntity member, Object value,
 			Object hint) {
 		ArkDockEntity ae = (ArkDockEntity) e;
@@ -42,35 +47,22 @@ public class ArkDock implements ArkDockDslConsts, ArkDockDsl {
 
 	public static String formatEntity(DustEntity e) {
 		return getGlobalId(e);
-//		ArkDockEntity de = (ArkDockEntity) e;
-//		String ret = (String) de.data.get(THE_MIND.dslText.memTextName);
-//		return (null == ret) ? getGlobalId(e) : ret;
 	}
 
 	public static String getGlobalId(DustEntity e) {
-		return (String) ((ArkDockEntity) e).data.get(THE_MIND.memEntityGlobalId);
-	}
-
-	public static DustEntity getByGlobalId(String globalId) {
-		DustEntity ret = THE_MIND.factUnit.get(ArkDockUtils.getSegment(globalId, TokenSegment.UNIT)).getEntity(globalId);
-		
-//		if ( null == ret ) {
-//			DustGenLog.log(DustEventLevel.WARNING, "Unresolved global ID ", globalId);
-//		}
-		
-		return ret;
+		return (null == e) ? null : (String) ((ArkDockEntity) e).data.get(THE_MIND.memEntityGlobalId);
 	}
 
 	public static String getId(DustEntity e) {
-		return (String) ((ArkDockEntity) e).data.get(THE_MIND.memEntityId);
+		return (null == e) ? null : (String) ((ArkDockEntity) e).data.get(THE_MIND.memEntityId);
 	}
 
 	public static DustEntity getPrimaryType(DustEntity e) {
-		return (DustEntity) ((ArkDockEntity) e).data.get(THE_MIND.memEntityPrimaryType);
+		return (null == e) ? null : (DustEntity) ((ArkDockEntity) e).data.get(THE_MIND.memEntityPrimaryType);
 	}
 
 	public static final DustEntity getTagByOwner(DustEntity e, DustEntity tagRoot) {
-		return THE_MIND.getTagByOwner(e, tagRoot);
+		return (null == e) ? null : THE_MIND.getTagByOwner(e, tagRoot);
 	}
 
 }
