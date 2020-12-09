@@ -29,7 +29,8 @@ public class ArkDockUnit implements ArkDockConsts, Iterable<DustEntity> {
 		this.unitName = src.unitName;
 		this.parent = src.parent;
 		this.mind = ArkDock.getMind();
-		eUnit = src.eUnit;
+		eUnit = new ArkDockEntity(this, src.eUnit);
+		entities.put((String) eUnit.data.get(mind.memEntityGlobalId), eUnit);
 	}
 
 	public ArkDockUnit(String unitName_, ArkDockUnit parent_) {

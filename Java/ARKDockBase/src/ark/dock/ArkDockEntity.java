@@ -22,6 +22,11 @@ class ArkDockEntity implements DustEntity, ArkDockConsts {
 		this.unit = unit_;
 	}
 
+	public ArkDockEntity(ArkDockUnit unit_, ArkDockEntity src) {
+		this.unit = unit_;
+		data.putAll(src.data);
+	}
+
 	@Override
 	public String toString() {
 		return ArkDock.formatEntity(this);

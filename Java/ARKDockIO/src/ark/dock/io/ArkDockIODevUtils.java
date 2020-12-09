@@ -41,7 +41,7 @@ public class ArkDockIODevUtils extends DustGenUtils implements ArkDockIOConsts {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		File fSrc = new File("src");
+		File fSrc = new File(".");
 		collectInfo(fSrc, 0);
 		
     System.out.println(fSrc.getAbsolutePath() + " lines total:" + COUNT + ", real: " + COUNT_REAL);
